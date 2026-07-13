@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<title>pwa-mobile-app-shell</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0c10;
+    --surface: #15161c;
+    --surface-2: #1c1d25;
+    --line: #262832;
+    --text: #f2f3f7;
+    --muted: #92939f;
+    --accent: #5b8cff;
+    --accent-soft: rgba(91, 140, 255, 0.16);
+    --danger: #ff6b6b;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #05050a;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .desk {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .device {
+    width: 402px;
+    max-width: 100%;
+    height: 874px;
+    max-height: 92vh;
+    background: #000;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+    position: relative;
+  }
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 44px;
+    overflow: hidden;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+  }
+  .notch {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 26px;
+    background: #000;
+    border-radius: 16px;
+    z-index: 50;
+  }
+
+  .status-bar {
+    padding: calc(var(--safe-top) + 18px) 26px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+  .status-bar svg { display: block; }
+
+  .app-bar {
+    flex-shrink: 0;
+    padding: 6px 18px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(11,12,16,0.7);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  .app-bar .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, #5b8cff, #a06bff);
+    flex-shrink: 0;
+  }
+  .app-bar .title { flex: 1; min-width: 0; }
+  .app-bar .title h1 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
+  .app-bar .title p { margin: 1px 0 0; font-size: 12px; color: var(--muted); }
+  .app-bar .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    border: none; color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 24px;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  .pull-indicator {
+    display: flex;
+    justify-content: center;
+    padding: 14px 0 6px;
+    color: var(--muted);
+    font-size: 12px;
+    gap: 8px;
+    align-items: center;
+  }
+  .spinner {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .install-banner {
+    margin: 10px 18px 0;
+    background: linear-gradient(135deg, rgba(91,140,255,0.16), rgba(160,107,255,0.12));
+    border: 1px solid rgba(91,140,255,0.28);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .install-banner .ic {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .install-banner .copy { flex: 1; min-width: 0; }
+  .install-banner .copy strong { display: block; font-size: 13px; }
+  .install-banner .copy span { font-size: 11.5px; color: var(--muted); }
+  .install-banner button.install {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .install-banner button.dismiss {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    padding: 0 2px;
+    flex-shrink: 0;
+  }
+
+  .offline-banner {
+    margin: 10px 18px 0;
+    background: rgba(255,107,107,0.12);
+    border: 1px solid rgba(255,107,107,0.3);
+    color: #ffb4b4;
+    font-size: 12.5px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    display: none;
+  }
+  .offline-banner.show { display: flex; }
+  .offline-banner .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); flex-shrink: 0; }
+
+  .stories {
+    display: flex;
+    gap: 14px;
+    padding: 16px 18px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stories::-webkit-scrollbar { display: none; }
+  .story {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    width: 64px;
+  }
+  .story .ring {
+    width: 58px; height: 58px; border-radius: 50%;
+    padding: 2.5px;
+    background: linear-gradient(135deg, #5b8cff, #a06bff, #ff9d5b);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .story.seen .ring { background: var(--line); }
+  .story .ring .avatar {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    border: 2.5px solid var(--bg);
+  }
+  .story span { font-size: 11px; color: var(--muted); text-align: center; }
+
+  .section-label {
+    padding: 18px 18px 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .card {
+    margin: 0 18px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .card .card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .card .card-head .av {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff9d5b, #ff6b9d);
+  }
+  .card .card-head .who { flex: 1; min-width: 0; }
+  .card .card-head .who strong { font-size: 13.5px; display: block; }
+  .card .card-head .who span { font-size: 11.5px; color: var(--muted); }
+  .card .media {
+    height: 190px;
+    background: linear-gradient(135deg, #23283a, #171a24 60%);
+    position: relative;
+  }
+  .card .media::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(91,140,255,0.25), transparent 60%);
+  }
+  .card .body { padding: 12px 14px 6px; font-size: 13.5px; line-height: 1.5; color: #d7d8e0; }
+  .card .actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 4px 14px 14px;
+    color: var(--muted);
+  }
+  .card .actions .action {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12.5px;
+    background: none; border: none; color: var(--muted);
+    padding: 4px;
+  }
+  .card .actions .action.liked { color: var(--danger); }
+  .card .actions .spacer { flex: 1; }
+
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 4px 18px 8px;
+  }
+  .quick-grid .tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .quick-grid .tile .ic {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+  }
+  .quick-grid .tile span { font-size: 10.5px; color: var(--muted); text-align: center; }
+
+  .fab {
+    position: absolute;
+    right: 18px;
+    bottom: calc(78px + var(--safe-bottom));
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #a06bff);
+    border: none;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 26px rgba(91,140,255,0.4);
+    z-index: 20;
+  }
+
+  .tab-bar {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 10px 6px calc(10px + var(--safe-bottom));
+    background: rgba(11,12,16,0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--line);
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 10.5px;
+    padding: 4px 10px;
+    flex: 1;
+    position: relative;
+  }
+  .tab.active { color: var(--accent); }
+  .tab .badge {
+    position: absolute;
+    top: -1px; right: 16px;
+    min-width: 14px; height: 14px;
+    border-radius: 7px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 3px;
+  }
+
+  .toast {
+    position: absolute;
+    left: 50%;
+    bottom: calc(96px + var(--safe-bottom));
+    transform: translate(-50%, 12px);
+    background: #23252f;
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 12.5px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+    z-index: 40;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .splash {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    z-index: 100;
+    transition: opacity 0.5s ease;
+  }
+  .splash .mark {
+    width: 76px; height: 76px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, var(--accent), #a06bff);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    font-weight: 800;
+  }
+  .splash p { font-size: 12.5px; color: var(--muted); letter-spacing: 0.04em; }
+  .splash.hidden { opacity: 0; pointer-events: none; }
+
+  .controls {
+    max-width: 402px;
+    margin: 16px auto 0;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .controls button {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+  @media (max-width: 460px) {
+    .device { border-radius: 0; padding: 0; height: 100vh; max-height: 100vh; width: 100vw; }
+    .screen { border-radius: 0; }
+    .notch { display: none; }
+    .desk { padding: 0; }
+    .controls { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="desk">
+    <div class="device">
+      <div class="notch"></div>
+      <div class="screen">
+
+        <div class="splash" id="splash">
+          <div class="mark">P</div>
+          <p>LOADING PULSE&nbsp;&nbsp;•&nbsp;&nbsp;OFFLINE-READY</p>
+        </div>
+
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="icons">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.7" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.7" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.7" fill="currentColor"/><rect x="13.5" y="0" width="3" height="11" rx="0.7" fill="currentColor"/></svg>
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M7.5 2.2c2.4 0 4.6 1 6.2 2.6l-1.4 1.4a6.7 6.7 0 0 0-9.6 0L1.3 4.8A8.7 8.7 0 0 1 7.5 2.2Z" fill="currentColor"/><circle cx="7.5" cy="9" r="1.3" fill="currentColor"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11" fill="none"><rect x="0.5" y="0.5" width="20" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="21.5" y="3.3" width="1.6" height="4.4" rx="0.8" fill="currentColor"/></svg>
+          </div>
+        </div>
+
+        <div class="app-bar">
+          <div class="avatar"></div>
+          <div class="title">
+            <h1>Good evening, Alex</h1>
+            <p>Tuesday · Feed refreshed 2m ago</p>
+          </div>
+          <button class="icon-btn" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-btn" aria-label="Notifications" onclick="showToast('No new notifications')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 14 6 10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+        </div>
+
+        <div class="content" id="content">
+          <div class="pull-indicator" id="pullIndicator" style="display:none;">
+            <div class="spinner"></div> Refreshing…
+          </div>
+
+          <div class="offline-banner" id="offlineBanner">
+            <span class="dot"></span> You're offline — showing cached content
+          </div>
+
+          <div class="install-banner" id="installBanner">
+            <div class="ic">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="copy">
+              <strong>Install Pulse</strong>
+              <span>Add to Home Screen for offline access</span>
+            </div>
+            <button class="install" onclick="installApp()">Install</button>
+            <button class="dismiss" onclick="dismissInstall()">✕</button>
+          </div>
+
+          <div class="stories">
+            <div class="story">
+              <div class="ring"><div class="avatar">＋</div></div>
+              <span>Your story</span>
+            </div>
+            <div class="story"><div class="ring"><div class="avatar">JM</div></div><span>Jamie</span></div>
+            <div class="story"><div class="ring"><div class="avatar">RK</div></div><span>Reiko</span></div>
+            <div class="story seen"><div class="ring"><div class="avatar">TS</div></div><span>Theo</span></div>
+            <div class="story"><div class="ring"><div class="avatar">NL</div></div><span>Nadia</span></div>
+            <div class="story seen"><div class="ring"><div class="avatar">OP</div></div><span>Omar</span></div>
+          </div>
+
+          <div class="section-label">Quick actions</div>
+          <div class="quick-grid">
+            <div class="tile"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span>New post</span></div>
+            <div class="tile"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 8h18" stroke="currentColor" stroke-width="2"/></svg></div><span>Schedule</span></div>
+            <div class="tile"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.3-8.8C1.2 8.6 3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5 19 5 20.8 8.6 19.3 12.2 17 16.5 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><span>Saved</span></div>
+            <div class="tile"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><span>History</span></div>
+          </div>
+
+          <div class="section-label">Latest</div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="av"></div>
+              <div class="who"><strong>Studio North</strong><span>Sponsored · 12m</span></div>
+            </div>
+            <div class="media"></div>
+            <div class="body">Offline-first release notes are live — sync resumes automatically the moment you're back online.</div>
+            <div class="actions">
+              <button class="action liked" onclick="this.classList.toggle('liked')">♥ 482</button>
+              <button class="action">💬 36</button>
+              <button class="action">↗ Share</button>
+              <span class="spacer"></span>
+              <button class="action">⋯</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="av"></div>
+              <div class="who"><strong>Reiko Tanaka</strong><span>48m</span></div>
+            </div>
+            <div class="media"></div>
+            <div class="body">Home-screen install rate up 34% after we shortened the splash sequence. Small tweak, big difference.</div>
+            <div class="actions">
+              <button class="action" onclick="this.classList.toggle('liked')">♥ 118</button>
+              <button class="action">💬 9</button>
+              <button class="action">↗ Share</button>
+              <span class="spacer"></span>
+              <button class="action">⋯</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="fab" aria-label="Compose" onclick="showToast('New post')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        </button>
+
+        <div class="toast" id="toast"></div>
+
+        <nav class="tab-bar">
+          <button class="tab active" onclick="setTab(this)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Home
+          </button>
+          <button class="tab" onclick="setTab(this)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Search
+          </button>
+          <button class="tab" onclick="setTab(this)">
+            <span class="badge">3</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 4V5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Inbox
+          </button>
+          <button class="tab" onclick="setTab(this)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="2"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Profile
+          </button>
+        </nav>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="toggleOffline()">Toggle offline</button>
+    <button onclick="pullToRefresh()">Pull to refresh</button>
+    <button onclick="resetSplash()">Replay splash</button>
+  </div>
+
+  <script>
+    function setTab(el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function dismissInstall() {
+      document.getElementById('installBanner').style.display = 'none';
+    }
+
+    function installApp() {
+      dismissInstall();
+      showToast('Added to Home Screen');
+    }
+
+    function toggleOffline() {
+      document.getElementById('offlineBanner').classList.toggle('show');
+    }
+
+    function pullToRefresh() {
+      const ind = document.getElementById('pullIndicator');
+      const content = document.getElementById('content');
+      ind.style.display = 'flex';
+      content.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => { ind.style.display = 'none'; showToast('Feed updated'); }, 1100);
+    }
+
+    function resetSplash() {
+      const splash = document.getElementById('splash');
+      splash.classList.remove('hidden');
+      setTimeout(() => splash.classList.add('hidden'), 900);
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => document.getElementById('splash').classList.add('hidden'), 900);
+    });
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let startY = 0;
+      const content = document.getElementById('content');
+      content.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+      content.addEventListener('touchmove', e => {
+        if (content.scrollTop === 0 && e.touches[0].clientY - startY > 70) {
+          pullToRefresh();
+        }
+      }, { passive: true });
+    }
+  </script>
+</body>
+</html>
