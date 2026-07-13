@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>matterjs</title>
+<style>
+  :root {
+    --bg: #fbf7f0;
+    --ink: #17181c;
+    --muted: #6b6b73;
+    --accent: #ff5a3c;
+    --accent-2: #2b2be0;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    overflow-x: hidden;
+  }
+  .nav {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 48px;
+  }
+  .logo { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; }
+  .logo span { color: var(--accent); }
+  .nav ul { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; font-size: 14px; color: var(--muted); }
+  .nav a { color: inherit; text-decoration: none; }
+  .nav .cta {
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .hero {
+    position: relative;
+    min-height: 88vh;
+    padding: 40px 48px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero .eyebrow {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 30px 0 16px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 6vw, 64px);
+    line-height: 1.02;
+    margin: 0 0 16px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    max-width: 860px;
+  }
+  .hero p {
+    color: var(--muted);
+    max-width: 480px;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 8px;
+  }
+  .hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  #physics-stage {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    height: 460px;
+    margin-top: 6px;
+  }
+  #physics-stage canvas {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 20px;
+    cursor: grab;
+  }
+  @media (max-width: 720px) {
+    #physics-stage { height: 360px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">bounce<span>lab</span></div>
+    <ul>
+      <li><a href="#">Product</a></li>
+      <li><a href="#">Playground</a></li>
+      <li><a href="#">Pricing</a></li>
+    </ul>
+    <div class="cta">Try it free</div>
+  </nav>
+
+  <section class="hero">
+    <div class="eyebrow">Tactile onboarding</div>
+    <h1>Drag it. Throw it. Watch it settle.</h1>
+    <p>Every card, badge, and label on this page is a real physics body. Grab one and fling it around.</p>
+    <div class="hint">Click and drag any shape below</div>
+    <div id="physics-stage"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+  <script>
+    const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Events, Body, Common } = Matter;
+
+    const stage = document.getElementById("physics-stage");
+    const engine = Engine.create();
+    engine.gravity.y = 0.8;
+
+    const width = stage.clientWidth;
+    const height = stage.clientHeight;
+
+    const render = Render.create({
+      element: stage,
+      engine,
+      options: {
+        width,
+        height,
+        wireframes: false,
+        background: "transparent",
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      },
+    });
+
+    const wallOptions = { isStatic: true, render: { visible: false } };
+    const ground = Bodies.rectangle(width / 2, height + 30, width + 200, 60, wallOptions);
+    const ceiling = Bodies.rectangle(width / 2, -80, width + 200, 60, wallOptions);
+    const leftWall = Bodies.rectangle(-30, height / 2, 60, height + 200, wallOptions);
+    const rightWall = Bodies.rectangle(width + 30, height / 2, 60, height + 200, wallOptions);
+
+    const palette = ["#ff5a3c", "#2b2be0", "#17181c", "#ffb703"];
+    const labels = ["Ship", "Grab", "Bounce", "Physics", "UI", "Drag me"];
+
+    const bodies = [];
+    for (let i = 0; i < 14; i++) {
+      const isCircle = i % 3 === 0;
+      const x = 80 + Math.random() * (width - 160);
+      const y = -Math.random() * 400 - 40;
+      const color = palette[i % palette.length];
+      let body;
+      if (isCircle) {
+        const r = 26 + Math.random() * 16;
+        body = Bodies.circle(x, y, r, {
+          restitution: 0.55,
+          friction: 0.15,
+          render: { fillStyle: color, strokeStyle: "rgba(0,0,0,0.08)", lineWidth: 1 },
+        });
+      } else {
+        const w = 90 + Math.random() * 60;
+        const h = 40 + Math.random() * 16;
+        body = Bodies.rectangle(x, y, w, h, {
+          chamfer: { radius: 12 },
+          restitution: 0.5,
+          friction: 0.2,
+          render: { fillStyle: color },
+        });
+      }
+      Body.setAngle(body, Common.random(-0.5, 0.5));
+      bodies.push(body);
+    }
+
+    Composite.add(engine.world, [ground, ceiling, leftWall, rightWall, ...bodies]);
+
+    const mouse = Mouse.create(render.canvas);
+    mouse.pixelRatio = render.options.pixelRatio;
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse,
+      constraint: { stiffness: 0.2, render: { visible: false } },
+    });
+    Composite.add(engine.world, mouseConstraint);
+    render.mouse = mouse;
+
+    const runner = Runner.create();
+    Runner.run(runner, engine);
+    Render.run(render);
+
+    Events.on(render, "afterRender", () => {
+      const ctx = render.context;
+      ctx.font = "600 13px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillStyle = "rgba(23,24,28,0.85)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      bodies.forEach((b, i) => {
+        if (i % 3 !== 0 && labels[i % labels.length]) {
+          ctx.save();
+          ctx.translate(b.position.x, b.position.y);
+          ctx.rotate(b.angle);
+          ctx.fillText(labels[i % labels.length], 0, 0);
+          ctx.restore();
+        }
+      });
+    });
+
+    function handleResize() {
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+      render.options.width = w;
+      render.options.height = h;
+      render.canvas.width = w * render.options.pixelRatio;
+      render.canvas.height = h * render.options.pixelRatio;
+      Body.setPosition(ground, { x: w / 2, y: h + 30 });
+      Body.setPosition(ceiling, { x: w / 2, y: -80 });
+      Body.setPosition(rightWall, { x: w + 30, y: h / 2 });
+    }
+    window.addEventListener("resize", handleResize);
+  </script>
+</body>
+</html>

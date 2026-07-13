@@ -1,0 +1,217 @@
+<title>solar-duotone-bold</title>
+<script src="https://code.iconify.design/iconify-icon/2/iconify-icon.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #f1f5f9;
+    padding: 48px 24px 80px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin: 0 0 8px;
+  }
+
+  p.lead {
+    text-align: center;
+    color: #8b93a7;
+    margin: 0 0 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  figure { margin: 0; }
+
+  figcaption {
+    text-align: center;
+    color: #8b93a7;
+    font-size: 13px;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+
+  .card {
+    background: #111119;
+    border: 1px solid #212130;
+    border-radius: 18px;
+    padding: 24px;
+    height: 230px;
+  }
+
+  .nav-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #9aa2b7;
+  }
+
+  .nav-item.active {
+    background: rgba(96, 165, 250, 0.14);
+    color: #eaf1ff;
+  }
+
+  .nav-item iconify-icon {
+    font-size: 20px;
+    color: #60a5fa;
+  }
+
+  .nav-item.active iconify-icon {
+    color: #93c5fd;
+  }
+
+  .feature-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    justify-content: center;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(96, 165, 250, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon-badge iconify-icon {
+    font-size: 24px;
+    color: #f0a34e;
+  }
+
+  .icon-badge.blue iconify-icon { color: #60a5fa; }
+  .icon-badge.purple iconify-icon { color: #b083f0; }
+
+  .feature-row h3 {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .feature-row p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #8b93a7;
+  }
+
+  .control-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+
+  .control-row {
+    display: flex;
+    gap: 18px;
+  }
+
+  .control-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: #1a1a26;
+    border: 1px solid #262636;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .control-btn iconify-icon {
+    font-size: 26px;
+    color: #60a5fa;
+  }
+
+  .control-btn.primary {
+    background: rgba(96, 165, 250, 0.16);
+    border-color: rgba(96, 165, 250, 0.4);
+  }
+
+  .control-card p {
+    margin: 0;
+    font-size: 12px;
+    color: #8b93a7;
+  }
+</style>
+
+<h1>Solar Duotone Bold</h1>
+<p class="lead">Cohesive Iconify Solar Duotone Bold icons paired with clear labels</p>
+
+<div class="grid">
+  <figure>
+    <div class="card nav-card">
+      <div class="nav-item active"><iconify-icon icon="solar:home-2-bold-duotone"></iconify-icon> Home</div>
+      <div class="nav-item"><iconify-icon icon="solar:widget-5-bold-duotone"></iconify-icon> Dashboard</div>
+      <div class="nav-item"><iconify-icon icon="solar:chat-round-dots-bold-duotone"></iconify-icon> Messages</div>
+      <div class="nav-item"><iconify-icon icon="solar:settings-bold-duotone"></iconify-icon> Settings</div>
+    </div>
+    <figcaption>Sidebar navigation: consistent icon size, active state brightens both glyph and secondary fill</figcaption>
+  </figure>
+
+  <figure>
+    <div class="card feature-grid">
+      <div class="feature-row">
+        <div class="icon-badge"><iconify-icon icon="solar:bolt-bold-duotone"></iconify-icon></div>
+        <div><h3>Fast Sync</h3><p>Realtime updates across devices</p></div>
+      </div>
+      <div class="feature-row">
+        <div class="icon-badge blue"><iconify-icon icon="solar:shield-check-bold-duotone"></iconify-icon></div>
+        <div><h3>Secure</h3><p>End-to-end encrypted by default</p></div>
+      </div>
+      <div class="feature-row">
+        <div class="icon-badge purple"><iconify-icon icon="solar:magic-stick-3-bold-duotone"></iconify-icon></div>
+        <div><h3>Smart Suggestions</h3><p>Context-aware recommendations</p></div>
+      </div>
+    </div>
+    <figcaption>Feature list: duotone secondary fill supports each glyph, color varies by badge but style family stays consistent</figcaption>
+  </figure>
+
+  <figure>
+    <div class="card control-card">
+      <div class="control-row">
+        <div class="control-btn"><iconify-icon icon="solar:rewind-back-bold-duotone"></iconify-icon></div>
+        <div class="control-btn primary"><iconify-icon icon="solar:play-bold-duotone"></iconify-icon></div>
+        <div class="control-btn"><iconify-icon icon="solar:rewind-forward-bold-duotone"></iconify-icon></div>
+      </div>
+      <p>Transport controls with labeled tooltips, not icon-only</p>
+    </div>
+    <figcaption>Media controls: primary action gets a brighter surface, all icons share stroke weight and duotone opacity</figcaption>
+  </figure>
+</div>

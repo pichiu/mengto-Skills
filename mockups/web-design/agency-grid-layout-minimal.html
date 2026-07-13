@@ -1,0 +1,804 @@
+<title>agency-grid-layout-minimal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #f4f3f1;
+    --bg-alt: #ececea;
+    --surface: #ffffff;
+    --ink: #16161a;
+    --ink-soft: #55555c;
+    --ink-faint: #93938f;
+    --line: rgba(20, 20, 20, 0.1);
+    --line-soft: rgba(20, 20, 20, 0.06);
+    --accent: #b5502e;
+    --radius: 18px;
+    --max: 1400px;
+    --gutter: clamp(20px, 4vw, 64px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Arial, "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+  }
+
+  .shell {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+
+  a { color: inherit; }
+
+  /* ---------- nav ---------- */
+
+  header.site {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 243, 241, 0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  nav.bar {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: center;
+    column-gap: 16px;
+    padding: 22px var(--gutter);
+    max-width: var(--max);
+    margin: 0 auto;
+  }
+
+  .logo {
+    grid-column: 1 / 4;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    grid-column: 5 / 10;
+    display: flex;
+    gap: 34px;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+    transition: color 0.25s ease;
+  }
+
+  .nav-links a:hover { color: var(--ink); }
+
+  .nav-cta {
+    grid-column: 10 / 13;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .menu-toggle {
+    display: none;
+    grid-column: 11 / 13;
+    justify-self: end;
+    background: none;
+    border: none;
+    color: var(--ink);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ---------- buttons ---------- */
+
+  .btn-gradient {
+    display: inline-flex;
+    padding: 1px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, rgba(181, 80, 46, 0.55), rgba(20, 20, 20, 0.35), rgba(181, 80, 46, 0.35));
+    text-decoration: none;
+    transition: transform 0.35s ease;
+  }
+
+  .btn-gradient:hover { transform: translateY(-1px); }
+
+  .btn-gradient span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 4px;
+    transition: border-color 0.3s ease, opacity 0.3s ease;
+  }
+
+  .btn-ghost:hover { border-color: var(--ink); }
+
+  .arrow { transition: transform 0.3s ease; }
+  .btn-gradient:hover .arrow,
+  .btn-ghost:hover .arrow { transform: translateX(3px); }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    padding: clamp(64px, 11vw, 128px) 0 clamp(48px, 8vw, 96px);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    align-items: end;
+  }
+
+  .hero-eyebrow {
+    grid-column: 1 / 13;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+
+  .hero-eyebrow .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  h1.display {
+    grid-column: 1 / 10;
+    margin: 0;
+    font-size: clamp(44px, 8vw, 108px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+
+  h1.display em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+
+  .hero-side {
+    grid-column: 10 / 13;
+    padding-left: 12px;
+    border-left: 1px solid var(--line);
+    align-self: end;
+  }
+
+  .hero-side p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+  }
+
+  .hero-meta {
+    grid-column: 1 / 13;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    margin-top: 48px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .hero-meta .field {
+    grid-column: span 3;
+  }
+
+  .hero-meta .field span.label { display: block; margin-bottom: 8px; }
+  .hero-meta .field p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- image block ---------- */
+
+  .panorama {
+    margin: 12px 0 clamp(64px, 9vw, 120px);
+    border-radius: var(--radius);
+    height: clamp(280px, 44vw, 560px);
+    background:
+      linear-gradient(120deg, rgba(255,255,255,0.05), rgba(0,0,0,0.06) 40%, rgba(255,255,255,0.08) 70%),
+      linear-gradient(200deg, #3d3c3a, #6b6864 35%, #a9a5a0 65%, #cfccc6 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panorama::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(100deg, transparent 0 120px, rgba(255,255,255,0.05) 120px 121px);
+    opacity: 0.6;
+  }
+
+  .panorama .frame-tag {
+    position: absolute;
+    left: 24px;
+    bottom: 20px;
+    color: rgba(255,255,255,0.82);
+  }
+
+  .panorama .frame-tag .label { color: rgba(255,255,255,0.6); }
+  .panorama .frame-tag p { margin: 6px 0 0; font-size: 13px; }
+
+  /* ---------- section heads ---------- */
+
+  section { padding: clamp(48px, 8vw, 96px) 0; }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    align-items: end;
+    margin-bottom: clamp(36px, 6vw, 64px);
+  }
+
+  .section-head .label { grid-column: 1 / 4; align-self: start; padding-top: 6px; }
+
+  .section-head h2 {
+    grid-column: 4 / 11;
+    margin: 0;
+    font-size: clamp(30px, 4.2vw, 52px);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    font-weight: 700;
+  }
+
+  .section-head .count {
+    grid-column: 11 / 13;
+    text-align: right;
+    color: var(--ink-faint);
+    font-size: 13px;
+  }
+
+  /* ---------- service rows ---------- */
+
+  .rows { border-top: 1px solid var(--line); }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    align-items: center;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    color: var(--ink);
+    transition: padding-left 0.35s ease;
+  }
+
+  .row:hover { padding-left: 10px; }
+
+  .row .index {
+    grid-column: 1 / 2;
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+  }
+
+  .row .title {
+    grid-column: 2 / 8;
+    font-size: clamp(20px, 2.6vw, 30px);
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .row .desc {
+    grid-column: 8 / 12;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .row .go {
+    grid-column: 12 / 13;
+    justify-self: end;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .row:hover .go {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+    transform: rotate(45deg);
+  }
+
+  /* ---------- capability grid ---------- */
+
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    row-gap: 40px;
+  }
+
+  .capability {
+    grid-column: span 4;
+    padding-right: 12px;
+  }
+
+  .capability .num { font-size: 12px; color: var(--ink-faint); margin-bottom: 18px; display: block; }
+  .capability h3 { margin: 0 0 12px; font-size: 20px; letter-spacing: -0.01em; }
+  .capability p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- overlay content block ---------- */
+
+  .overlay-block {
+    background: var(--surface);
+    border-radius: 28px;
+    box-shadow: 0 1px 0 var(--line-soft), 0 30px 60px -40px rgba(20, 20, 20, 0.25);
+    margin-top: -40px;
+    position: relative;
+    z-index: 5;
+    padding: clamp(40px, 7vw, 80px) var(--gutter);
+  }
+
+  .overlay-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    align-items: center;
+  }
+
+  .overlay-grid .label { grid-column: 1 / 4; }
+
+  .overlay-grid h2 {
+    grid-column: 4 / 10;
+    margin: 0;
+    font-size: clamp(26px, 3.6vw, 44px);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+  }
+
+  .overlay-grid .cta-wrap {
+    grid-column: 10 / 13;
+    justify-self: end;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    margin-top: clamp(40px, 6vw, 72px);
+    padding-top: 32px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .stat { grid-column: span 3; }
+  .stat .value { font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; letter-spacing: -0.02em; }
+  .stat .caption { font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+
+  /* ---------- work strip ---------- */
+
+  .work-strip {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+    row-gap: 16px;
+  }
+
+  .work-item { grid-column: span 6; }
+  .work-item .thumb {
+    height: clamp(220px, 24vw, 320px);
+    border-radius: 14px;
+    margin-bottom: 18px;
+  }
+
+  .work-item .thumb.one {
+    background: linear-gradient(160deg, #cfcbc4, #a19d96 55%, #78746e);
+  }
+  .work-item .thumb.two {
+    background: linear-gradient(160deg, #e4e1da, #b9b4ac 55%, #8c877e);
+  }
+
+  .work-item .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .work-item h4 { margin: 0; font-size: 18px; letter-spacing: -0.01em; }
+  .work-item span.tag { font-size: 12px; color: var(--ink-faint); }
+
+  /* ---------- footer ---------- */
+
+  footer.site {
+    border-top: 1px solid var(--line);
+    padding: clamp(48px, 8vw, 90px) 0 40px;
+    margin-top: clamp(48px, 8vw, 96px);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 16px;
+  }
+
+  .footer-cta { grid-column: 1 / 8; }
+  .footer-cta h2 {
+    margin: 14px 0 30px;
+    font-size: clamp(28px, 4.4vw, 56px);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .footer-cols {
+    grid-column: 9 / 13;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 16px;
+  }
+
+  .footer-cols h5 {
+    margin: 0 0 16px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+
+  .footer-cols ul { list-style: none; margin: 0; padding: 0; }
+  .footer-cols li { margin-bottom: 10px; }
+  .footer-cols a { text-decoration: none; font-size: 14px; color: var(--ink-soft); transition: color 0.25s ease; }
+  .footer-cols a:hover { color: var(--ink); }
+
+  .footer-base {
+    grid-column: 1 / 13;
+    margin-top: clamp(48px, 7vw, 84px);
+    padding-top: 22px;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-faint);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* ---------- reveal motion ---------- */
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ---------- responsive ---------- */
+
+  @media (max-width: 980px) {
+    .nav-links { display: none; }
+    .menu-toggle { display: block; }
+    .nav-cta { grid-column: 1 / 11; }
+    .logo { grid-column: 1 / 8; }
+
+    h1.display { grid-column: 1 / 13; }
+    .hero-side {
+      grid-column: 1 / 13;
+      border-left: none;
+      padding-left: 0;
+      margin-top: 28px;
+    }
+    .hero-meta .field { grid-column: span 6; margin-bottom: 18px; }
+
+    .section-head .label { grid-column: 1 / 13; margin-bottom: 12px; }
+    .section-head h2 { grid-column: 1 / 12; }
+    .section-head .count { display: none; }
+
+    .row .desc { display: none; }
+    .row .title { grid-column: 2 / 11; }
+
+    .capability { grid-column: span 6; }
+
+    .overlay-grid .label { grid-column: 1 / 13; margin-bottom: 14px; }
+    .overlay-grid h2 { grid-column: 1 / 13; margin-bottom: 26px; }
+    .overlay-grid .cta-wrap { grid-column: 1 / 13; justify-self: start; }
+    .stat { grid-column: span 6; margin-bottom: 20px; }
+
+    .work-item { grid-column: span 12; }
+
+    .footer-cta { grid-column: 1 / 13; }
+    .footer-cols { grid-column: 1 / 13; margin-top: 36px; }
+  }
+
+  @media (max-width: 560px) {
+    nav.bar { padding-top: 18px; padding-bottom: 18px; }
+    .row .index { display: none; }
+    .row .title { grid-column: 1 / 10; }
+    .capability { grid-column: span 12; }
+    .footer-cols { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+
+<header class="site">
+  <nav class="bar">
+    <a class="logo" href="#top">Novant<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#studio">Studio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn-gradient" href="#contact">
+        <span>Start a project <span class="arrow">&rarr;</span></span>
+      </a>
+    </div>
+    <button class="menu-toggle" aria-label="Open menu">Menu</button>
+  </nav>
+</header>
+
+<main id="top">
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-eyebrow">
+          <span class="dot"></span>
+          <span class="label">Architecture &middot; Strategy &middot; Studio No. 04</span>
+        </div>
+        <h1 class="display reveal">Structure is<br>the <em>quiet</em> form<br>of ambition.</h1>
+        <div class="hero-side">
+          <p>Novant is a design and architecture studio building spatial systems for cultural, civic, and commercial clients across three continents.</p>
+          <a class="btn-ghost" href="#work">View selected work <span class="arrow">&rarr;</span></a>
+        </div>
+        <div class="hero-meta">
+          <div class="field">
+            <span class="label">Founded</span>
+            <p>2011, Lisbon</p>
+          </div>
+          <div class="field">
+            <span class="label">Focus</span>
+            <p>Architecture, interiors, identity</p>
+          </div>
+          <div class="field">
+            <span class="label">Active projects</span>
+            <p>19 across 11 cities</p>
+          </div>
+          <div class="field">
+            <span class="label">Next opening</span>
+            <p>Kyoto Pavilion, 2027</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="panorama reveal">
+      <div class="frame-tag">
+        <span class="label">Fig. 01 &mdash; Facade study</span>
+        <p>Meridian House, concrete and glass elevation</p>
+      </div>
+    </div>
+
+    <section id="services">
+      <div class="section-head">
+        <span class="label">01 &mdash; Services</span>
+        <h2 class="reveal">What we practice, precisely.</h2>
+        <span class="count">04 disciplines</span>
+      </div>
+      <div class="rows">
+        <a class="row" href="#">
+          <span class="index">01</span>
+          <span class="title">Architecture <span class="label">Ground-up</span></span>
+          <span class="desc">Full-scope building design from site analysis through construction documentation.</span>
+          <span class="go">&#8599;</span>
+        </a>
+        <a class="row" href="#">
+          <span class="index">02</span>
+          <span class="title">Interiors <span class="label">Spatial</span></span>
+          <span class="desc">Material, light, and volume studies tailored to how a space is actually lived in.</span>
+          <span class="go">&#8599;</span>
+        </a>
+        <a class="row" href="#">
+          <span class="index">03</span>
+          <span class="title">Strategy <span class="label">Advisory</span></span>
+          <span class="desc">Master planning and feasibility work for civic and cultural institutions.</span>
+          <span class="go">&#8599;</span>
+        </a>
+        <a class="row" href="#">
+          <span class="index">04</span>
+          <span class="title">Identity <span class="label">Systems</span></span>
+          <span class="desc">Environmental graphics and wayfinding built to match the architecture.</span>
+          <span class="go">&#8599;</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="studio">
+      <div class="section-head">
+        <span class="label">02 &mdash; Capability</span>
+        <h2 class="reveal">A studio built around<br>fewer, larger commitments.</h2>
+        <span class="count">03 pillars</span>
+      </div>
+      <div class="capabilities">
+        <div class="capability">
+          <span class="num">&mdash; A</span>
+          <h3>Site-first thinking</h3>
+          <p>Every commission begins with months of site study before a single line is drawn. Context governs form.</p>
+        </div>
+        <div class="capability">
+          <span class="num">&mdash; B</span>
+          <h3>Material honesty</h3>
+          <p>We work in concrete, timber, and stone left largely as found, avoiding surfaces that pretend to be something else.</p>
+        </div>
+        <div class="capability">
+          <span class="num">&mdash; C</span>
+          <h3>Long-term partnership</h3>
+          <p>Most clients return for a second and third building. We design for institutions, not for single moments.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="shell">
+    <div class="overlay-block reveal">
+      <div class="overlay-grid">
+        <span class="label">03 &mdash; About</span>
+        <h2>Twelve years of restraint, applied at every scale &mdash; from a door handle to a district plan.</h2>
+        <div class="cta-wrap">
+          <a class="btn-gradient" href="#contact"><span>Meet the studio <span class="arrow">&rarr;</span></span></a>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="value">47</div>
+          <div class="caption">Completed buildings</div>
+        </div>
+        <div class="stat">
+          <div class="value">11</div>
+          <div class="caption">Cities of practice</div>
+        </div>
+        <div class="stat">
+          <div class="value">6</div>
+          <div class="caption">Design awards, 2023&ndash;25</div>
+        </div>
+        <div class="stat">
+          <div class="value">28</div>
+          <div class="caption">People across two studios</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <section id="work">
+      <div class="section-head">
+        <span class="label">04 &mdash; Selected work</span>
+        <h2 class="reveal">Recent commissions.</h2>
+        <span class="count">02 of 47</span>
+      </div>
+      <div class="work-strip">
+        <div class="work-item reveal">
+          <div class="thumb one"></div>
+          <div class="meta">
+            <h4>Meridian House</h4>
+            <span class="tag">Residential, 2025</span>
+          </div>
+        </div>
+        <div class="work-item reveal">
+          <div class="thumb two"></div>
+          <div class="meta">
+            <h4>Harbor Archive</h4>
+            <span class="tag">Cultural, 2024</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site" id="contact">
+  <div class="shell">
+    <div class="footer-grid">
+      <div class="footer-cta">
+        <span class="label">05 &mdash; Get in touch</span>
+        <h2>Have a site.<br>Need a structure.</h2>
+        <a class="btn-gradient" href="#top"><span>Start a conversation <span class="arrow">&rarr;</span></span></a>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <h5>Studio</h5>
+          <ul>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#studio">About</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Connect</h5>
+          <ul>
+            <li><a href="#">Journal</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-base">
+        <span>&copy; 2026 Novant Studio. All rights reserved.</span>
+        <span>Lisbon &middot; Kyoto &middot; Austin</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var targets = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    targets.forEach(function (el) { io.observe(el); });
+  } else {
+    targets.forEach(function (el) { el.classList.add('in-view'); });
+  }
+</script>

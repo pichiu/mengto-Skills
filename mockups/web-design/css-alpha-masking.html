@@ -1,0 +1,125 @@
+<title>css-alpha-masking</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0a0a0f;
+    color: #f4f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    padding: clamp(24px, 6vw, 64px) clamp(16px, 5vw, 48px);
+  }
+  h1 { font-size: clamp(22px, 3vw, 28px); margin: 0 0 8px; letter-spacing: -0.01em; }
+  p.lede { margin: 0 0 40px; color: #9a9aa5; max-width: 60ch; font-size: 15px; line-height: 1.5; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+  }
+  figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .box {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    overflow: hidden;
+  }
+
+  .fade-h {
+    width: 100%;
+    height: 90px;
+    background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6, #06b6d4);
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+
+  .fade-v-wrap {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .fade-v {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px;
+    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  }
+  .chip {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .fade-text-wrap { width: 100%; height: 100%; overflow: hidden; }
+  .fade-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #d4d4d9;
+    mask-image: linear-gradient(to bottom, black 60%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent);
+  }
+
+  .marquee-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 28px;
+    white-space: nowrap;
+    animation: scroll 12s linear infinite;
+  }
+  .marquee-track span { font-size: 13px; color: #b6b6c0; }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  figcaption { font-size: 13px; color: #9a9aa5; line-height: 1.5; }
+  code { background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+<body>
+  <h1>CSS Alpha Masking</h1>
+  <p class="lede">Fade edges with <code>mask-image</code> linear gradients — content stays intact, only the alpha channel fades at the edges.</p>
+  <div class="grid">
+    <figure>
+      <div class="box"><div class="fade-h"></div></div>
+      <figcaption>Horizontal fade on a color band: <code>to right, transparent, black 15%, black 85%, transparent</code>.</figcaption>
+    </figure>
+    <figure>
+      <div class="box"><div class="fade-v-wrap"><div class="fade-v">
+        <span class="chip">React</span><span class="chip">Swift</span><span class="chip">Figma</span>
+        <span class="chip">Rust</span><span class="chip">Python</span><span class="chip">Go</span>
+      </div></div></div>
+      <figcaption>Vertical fade on a wrapped chip list, so top and bottom edges dissolve instead of cutting off abruptly.</figcaption>
+    </figure>
+    <figure>
+      <div class="box"><div class="fade-text-wrap"><p class="fade-text">Alpha masks only reveal or hide existing content — the element still needs visible pixels underneath. This paragraph fades to transparent past 60%, hinting there is more to read without a hard clip.</p></div></div>
+      <figcaption>Text fade using a single stop: readable content up top, a soft dissolve near the bottom edge.</figcaption>
+    </figure>
+    <figure>
+      <div class="box"><div class="marquee-wrap"><div class="marquee-track">
+        <span>Design systems</span><span>Motion</span><span>Typography</span><span>Grids</span>
+        <span>Design systems</span><span>Motion</span><span>Typography</span><span>Grids</span>
+      </div></div></div>
+      <figcaption>Scrolling marquee masked on both left and right edges so items fade in and out instead of hard-clipping.</figcaption>
+    </figure>
+  </div>
+</body>

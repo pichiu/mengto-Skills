@@ -1,0 +1,363 @@
+<title>staggered-word-reveal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #f7f5f1;
+    --paper: #ffffff;
+    --ink: #17181a;
+    --muted: #6b6d72;
+    --line: #e4e1da;
+    --accent: #9a3324;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    line-height: 1.5;
+  }
+
+  .label {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 6vw;
+    background: rgba(247, 245, 241, 0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  header .mark {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  main { padding: 0 6vw; }
+
+  section {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 14vh 0;
+  }
+
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 12vh 0;
+  }
+
+  .hero .label { margin-bottom: 28px; }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    line-height: 1.08;
+    margin: 0 0 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  h2 {
+    font-size: clamp(1.7rem, 3.6vw, 2.6rem);
+    line-height: 1.2;
+    margin: 0 0 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .subhead {
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    color: var(--muted);
+    max-width: 620px;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .hero .subhead { max-width: 560px; }
+
+  .quote {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    line-height: 1.4;
+    font-style: italic;
+    border-left: 2px solid var(--accent);
+    padding-left: 28px;
+    margin: 40px 0 0;
+    color: var(--ink);
+  }
+
+  .quote-attr {
+    display: block;
+    margin-top: 18px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    font-style: normal;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  .filler {
+    max-width: 680px;
+    color: var(--muted);
+    font-size: 1.02rem;
+  }
+
+  .filler p { margin: 0 0 20px; }
+
+  .divider {
+    max-width: 880px;
+    margin: 0 auto;
+    border: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .card-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 24px;
+  }
+
+  .card .label { margin-bottom: 12px; }
+
+  .card p {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  footer {
+    padding: 8vh 6vw 10vh;
+    text-align: center;
+  }
+
+  footer .label { margin-bottom: 10px; }
+
+  html.js .word-reveal[data-word-reveal]:not(.is-ready) {
+    opacity: 0;
+  }
+
+  .word-reveal__word {
+    display: inline-block;
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    will-change: opacity, transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js .word-reveal[data-word-reveal]:not(.is-ready),
+    .word-reveal__word {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<header>
+  <div class="mark">Field Notes</div>
+  <div class="label">Issue 04 &mdash; Editorial</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="label">A quarterly on craft</div>
+    <h1 class="word-reveal" data-word-reveal>Build interfaces that feel calm, cinematic, and alive.</h1>
+    <p class="subhead word-reveal" data-word-reveal>Notes on restraint, rhythm, and the discipline of doing less on screen.</p>
+  </section>
+
+  <section class="filler">
+    <p>Every interface makes a first impression before a single word is read. The pace at which elements arrive, the space they're given, and the quiet moments between them all shape whether a product feels considered or careless. This is a study in that pacing &mdash; not through spectacle, but through restraint.</p>
+    <p>We tend to reach for motion to prove effort. But the most convincing interfaces often move the least. What separates a calm product from a busy one is rarely the absence of animation &mdash; it's the discipline of using it only where it earns its place, and only once.</p>
+    <p>Scroll on. Each section ahead uses the same reveal: text held back a beat, then lifted gently into view, word by word, exactly once.</p>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="label">01 &mdash; Principle</div>
+    <h2 class="word-reveal" data-word-reveal>Motion should explain, not decorate.</h2>
+    <p class="subhead word-reveal" data-word-reveal>If an animation doesn't clarify hierarchy or sequence, it's noise wearing a costume.</p>
+  </section>
+
+  <section class="filler">
+    <p>Designers often add motion at the end of a project, treating it as polish rather than structure. But sequencing is structure. The order in which things appear tells a reader what matters first, second, and last &mdash; before they've consciously parsed a single sentence.</p>
+    <p>A word-by-word reveal works because reading is already sequential. The animation isn't inventing a new pattern; it's making the existing one, the one your eyes already follow, slightly more deliberate. That's the difference between motion that helps and motion that performs.</p>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="label">02 &mdash; Timing</div>
+    <h2 class="word-reveal" data-word-reveal>Eighty milliseconds is a heartbeat, not a pause.</h2>
+    <p class="subhead word-reveal" data-word-reveal>Stagger too slow and the reader waits. Too fast and the words blur into a single flash.</p>
+    <blockquote class="quote word-reveal" data-word-reveal>Good pacing is invisible. You only notice it in its absence.<span class="quote-attr">— House style, Field Notes</span></blockquote>
+  </section>
+
+  <section class="filler">
+    <div class="card-row">
+      <div class="card">
+        <div class="label">Duration</div>
+        <p>0.8s per word, eased with an expo curve so motion decelerates softly into rest.</p>
+      </div>
+      <div class="card">
+        <div class="label">Stagger</div>
+        <p>0.07s between words &mdash; fast enough to read as one gesture, slow enough to track.</p>
+      </div>
+      <div class="card">
+        <div class="label">Offset</div>
+        <p>20px of lift. Enough to register as motion, never enough to distract.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="label">03 &mdash; Restraint</div>
+    <h2 class="word-reveal" data-word-reveal>No bounce. No rotation. No blur.</h2>
+    <p class="subhead word-reveal" data-word-reveal>Only opacity and position change. Everything else about the type stays exactly as set.</p>
+  </section>
+
+  <section class="filler">
+    <p>It's tempting to add flourish once the basic reveal works &mdash; a little overshoot, a touch of blur, a slight rotation for character. Each addition asks the reader to notice the animation instead of the words. In editorial work, the words are the point.</p>
+    <p>Constraining the property list to transform and opacity keeps the motion cheap to run and easy to reason about. It also keeps the type legible throughout the transition, which matters more than any single embellishment.</p>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="label">04 &mdash; Once, and only once</div>
+    <h2 class="word-reveal" data-word-reveal>A reveal that repeats stops meaning anything.</h2>
+    <p class="subhead word-reveal" data-word-reveal>Scroll back up and the words stay put. The moment already happened.</p>
+    <blockquote class="quote word-reveal" data-word-reveal>Anticipation only works the first time you don't know what's coming.<span class="quote-attr">— Editor's note</span></blockquote>
+  </section>
+
+  <section class="filler">
+    <p>If a headline replays every time it crosses the viewport, it trades a moment of arrival for a mechanical loop. Locking the trigger to fire once respects the reader's attention: the first pass earns the motion, every pass after gets the finished thought.</p>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="label">05 &mdash; Closing</div>
+    <h2 class="word-reveal" data-word-reveal>Calm interfaces still have a pulse.</h2>
+    <p class="subhead word-reveal" data-word-reveal>Restraint isn't the absence of motion. It's motion that knows exactly when to stop.</p>
+  </section>
+
+  <section class="filler">
+    <p>That's the whole idea behind this reveal: a small, considered gesture, played once, in service of the words themselves. Nothing more is required.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="label">Field Notes &mdash; Issue 04</div>
+  <p class="subhead">Set in a calm hand, for readers who scroll slowly.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script>
+  document.documentElement.classList.add("js");
+
+  function splitWordReveal(element) {
+    if (element.dataset.wordRevealReady === "true") return;
+
+    const text = element.textContent || "";
+    const parts = text.split(/(\s+)/);
+    let wordIndex = 0;
+
+    element.textContent = "";
+    element.setAttribute("aria-label", text.trim());
+
+    parts.forEach((part) => {
+      if (!part.trim()) {
+        element.appendChild(document.createTextNode(part));
+        return;
+      }
+
+      const word = document.createElement("span");
+      word.className = "word-reveal__word";
+      word.setAttribute("aria-hidden", "true");
+      word.style.setProperty("--word-index", wordIndex);
+      word.textContent = part;
+
+      element.appendChild(word);
+      wordIndex += 1;
+    });
+
+    element.dataset.wordRevealReady = "true";
+    element.classList.add("is-ready");
+  }
+
+  function initWordReveals(selector = "[data-word-reveal]") {
+    const elements = Array.from(document.querySelectorAll(selector));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    elements.forEach((element) => splitWordReveal(element));
+
+    if (reduceMotion || typeof gsap === "undefined") {
+      elements.forEach((element) => {
+        element.classList.add("is-ready", "is-visible");
+        element.querySelectorAll(".word-reveal__word").forEach((word) => {
+          word.style.opacity = "1";
+          word.style.transform = "none";
+        });
+      });
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    elements.forEach((element) => {
+      element.classList.add("is-visible");
+      const words = element.querySelectorAll(".word-reveal__word");
+
+      gsap.fromTo(
+        words,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "expo.out",
+          stagger: 0.07,
+          scrollTrigger: {
+            trigger: element,
+            start: "top 85%",
+            once: true,
+          },
+        }
+      );
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initWordReveals();
+  });
+</script>

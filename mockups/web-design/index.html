@@ -1,0 +1,147 @@
+<title>web-design skill mockups</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0d;
+    --panel: #131318;
+    --line: #232330;
+    --text: #e9e9ef;
+    --muted: #8b8b9a;
+    --accent: #7d8bff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    padding: clamp(24px, 5vw, 72px);
+  }
+  header {
+    max-width: 960px;
+    margin: 0 auto 48px;
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 640px;
+  }
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  section {
+    margin-bottom: 56px;
+  }
+  section h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  section h2 span {
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    margin-left: 8px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  a.card {
+    display: block;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  a.card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  a.card .name {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
+  a.card .path {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+  }
+  footer {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+</style>
+
+<header>
+  <h1>web-design skill mockups</h1>
+  <p>62 self-contained HTML mockups, one per skill in <code>agent-skills/web-design/</code>, grouped by the five categories from <code>.trace/SKILL_CATALOG_part2.md</code>. Each file is standalone — open directly in a browser.</p>
+</header>
+
+<main>
+  <section>
+    <h2>完整視覺風格系統 <span>31</span></h2>
+    <div class="grid" id="g1"></div>
+  </section>
+  <section>
+    <h2>CSS 微觀技巧 / 裝飾細節 <span>12</span></h2>
+    <div class="grid" id="g2"></div>
+  </section>
+  <section>
+    <h2>動效 / 滾動敘事 <span>8</span></h2>
+    <div class="grid" id="g3"></div>
+  </section>
+  <section>
+    <h2>WebGL / 3D / 物理函式庫 <span>8</span></h2>
+    <div class="grid" id="g4"></div>
+  </section>
+  <section>
+    <h2>版面系統 / 轉換導向文案 <span>3</span></h2>
+    <div class="grid" id="g5"></div>
+  </section>
+</main>
+
+<footer>Generated mockups — agent-skills/web-design/*/SKILL.md</footer>
+
+<script>
+  const groups = {
+    g1: ["agency-grid-layout-minimal","atmosphere-background","background-grid-webgl","blue-cloudy-clean-modern","blue-laser-clean-glass-layout","book-serif-index","bright-green-tech-system-webgl","clean-minimal-beige-light-mode","corner-lasers","dark-blue-contrasting-clean","dark-glass-clean-layout","dither-background","dither-laser-dark-mode","editorial-tech","framed-grid-layout","framed-tech-dark-border-gradient","funky-purple-container-tech","glass-dark-mode-clock","gooey-blob-system","high-contrast-skeuomorphic-clean","image-first-grid-layout","light-mode-paper-technical","mesh-gradient-dark-blue-clean","nested-container-clean-agency","nested-container-frames","orange-clean-paper-saas","split-layout-technical","tech-green-dark-mode-modern","technical-wireframe-info-layout","webgl-3d-object","webgl-laser"],
+    g2: ["beautiful-shadows","company-logos","container-lines","corner-diagonals","css-alpha-masking","css-border-gradient","glass-dark-ui","marquee-loop","number-details","progressive-blur","skeuomorphic-ui","solar-duotone-bold"],
+    g3: ["animation-on-scroll","animation-systems","cinematic-gsap-lenis-motion-system","cinematic-scroll-storytelling","gsap-scrolltrigger-storytelling","gsap","masked-reveal","staggered-word-reveal"],
+    g4: ["cobejs","globe-gl","globe-particles","matterjs","threejs","unicorn-studio","vantajs","webgl-landing-steering"],
+    g5: ["landing-page","pricing-page","tailwindcss"],
+  };
+
+  for (const [id, names] of Object.entries(groups)) {
+    const el = document.getElementById(id);
+    el.innerHTML = names.map(n => `
+      <a class="card" href="./${n}.html">
+        <span class="name">${n}</span>
+        <span class="path">${n}.html</span>
+      </a>
+    `).join("");
+  }
+</script>

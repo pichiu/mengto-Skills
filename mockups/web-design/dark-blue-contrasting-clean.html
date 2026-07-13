@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dark-blue-contrasting-clean</title>
+<style>
+  :root {
+    --navy: #05070f;
+    --navy-2: #090c1a;
+    --cobalt: #2452ff;
+    --cobalt-2: #123099;
+    --pale: #aebbe8;
+    --white: #f6f8ff;
+    --line: rgba(255,255,255,0.09);
+    --line-strong: rgba(255,255,255,0.22);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: var(--navy);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+  }
+
+  body {
+    background-image:
+      radial-gradient(1200px 600px at 15% -10%, rgba(36,82,255,0.16), transparent 60%),
+      radial-gradient(900px 500px at 100% 20%, rgba(36,82,255,0.10), transparent 60%);
+  }
+
+  .shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+
+  .corner {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--line-strong);
+  }
+  .corner.tl { top: -1px; left: -1px; }
+  .corner.tr { top: -1px; right: -1px; }
+  .corner.bl { bottom: -1px; left: -1px; }
+  .corner.br { bottom: -1px; right: -1px; }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand { font-weight: 600; letter-spacing: 0.02em; font-size: 15px; }
+
+  .links { display: flex; gap: 30px; font-size: 13px; color: var(--pale); }
+  .links a { color: var(--pale); text-decoration: none; }
+  .links a:hover { color: var(--white); }
+
+  .cta-nav {
+    padding: 9px 18px;
+    background: var(--cobalt);
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .util-line {
+    padding: 10px 40px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--pale);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .util-line .live {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cobalt);
+    box-shadow: 0 0 8px var(--cobalt);
+  }
+
+  header.hero {
+    padding: 90px 40px 70px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pale); margin-bottom: 20px; }
+
+  h1 {
+    font-weight: 300;
+    font-size: clamp(36px, 6vw, 68px);
+    line-height: 1.06;
+    margin: 0 0 24px;
+    max-width: 780px;
+    letter-spacing: -0.01em;
+  }
+
+  header.hero p {
+    max-width: 500px;
+    color: var(--pale);
+    font-size: 15.5px;
+    line-height: 1.7;
+    margin: 0 0 32px;
+  }
+
+  .hero-actions { display: flex; gap: 14px; }
+
+  .btn-primary {
+    background: var(--cobalt);
+    color: var(--white);
+    padding: 13px 26px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .btn-ghost {
+    padding: 13px 26px;
+    border: 1px solid rgba(36,82,255,0.4);
+    border-radius: 8px;
+    color: var(--pale);
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .feature-band {
+    margin: 60px 40px;
+    padding: 2px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(36,82,255,0.9), rgba(36,82,255,0.05));
+  }
+
+  .feature-inner {
+    border-radius: 18px;
+    background: linear-gradient(160deg, var(--cobalt-2), #060a1c 70%);
+    padding: 56px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .feature-inner h2 {
+    font-size: 32px;
+    font-weight: 400;
+    margin: 0 0 16px;
+  }
+
+  .feature-inner p {
+    color: var(--pale);
+    font-size: 14.5px;
+    line-height: 1.7;
+    margin: 0 0 26px;
+    max-width: 420px;
+  }
+
+  .feature-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .feature-card .metric {
+    font-size: 34px;
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+  .feature-card .label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--pale);
+  }
+
+  section.index {
+    padding: 80px 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .section-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 44px; gap: 20px; flex-wrap: wrap; }
+  .section-head h2 { font-size: 26px; font-weight: 400; margin: 0; }
+  .section-head p { color: var(--pale); font-size: 13.5px; margin: 0; max-width: 380px; }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .col {
+    background: var(--navy-2);
+    padding: 28px;
+  }
+
+  .col .num { font-size: 11px; color: var(--pale); letter-spacing: 0.08em; display: block; margin-bottom: 14px; }
+  .col h3 { font-size: 16px; font-weight: 600; margin: 0 0 10px; }
+  .col p { color: var(--pale); font-size: 13px; line-height: 1.6; margin: 0; }
+
+  .link-index {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 40px;
+    padding: 80px 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .link-index a {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--white);
+    text-decoration: none;
+    font-size: 14.5px;
+  }
+  .link-index a span { color: var(--pale); font-size: 12px; }
+  .link-index a:hover { color: var(--cobalt); }
+
+  footer {
+    padding: 34px 40px 50px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--pale);
+  }
+
+  @media (max-width: 860px) {
+    .feature-inner { grid-template-columns: 1fr; }
+    .cols { grid-template-columns: 1fr; }
+    .link-index { grid-template-columns: 1fr; }
+    .links { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+
+  <nav>
+    <div class="brand">COBALT / OS</div>
+    <div class="links">
+      <a href="#">Platform</a>
+      <a href="#">Network</a>
+      <a href="#">Pricing</a>
+      <a href="#">Docs</a>
+    </div>
+    <a class="cta-nav" href="#">Request access</a>
+  </nav>
+
+  <div class="util-line"><span class="live"></span> System status — all nodes operational</div>
+
+  <header class="hero">
+    <div class="eyebrow">02 / INFRASTRUCTURE</div>
+    <h1>A dark, precise foundation for teams that ship at scale.</h1>
+    <p>Engineered surfaces, cobalt focal points, and a framed structure that keeps every screen legible under pressure.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#">Start building</a>
+      <a class="btn-ghost" href="#">View architecture</a>
+    </div>
+  </header>
+
+  <div class="feature-band">
+    <div class="feature-inner">
+      <div>
+        <div class="eyebrow" style="color:var(--pale)">FEATURE / 03</div>
+        <h2>One control plane, zero blind spots.</h2>
+        <p>Route, observe, and roll back every deployment from a single cobalt command surface built for engineering teams.</p>
+        <a class="btn-primary" href="#">See it live</a>
+      </div>
+      <div class="feature-card">
+        <div class="metric">99.98%</div>
+        <div class="label">Uptime, trailing 90 days</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="index">
+    <div class="section-head">
+      <h2>Built for critical paths</h2>
+      <p>Three pillars keep the system disciplined under contrast and load.</p>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <span class="num">01</span>
+        <h3>Framed rails</h3>
+        <p>Vertical boundary lines and corner markers hold every view to the same architectural grid.</p>
+      </div>
+      <div class="col">
+        <span class="num">02</span>
+        <h3>Cobalt focal blocks</h3>
+        <p>Contrast moments use gradient wrappers so the eye lands exactly where it should.</p>
+      </div>
+      <div class="col">
+        <span class="num">03</span>
+        <h3>Quiet glow</h3>
+        <p>Blue bloom stays localized to indicators and hover states, never flooding the page.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="link-index">
+    <a href="#">Platform overview <span>01</span></a>
+    <a href="#">Deployment network <span>02</span></a>
+    <a href="#">Security posture <span>03</span></a>
+    <a href="#">API reference <span>04</span></a>
+    <a href="#">Status history <span>05</span></a>
+    <a href="#">Enterprise plans <span>06</span></a>
+  </div>
+
+  <footer>
+    <span>© 2026 Cobalt OS</span>
+    <span>Built on framed-shell v4</span>
+  </footer>
+</div>
+</body>
+</html>

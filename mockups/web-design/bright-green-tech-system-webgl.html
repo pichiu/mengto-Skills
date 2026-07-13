@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>bright-green-tech-system-webgl</title>
+<style>
+  :root{
+    --bg: #08090a;
+    --bg-raised: #0e100f;
+    --line: rgba(255,255,255,0.10);
+    --line-strong: rgba(255,255,255,0.18);
+    --text: #e7ece7;
+    --text-dim: #8b948c;
+    --text-faint: #565f58;
+    --acid: #a6ff00;
+    --acid-dim: #7CFF3C;
+    --acid-glow: rgba(166,255,0,0.35);
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .mono{
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    letter-spacing: 0.04em;
+  }
+
+  ::selection{ background: var(--acid); color:#000; }
+
+  .shell{
+    position: relative;
+    margin: 14px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg);
+    min-height: calc(100vh - 28px);
+  }
+
+  .bracket{
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+  .bracket::before, .bracket::after{
+    content: "";
+    position: absolute;
+    background: var(--acid);
+  }
+  .bracket-tl{ top:-1px; left:-1px; }
+  .bracket-tl::before{ width:12px; height:2px; top:0; left:0; }
+  .bracket-tl::after{ width:2px; height:12px; top:0; left:0; }
+
+  .bracket-tr{ top:-1px; right:-1px; }
+  .bracket-tr::before{ width:12px; height:2px; top:0; right:0; }
+  .bracket-tr::after{ width:2px; height:12px; top:0; right:0; }
+
+  .bracket-bl{ bottom:-1px; left:-1px; }
+  .bracket-bl::before{ width:12px; height:2px; bottom:0; left:0; }
+  .bracket-bl::after{ width:2px; height:12px; bottom:0; left:0; }
+
+  .bracket-br{ bottom:-1px; right:-1px; }
+  .bracket-br::before{ width:12px; height:2px; bottom:0; right:0; }
+  .bracket-br::after{ width:2px; height:12px; bottom:0; right:0; }
+
+  header.topnav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--line);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+  .brand .dot{
+    width:8px; height:8px;
+    background: var(--acid);
+    box-shadow: 0 0 8px 2px var(--acid-glow);
+    display:inline-block;
+  }
+  .brand b{ color:var(--text); font-weight:600; }
+  .brand span{ color: var(--text-faint); }
+
+  nav.navlinks{
+    display:flex;
+    gap: 26px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  nav.navlinks a{
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 3px;
+  }
+  nav.navlinks a.active{ color: var(--acid); }
+  nav.navlinks a.active::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:1px;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid-glow);
+  }
+
+  .navmeta{
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    display:flex;
+    gap: 18px;
+  }
+
+  main.hero{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-left{
+    padding: 56px 44px 56px 44px;
+    border-right: 1px solid var(--line);
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    position: relative;
+  }
+
+  .eyebrow{
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--acid);
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:6px; height:6px;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid-glow);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.25; }
+  }
+
+  h1{
+    font-size: clamp(34px, 4.4vw, 56px);
+    line-height: 1.04;
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    max-width: 620px;
+    animation: fadeUp 0.7s ease both;
+  }
+  h1 .accent{ color: var(--acid); }
+
+  p.lede{
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.65;
+    max-width: 480px;
+    margin: 0;
+    animation: fadeUp 0.8s ease both;
+    animation-delay: 0.08s;
+  }
+
+  @keyframes fadeUp{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .process{
+    display:flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--line);
+    max-width: 480px;
+    animation: fadeUp 0.9s ease both;
+    animation-delay: 0.16s;
+  }
+  .process .row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 11px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text-faint);
+  }
+  .process .row:last-child{ border-bottom: none; }
+  .process .row .step{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .process .row .num{
+    color: var(--text-faint);
+  }
+  .process .row.active{
+    color: var(--text);
+  }
+  .process .row.active .num{ color: var(--acid); }
+  .process .row.active .status{ color: var(--acid); }
+  .process .row .status{ color: var(--text-faint); }
+  .process .row.done .status{ color: var(--text-dim); }
+  .process .row.active .step::before{
+    content:"";
+    width:5px; height:5px;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid-glow);
+    border-radius: 50%;
+    flex-shrink:0;
+  }
+  .process .row:not(.active) .step::before{
+    content:"";
+    width:5px; height:5px;
+    background: var(--text-faint);
+    border-radius: 50%;
+    flex-shrink:0;
+  }
+
+  .cta-row{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    animation: fadeUp 1s ease both;
+    animation-delay: 0.22s;
+  }
+  .btn{
+    border: 1px solid var(--acid);
+    color: #06110a;
+    background: var(--acid);
+    padding: 13px 26px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    font-weight: 700;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .btn:hover{
+    box-shadow: 0 0 22px var(--acid-glow);
+    transform: translateY(-1px);
+  }
+  .btn.ghost{
+    background: transparent;
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+  .btn.ghost:hover{ box-shadow: none; border-color: var(--acid); color: var(--acid); }
+
+  .hero-right{
+    position: relative;
+    min-height: 560px;
+    background: radial-gradient(circle at 60% 40%, rgba(166,255,0,0.06), transparent 60%);
+    overflow: hidden;
+  }
+  #webgl-canvas{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .fallback-glow{
+    position: absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+  }
+  .fallback-glow .core{
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--acid) 0%, rgba(166,255,0,0.25) 40%, transparent 70%);
+    filter: blur(6px);
+    animation: glowpulse 3.6s ease-in-out infinite;
+  }
+  @keyframes glowpulse{
+    0%,100%{ transform: scale(0.92); opacity: 0.75; }
+    50%{ transform: scale(1.08); opacity: 1; }
+  }
+  .viewport-frame{
+    position:absolute;
+    inset: 18px;
+    border: 1px solid var(--line);
+    pointer-events: none;
+  }
+  .viewport-hud{
+    position:absolute;
+    top: 30px; left: 30px;
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    display:flex;
+    flex-direction: column;
+    gap: 4px;
+    pointer-events: none;
+  }
+  .viewport-hud .h-live{
+    color: var(--acid);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .viewport-hud .h-live::before{
+    content:"";
+    width:6px; height:6px;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid-glow);
+  }
+  .viewport-readout{
+    position:absolute;
+    bottom: 30px; right: 30px;
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    text-align: right;
+    pointer-events: none;
+  }
+  .viewport-readout .val{ color: var(--acid); }
+
+  section.modules{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .module{
+    padding: 26px 26px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    display:flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 150px;
+  }
+  .module:last-child{ border-right: none; }
+  .module .m-head{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .module .m-head .tag{
+    color: var(--acid);
+  }
+  .module .m-value{
+    font-size: 26px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  .module .m-value .unit{
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  .progress-rail{
+    height: 3px;
+    width: 100%;
+    background: var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-rail .fill{
+    position: absolute;
+    top:0; left:0; bottom:0;
+    background: var(--acid);
+    box-shadow: 0 0 8px var(--acid-glow);
+  }
+  .module .m-foot{
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+
+  footer.footbar{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  footer.footbar .foot-links{
+    display:flex;
+    gap: 22px;
+  }
+  footer.footbar a{ color: var(--text-faint); text-decoration:none; }
+  footer.footbar a:hover{ color: var(--acid); }
+  footer.footbar .foot-status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color: var(--acid-dim);
+  }
+  footer.footbar .foot-status::before{
+    content:"";
+    width:6px; height:6px;
+    background: var(--acid);
+    box-shadow: 0 0 6px var(--acid-glow);
+  }
+
+  @media (max-width: 900px){
+    main.hero{ grid-template-columns: 1fr; }
+    .hero-left{ border-right:none; border-bottom:1px solid var(--line); padding: 40px 24px; }
+    .hero-right{ min-height: 420px; }
+    section.modules{ grid-template-columns: repeat(2, 1fr); }
+    .module:nth-child(2){ border-right:none; }
+    .module:nth-child(4){ border-right:none; }
+    nav.navlinks{ display:none; }
+  }
+
+  @media (max-width: 560px){
+    .shell{ margin: 8px; min-height: calc(100vh - 16px); }
+    header.topnav{ padding: 14px 16px; }
+    .navmeta{ display:none; }
+    .hero-left{ padding: 32px 18px; gap: 22px; }
+    h1{ font-size: 30px; }
+    .process{ max-width: 100%; }
+    section.modules{ grid-template-columns: 1fr; }
+    .module{ border-right: none !important; }
+    .hero-right{ min-height: 320px; }
+    footer.footbar{ flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <span class="bracket bracket-tl"></span>
+  <span class="bracket bracket-tr"></span>
+  <span class="bracket bracket-bl"></span>
+  <span class="bracket bracket-br"></span>
+
+  <header class="topnav">
+    <div class="brand mono">
+      <span class="dot"></span>
+      <b>SYNTH.ENGINE</b>
+      <span>/ V4.02</span>
+    </div>
+    <nav class="navlinks mono">
+      <a href="#" class="active">Overview</a>
+      <a href="#">Pipeline</a>
+      <a href="#">Runtime</a>
+      <a href="#">Docs</a>
+    </nav>
+    <div class="navmeta mono">
+      <span>NODE 04A-7</span>
+      <span>LAT 12MS</span>
+      <span>UTC 09:41:02</span>
+    </div>
+  </header>
+
+  <main class="hero">
+    <div class="hero-left">
+      <div class="eyebrow mono">Compilation Layer — Active</div>
+      <h1>Build systems that <span class="accent">render</span> themselves in real time.</h1>
+      <p class="lede">A synthesis runtime for generative interfaces. Compose geometry, signal, and layout in one pass, then watch the viewport resolve it live — no pre-bake, no static frames.</p>
+
+      <div class="process mono">
+        <div class="row done">
+          <div class="step">01 — INGEST SCHEMA</div>
+          <div class="status">COMPLETE</div>
+        </div>
+        <div class="row done">
+          <div class="step">02 — RESOLVE DEPENDENCIES</div>
+          <div class="status">COMPLETE</div>
+        </div>
+        <div class="row active">
+          <div class="step">03 — SYNTHESIZE GEOMETRY</div>
+          <div class="status">RUNNING · 64%</div>
+        </div>
+        <div class="row">
+          <div class="step">04 — BAKE RUNTIME SHADERS</div>
+          <div class="status">QUEUED</div>
+        </div>
+        <div class="row">
+          <div class="step">05 — DEPLOY TO EDGE</div>
+          <div class="status">QUEUED</div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn">Launch Console</button>
+        <button class="btn ghost">Read Spec →</button>
+      </div>
+    </div>
+
+    <div class="hero-right" id="viewport">
+      <canvas id="webgl-canvas"></canvas>
+      <div class="fallback-glow" id="fallback-glow"><div class="core"></div></div>
+      <div class="viewport-frame"></div>
+      <div class="viewport-hud mono">
+        <div class="h-live">RENDER LIVE</div>
+        <div>PARTICLES · 2400</div>
+        <div>MODE · ORBITAL FIELD</div>
+      </div>
+      <div class="viewport-readout mono">
+        <div>FPS <span class="val" id="fps-readout">60</span></div>
+        <div>DRAW CALLS <span class="val">3</span></div>
+      </div>
+    </div>
+  </main>
+
+  <section class="modules">
+    <div class="module">
+      <div class="m-head mono"><span>Compute Load</span><span class="tag">ACTIVE</span></div>
+      <div class="m-value">72<span class="unit">%</span></div>
+      <div class="progress-rail"><div class="fill" style="width:72%;"></div></div>
+      <div class="m-foot mono">8 cores allocated</div>
+    </div>
+    <div class="module">
+      <div class="m-head mono"><span>Shader Cache</span><span class="tag">OK</span></div>
+      <div class="m-value">1.8<span class="unit">GB</span></div>
+      <div class="progress-rail"><div class="fill" style="width:41%;"></div></div>
+      <div class="m-foot mono">41% of budget used</div>
+    </div>
+    <div class="module">
+      <div class="m-head mono"><span>Signal Integrity</span><span class="tag">STABLE</span></div>
+      <div class="m-value">99.2<span class="unit">%</span></div>
+      <div class="progress-rail"><div class="fill" style="width:99%;"></div></div>
+      <div class="m-foot mono">0 dropped frames / hr</div>
+    </div>
+    <div class="module">
+      <div class="m-head mono"><span>Edge Sync</span><span class="tag">SYNCING</span></div>
+      <div class="m-value">03<span class="unit">nodes</span></div>
+      <div class="progress-rail"><div class="fill" style="width:58%;"></div></div>
+      <div class="m-foot mono">ETA 00:04:12</div>
+    </div>
+  </section>
+
+  <footer class="footbar mono">
+    <div>© 2026 SYNTH.ENGINE — BUILD 4.02.11</div>
+    <div class="foot-links">
+      <a href="#">Status</a>
+      <a href="#">Changelog</a>
+      <a href="#">API</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="foot-status">RUNTIME OPERATIONAL</div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var viewport = document.getElementById('viewport');
+  var fallback = document.getElementById('fallback-glow');
+  var canvas = document.getElementById('webgl-canvas');
+  var fpsReadout = document.getElementById('fps-readout');
+
+  function showFallback(){
+    canvas.style.display = 'none';
+    fallback.style.display = 'flex';
+  }
+
+  if (typeof THREE === 'undefined') {
+    showFallback();
+    return;
+  }
+
+  try {
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    var scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x08090a, 0.06);
+
+    var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 0, 9);
+
+    var acid = new THREE.Color(0xa6ff00);
+
+    var particleCount = 2400;
+    var positions = new Float32Array(particleCount * 3);
+    var radii = new Float32Array(particleCount);
+
+    for (var i = 0; i < particleCount; i++) {
+      var r = 3.2 + Math.random() * 2.4;
+      var theta = Math.random() * Math.PI * 2;
+      var phi = Math.acos((Math.random() * 2) - 1);
+      var x = r * Math.sin(phi) * Math.cos(theta);
+      var y = r * Math.sin(phi) * Math.sin(theta);
+      var z = r * Math.cos(phi);
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+      radii[i] = r;
+    }
+
+    var geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    var material = new THREE.PointsMaterial({
+      color: acid,
+      size: 0.035,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    var points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    var ringGeo = new THREE.TorusGeometry(3.6, 0.008, 8, 128);
+    var ringMat = new THREE.MeshBasicMaterial({ color: acid, transparent: true, opacity: 0.28 });
+    var ring1 = new THREE.Mesh(ringGeo, ringMat);
+    ring1.rotation.x = Math.PI / 2.4;
+    scene.add(ring1);
+
+    var ring2 = new THREE.Mesh(ringGeo.clone(), ringMat.clone());
+    ring2.scale.set(1.25, 1.25, 1.25);
+    ring2.rotation.x = Math.PI / 1.8;
+    ring2.rotation.y = Math.PI / 5;
+    ring2.material.opacity = 0.14;
+    scene.add(ring2);
+
+    var coreGeo = new THREE.IcosahedronGeometry(0.55, 1);
+    var coreMat = new THREE.MeshBasicMaterial({ color: 0x0d1a08, wireframe: true, transparent: true, opacity: 0.9 });
+    var core = new THREE.Mesh(coreGeo, coreMat);
+    scene.add(core);
+
+    var coreGlowMat = new THREE.MeshBasicMaterial({ color: acid, wireframe: true, transparent: true, opacity: 0.5 });
+    var coreGlow = new THREE.Mesh(coreGeo.clone(), coreGlowMat);
+    coreGlow.scale.set(1.02, 1.02, 1.02);
+    scene.add(coreGlow);
+
+    var ambient = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambient);
+
+    var mouseX = 0, mouseY = 0;
+    var targetRotX = 0, targetRotY = 0;
+
+    viewport.addEventListener('mousemove', function(e){
+      var rect = viewport.getBoundingClientRect();
+      mouseX = ((e.clientX - rect.left) / rect.width) - 0.5;
+      mouseY = ((e.clientY - rect.top) / rect.height) - 0.5;
+      targetRotY = mouseX * 0.4;
+      targetRotX = mouseY * 0.25;
+    });
+
+    function resize(){
+      var w = viewport.clientWidth;
+      var h = viewport.clientHeight;
+      if (w === 0 || h === 0) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    var clock = new THREE.Clock();
+    var lastFpsUpdate = 0;
+    var frames = 0;
+
+    function animate(){
+      requestAnimationFrame(animate);
+      var dt = clock.getDelta();
+      var elapsed = clock.getElapsedTime();
+
+      points.rotation.y += dt * 0.05;
+      points.rotation.x += dt * 0.012;
+
+      ring1.rotation.z += dt * 0.06;
+      ring2.rotation.z -= dt * 0.04;
+
+      core.rotation.y += dt * 0.25;
+      core.rotation.x += dt * 0.15;
+      coreGlow.rotation.y = core.rotation.y;
+      coreGlow.rotation.x = core.rotation.x;
+
+      var pulse = 1 + Math.sin(elapsed * 1.6) * 0.06;
+      coreGlow.scale.set(pulse * 1.02, pulse * 1.02, pulse * 1.02);
+
+      scene.rotation.y += (targetRotY - scene.rotation.y) * 0.03;
+      scene.rotation.x += (targetRotX - scene.rotation.x) * 0.03;
+
+      renderer.render(scene, camera);
+
+      frames++;
+      if (elapsed - lastFpsUpdate > 0.5) {
+        var fps = Math.round(frames / (elapsed - lastFpsUpdate));
+        fpsReadout.textContent = Math.min(fps, 60);
+        frames = 0;
+        lastFpsUpdate = elapsed;
+      }
+    }
+
+    animate();
+  } catch (err) {
+    showFallback();
+  }
+})();
+</script>
+</body>
+</html>

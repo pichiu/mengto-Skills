@@ -1,0 +1,233 @@
+<title>progressive-blur</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #f1f5f9;
+    padding: 48px 24px 80px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin: 0 0 8px;
+  }
+
+  p.lead {
+    text-align: center;
+    color: #8b93a7;
+    margin: 0 0 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  figure { margin: 0; }
+
+  figcaption {
+    text-align: center;
+    color: #8b93a7;
+    font-size: 13px;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+
+  .demo {
+    position: relative;
+    height: 320px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #212130;
+  }
+
+  .demo .content {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .stripes {
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(135deg, #1c1c28 0 18px, #14141c 18px 36px);
+  }
+
+  .photo-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, #6d5ef0 0%, transparent 45%),
+      radial-gradient(circle at 75% 70%, #f06e9e 0%, transparent 50%),
+      radial-gradient(circle at 50% 90%, #2fb8c6 0%, transparent 45%),
+      #14141c;
+  }
+
+  .list-bg {
+    position: absolute;
+    inset: 0;
+    padding: 60px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .row {
+    background: #1a1a26;
+    border-radius: 10px;
+    height: 40px;
+  }
+
+  .overlay-label {
+    position: absolute;
+    z-index: 20;
+    font-size: 12px;
+    color: #e2e8f0;
+    background: rgba(0,0,0,0.35);
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }
+
+  .gradient-blur {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .gradient-blur > div,
+  .gradient-blur::before,
+  .gradient-blur::after {
+    position: absolute;
+    inset: 0;
+  }
+
+  .gb-top {
+    inset: 0 0 auto 0;
+    height: 55%;
+  }
+
+  .gb-top::before {
+    content: "";
+    z-index: 1;
+    backdrop-filter: blur(0.5px);
+    mask: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 37.5%);
+  }
+  .gb-top > div:nth-of-type(1) { z-index: 2; backdrop-filter: blur(1px); mask: linear-gradient(to top, rgba(0,0,0,0) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,0) 50%); }
+  .gb-top > div:nth-of-type(2) { z-index: 3; backdrop-filter: blur(2px); mask: linear-gradient(to top, rgba(0,0,0,0) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 62.5%); }
+  .gb-top > div:nth-of-type(3) { z-index: 4; backdrop-filter: blur(4px); mask: linear-gradient(to top, rgba(0,0,0,0) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,0) 75%); }
+  .gb-top > div:nth-of-type(4) { z-index: 5; backdrop-filter: blur(8px); mask: linear-gradient(to top, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 87.5%); }
+  .gb-top > div:nth-of-type(5) { z-index: 6; backdrop-filter: blur(16px); mask: linear-gradient(to top, rgba(0,0,0,0) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,0) 100%); }
+  .gb-top > div:nth-of-type(6) { z-index: 7; backdrop-filter: blur(32px); mask: linear-gradient(to top, rgba(0,0,0,0) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,1) 100%); }
+  .gb-top::after { content: ""; z-index: 8; backdrop-filter: blur(64px); mask: linear-gradient(to top, rgba(0,0,0,0) 87.5%, rgba(0,0,0,1) 100%); }
+
+  .gb-bottom {
+    inset: auto 0 0 0;
+    height: 65%;
+  }
+
+  .gb-bottom::before {
+    content: "";
+    z-index: 1;
+    backdrop-filter: blur(0.5px);
+    mask: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 37.5%);
+  }
+  .gb-bottom > div:nth-of-type(1) { z-index: 2; backdrop-filter: blur(1px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 12.5%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,0) 50%); }
+  .gb-bottom > div:nth-of-type(2) { z-index: 3; backdrop-filter: blur(2px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 25%, rgba(0,0,0,1) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 62.5%); }
+  .gb-bottom > div:nth-of-type(3) { z-index: 4; backdrop-filter: blur(4px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 37.5%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,0) 75%); }
+  .gb-bottom > div:nth-of-type(4) { z-index: 5; backdrop-filter: blur(8px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 87.5%); }
+  .gb-bottom > div:nth-of-type(5) { z-index: 6; backdrop-filter: blur(16px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 62.5%, rgba(0,0,0,1) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,0) 100%); }
+  .gb-bottom > div:nth-of-type(6) { z-index: 7; backdrop-filter: blur(32px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 75%, rgba(0,0,0,1) 87.5%, rgba(0,0,0,1) 100%); }
+  .gb-bottom::after { content: ""; z-index: 8; backdrop-filter: blur(64px); mask: linear-gradient(to bottom, rgba(0,0,0,0) 87.5%, rgba(0,0,0,1) 100%); }
+
+  .nav-fake {
+    position: absolute;
+    z-index: 20;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-fake .brand { font-weight: 700; font-size: 13px; }
+  .nav-fake .links { display: flex; gap: 14px; font-size: 12px; color: #cbd2e1; }
+
+  .cta-fake {
+    position: absolute;
+    z-index: 20;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .cta-fake button {
+    background: #f1f5f9;
+    color: #0a0a0f;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+</style>
+
+<h1>Progressive Blur</h1>
+<p class="lead">Layered backdrop-filter masks that fade the blur strength from an edge</p>
+
+<div class="grid">
+  <figure>
+    <div class="demo">
+      <div class="content"><div class="photo-bg"></div></div>
+      <div class="nav-fake">
+        <span class="brand">Aurora</span>
+        <span class="links"><span>Work</span><span>About</span><span>Contact</span></span>
+      </div>
+      <div class="gradient-blur gb-top">
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
+    </div>
+    <figcaption>Top blur: six stacked layers (0.5px to 32px) each masked to a thin band, plus a solid 64px cap, so blur strength ramps in smoothly under a fixed nav.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="demo">
+      <div class="content"><div class="list-bg">
+        <div class="row"></div><div class="row"></div><div class="row"></div>
+        <div class="row"></div><div class="row"></div>
+      </div></div>
+      <div class="cta-fake"><button>Get Started</button></div>
+      <div class="gradient-blur gb-bottom">
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
+    </div>
+    <figcaption>Bottom blur: taller 65% zone so a floating CTA reads clearly over scrolling list content behind it.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="demo">
+      <div class="content"><div class="stripes"></div></div>
+      <span class="overlay-label" style="top:16px; left:16px;">0.5px → 32px</span>
+      <div class="gradient-blur gb-top" style="height:100%;">
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
+    </div>
+    <figcaption>Full-height version over diagonal stripes exposes each mask band, showing how the blur steps from sharp to soft rather than jumping in one flat layer.</figcaption>
+  </figure>
+</div>

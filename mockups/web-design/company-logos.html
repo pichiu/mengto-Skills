@@ -1,0 +1,125 @@
+<title>company-logos</title>
+<script src="https://code.iconify.design/iconify-icon/2/iconify-icon.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0a0a0f;
+    color: #f4f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    padding: clamp(24px, 6vw, 64px) clamp(16px, 5vw, 48px);
+  }
+  h1 { font-size: clamp(22px, 3vw, 28px); margin: 0 0 8px; letter-spacing: -0.01em; }
+  p.lede { margin: 0 0 40px; color: #9a9aa5; max-width: 60ch; font-size: 15px; line-height: 1.5; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+  }
+  figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .logo-box {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e5e5ea;
+    font-size: 30px;
+  }
+  .logo-box.brand iconify-icon { color: var(--brand); }
+  .logo-box.brand.gh { --brand: #ffffff; }
+  .logo-box.brand.fig { --brand: #f24e1e; }
+  .logo-box.brand.slack { --brand: #ecb22e; }
+  .logo-box.brand.stripe { --brand: #635bff; }
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #d4d4d9;
+  }
+  .badge iconify-icon { font-size: 20px; color: #e5e5ea; }
+  .partner-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(20px, 4vw, 40px);
+    flex-wrap: wrap;
+  }
+  .partner-strip iconify-icon {
+    font-size: 30px;
+    color: #7a7a85;
+    transition: color 0.15s ease;
+  }
+  .partner-strip a { display: flex; }
+  .partner-strip a:hover iconify-icon { color: #f4f4f6; }
+  figcaption { font-size: 13px; color: #9a9aa5; line-height: 1.5; }
+  code { background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+<body>
+  <h1>Company Logos</h1>
+  <p class="lede">Iconify Simple Icons rendered in consistent 64x64 boxes, aligned to a shared grid — no typed names, no mixed icon styles.</p>
+  <div class="grid">
+    <figure>
+      <div class="box logo-row">
+        <span class="logo-box"><iconify-icon icon="simple-icons:github" aria-label="GitHub"></iconify-icon></span>
+        <span class="logo-box"><iconify-icon icon="simple-icons:figma" aria-label="Figma"></iconify-icon></span>
+        <span class="logo-box"><iconify-icon icon="simple-icons:notion" aria-label="Notion"></iconify-icon></span>
+        <span class="logo-box"><iconify-icon icon="simple-icons:slack" aria-label="Slack"></iconify-icon></span>
+      </div>
+      <figcaption>Monochrome logo row: same 64x64 box, same size, same baseline — reads as one intentional grid.</figcaption>
+    </figure>
+    <figure>
+      <div class="box logo-row">
+        <span class="logo-box brand gh"><iconify-icon icon="simple-icons:github"></iconify-icon></span>
+        <span class="logo-box brand fig"><iconify-icon icon="simple-icons:figma"></iconify-icon></span>
+        <span class="logo-box brand slack"><iconify-icon icon="simple-icons:slack"></iconify-icon></span>
+        <span class="logo-box brand stripe"><iconify-icon icon="simple-icons:stripe"></iconify-icon></span>
+      </div>
+      <figcaption>Brand color used sparingly, only when recognition matters more than restraint (e.g. a "works with" grid).</figcaption>
+    </figure>
+    <figure>
+      <div class="box badge-grid">
+        <span class="badge"><iconify-icon icon="simple-icons:linear"></iconify-icon>Linear</span>
+        <span class="badge"><iconify-icon icon="simple-icons:framer"></iconify-icon>Framer</span>
+        <span class="badge"><iconify-icon icon="simple-icons:vercel"></iconify-icon>Vercel</span>
+        <span class="badge"><iconify-icon icon="simple-icons:asana"></iconify-icon>Asana</span>
+        <span class="badge"><iconify-icon icon="simple-icons:googledrive"></iconify-icon>Drive</span>
+        <span class="badge"><iconify-icon icon="simple-icons:zoom"></iconify-icon>Zoom</span>
+      </div>
+      <figcaption>Integrations grid: logo plus accessible label, scaled down to badge density without losing shape.</figcaption>
+    </figure>
+    <figure>
+      <div class="box partner-strip">
+        <a href="#" aria-label="Adobe"><iconify-icon icon="simple-icons:adobe"></iconify-icon></a>
+        <a href="#" aria-label="Spotify"><iconify-icon icon="simple-icons:spotify"></iconify-icon></a>
+        <a href="#" aria-label="Dropbox"><iconify-icon icon="simple-icons:dropbox"></iconify-icon></a>
+        <a href="#" aria-label="Airbnb"><iconify-icon icon="simple-icons:airbnb"></iconify-icon></a>
+      </div>
+      <figcaption>Interactive partner strip: quiet neutral fill by default, brightens on hover, labeled for accessibility.</figcaption>
+    </figure>
+  </div>
+</body>

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dither-background</title>
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: #030303;
+    color: #ececec;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+  }
+
+  .dither-background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #030303;
+    pointer-events: none;
+  }
+
+  .page-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px clamp(20px, 5vw, 60px);
+  }
+
+  .brand { font-size: 14px; font-weight: 600; letter-spacing: 0.03em; }
+  .links { display: flex; gap: 28px; font-size: 13px; color: #a8a9ab; }
+  .links a { color: #a8a9ab; text-decoration: none; }
+  .cta {
+    padding: 9px 18px;
+    border: 1px solid rgba(236,236,232,0.3);
+    border-radius: 999px;
+    color: #ececec;
+    text-decoration: none;
+    font-size: 12.5px;
+  }
+
+  header.hero {
+    min-height: 72vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #a8a9ab; margin-bottom: 22px; }
+  h1 { font-size: clamp(34px, 7vw, 72px); font-weight: 400; line-height: 1.05; margin: 0 0 22px; letter-spacing: -0.01em; max-width: 780px; }
+  header.hero p { color: #a8a9ab; max-width: 480px; font-size: 15.5px; line-height: 1.7; margin: 0 0 32px; }
+
+  .btn { background: #ececec; color: #050505; padding: 13px 26px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; }
+
+  section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    border-top: 1px solid rgba(236,236,232,0.1);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    background: rgba(20,20,21,0.6);
+    border: 1px solid rgba(236,236,232,0.1);
+    border-radius: 12px;
+    padding: 26px;
+    backdrop-filter: blur(4px);
+  }
+
+  .card .num { font-size: 11px; color: #a8a9ab; letter-spacing: 0.08em; display: block; margin-bottom: 14px; }
+  .card h3 { font-size: 16px; margin: 0 0 8px; }
+  .card p { font-size: 13px; color: #a8a9ab; line-height: 1.6; margin: 0; }
+
+  footer {
+    padding: 40px 24px 60px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 12px;
+    color: #a8a9ab;
+  }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    .links { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas class="dither-background" data-dither-background></canvas>
+
+<div class="page-content">
+  <nav>
+    <div class="brand">MONOCHROME / FIELD</div>
+    <div class="links">
+      <a href="#">Product</a>
+      <a href="#">Gallery</a>
+      <a href="#">Studio</a>
+    </div>
+    <a class="cta" href="#">Get in touch</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">PROCEDURAL BACKGROUND SYSTEM</div>
+    <h1>Depth made of pixels,<br>not gradients.</h1>
+    <p>An ordered Bayer dither field builds broad organic waves out of near-black cells — atmosphere with texture, never a soft blur.</p>
+    <a class="btn" href="#">See the render</a>
+  </header>
+
+  <section>
+    <div class="grid">
+      <div class="card">
+        <span class="num">01 / CELLS</span>
+        <h3>Enlarged pixels</h3>
+        <p>Square cells stay visible from a normal viewing distance — never fine grain, always legible structure.</p>
+      </div>
+      <div class="card">
+        <span class="num">02 / THRESHOLD</span>
+        <h3>4×4 Bayer matrix</h3>
+        <p>Ordered dithering steps brightness across a restrained six-tone monochrome palette.</p>
+      </div>
+      <div class="card">
+        <span class="num">03 / MOTION</span>
+        <h3>Slow organic drift</h3>
+        <p>Layered noise fields form cloud-like masses that drift instead of flicker.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Monochrome Field</span>
+    <span>Dither engine v1.0</span>
+  </footer>
+</div>
+
+<script>
+const BAYER_4X4 = [
+   0,  8,  2, 10,
+  12,  4, 14,  6,
+   3, 11,  1,  9,
+  15,  7, 13,  5,
+].map((value) => (value + 0.5) / 16);
+
+function smoothstep(edge0, edge1, value) {
+  const t = Math.max(0, Math.min(1, (value - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+function noise2(x, y) {
+  const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+  return value - Math.floor(value);
+}
+
+function valueNoise(x, y) {
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const fx = x - ix;
+  const fy = y - iy;
+  const ux = fx * fx * (3 - 2 * fx);
+  const uy = fy * fy * (3 - 2 * fy);
+
+  const a = noise2(ix, iy);
+  const b = noise2(ix + 1, iy);
+  const c = noise2(ix, iy + 1);
+  const d = noise2(ix + 1, iy + 1);
+  return (
+    a * (1 - ux) * (1 - uy) +
+    b * ux * (1 - uy) +
+    c * (1 - ux) * uy +
+    d * ux * uy
+  );
+}
+
+function fbm(x, y) {
+  let value = 0;
+  let amplitude = 0.5;
+  let frequency = 1;
+
+  for (let octave = 0; octave < 4; octave++) {
+    value += valueNoise(x * frequency, y * frequency) * amplitude;
+    frequency *= 2.02;
+    amplitude *= 0.5;
+  }
+
+  return value;
+}
+
+function initDitherBackground(canvas, options = {}) {
+  if (!canvas) return () => {};
+
+  const ctx = canvas.getContext("2d", { alpha: false });
+  if (!ctx) return () => {};
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cell = options.cellSize || 7;
+  const maxDpr = options.maxDpr || 1.5;
+  let width = 1;
+  let height = 1;
+  let cols = 1;
+  let rows = 1;
+  let rafId = 0;
+
+  const palette = options.palette || [
+    [3, 3, 3],
+    [16, 16, 17],
+    [34, 35, 37],
+    [74, 75, 78],
+    [168, 169, 171],
+    [236, 236, 232],
+  ];
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    width = Math.max(1, window.innerWidth);
+    height = Math.max(1, window.innerHeight);
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(width / cell);
+    rows = Math.ceil(height / cell);
+  }
+
+  function sampleField(x, y, time) {
+    const nx = (x / cols - 0.5) * 2;
+    const ny = (y / rows - 0.5) * 2;
+    const distance = Math.sqrt(nx * nx * 0.84 + ny * ny * 1.28);
+    const vignette = 1 - smoothstep(0.18, 1.15, distance);
+    const drift = reduceMotion ? 0 : time * 0.018;
+
+    const wave =
+      Math.sin(nx * 2.8 + ny * 1.2 + drift) * 0.18 +
+      Math.sin(nx * -1.4 + ny * 3.8 - drift * 0.8) * 0.14;
+    const cloud = fbm(nx * 1.35 + drift * 0.16, ny * 1.35 - drift * 0.08);
+    const ridge = smoothstep(0.48, 0.92, cloud + wave);
+    const offAxisMass = smoothstep(0.98, 0.18, Math.hypot(nx + 0.22, ny - 0.08));
+
+    return Math.max(0, Math.min(1, ridge * vignette * 0.92 + offAxisMass * 0.18));
+  }
+
+  function render(time = 0) {
+    const seconds = time * 0.001;
+    ctx.fillStyle = "rgb(3,3,3)";
+    ctx.fillRect(0, 0, width, height);
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const threshold = BAYER_4X4[(y % 4) * 4 + (x % 4)];
+        const brightness = sampleField(x, y, seconds);
+        const stepped = Math.floor(Math.max(0, Math.min(0.999, brightness + threshold * 0.18)) * palette.length);
+        const color = palette[Math.min(palette.length - 1, stepped)];
+        ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
+        ctx.fillRect(x * cell, y * cell, cell, cell);
+      }
+    }
+
+    if (!reduceMotion) rafId = requestAnimationFrame(render);
+  }
+
+  function handleResize() {
+    cancelAnimationFrame(rafId);
+    resize();
+    render();
+  }
+
+  resize();
+  render();
+  window.addEventListener("resize", handleResize);
+
+  return () => {
+    cancelAnimationFrame(rafId);
+    window.removeEventListener("resize", handleResize);
+  };
+}
+
+initDitherBackground(document.querySelector("[data-dither-background]"), {
+  cellSize: 7,
+  maxDpr: 1.5,
+});
+</script>
+</body>
+</html>

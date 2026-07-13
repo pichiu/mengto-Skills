@@ -1,0 +1,237 @@
+<title>tailwindcss</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            50:'#eef0fe',100:'#e0e3fc',400:'#8b7ff0',500:'#5850ec',600:'#4338ca',700:'#372da3'
+          }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  ::-webkit-scrollbar{height:10px;width:10px;}
+  ::-webkit-scrollbar-thumb{background:#c7cbe0;border-radius:999px;}
+  .dark ::-webkit-scrollbar-thumb{background:#3f3f52;}
+  pre code{white-space:pre;}
+</style>
+
+<body class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 antialiased">
+
+<header class="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+    <div class="flex items-center gap-2 font-bold">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-sm text-white">T</span>
+      <span>Tailwind Patterns</span>
+    </div>
+    <nav class="hidden gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400 sm:flex">
+      <a class="hover:text-zinc-900 dark:hover:text-white" href="#buttons">Buttons</a>
+      <a class="hover:text-zinc-900 dark:hover:text-white" href="#hero">Layout</a>
+      <a class="hover:text-zinc-900 dark:hover:text-white" href="#components">Components</a>
+      <a class="hover:text-zinc-900 dark:hover:text-white" href="#dynamic">Dynamic classes</a>
+      <a class="hover:text-zinc-900 dark:hover:text-white" href="#pitfalls">Pitfalls</a>
+    </nav>
+    <button id="theme-toggle" class="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-3 py-2 text-sm font-medium hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600">
+      <span id="theme-icon">🌙</span>
+      <span class="hidden sm:inline">Toggle theme</span>
+    </button>
+  </div>
+</header>
+
+<section id="hero" class="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+  <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+    <div>
+      <span class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-600/20 dark:text-brand-400">
+        Utility-first styling
+      </span>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+        Ship a beautiful site fast.
+      </h1>
+      <p class="mt-4 max-w-md text-zinc-600 dark:text-zinc-400">
+        Tailwind helps you move quickly without fighting CSS. Compose utilities in markup, lean on responsive and state variants, and extract components only when patterns repeat.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button class="inline-flex items-center justify-center rounded-xl px-5 py-3
+               bg-brand-600 text-white font-medium
+               hover:bg-brand-700 active:bg-brand-700
+               focus:outline-none focus:ring-2 focus:ring-brand-400/60">
+          Get started
+        </button>
+        <button class="inline-flex items-center justify-center rounded-xl px-5 py-3
+               border border-zinc-200 font-medium text-zinc-900
+               hover:border-zinc-300 dark:border-zinc-700 dark:text-white dark:hover:border-zinc-600
+               focus:outline-none focus:ring-2 focus:ring-brand-400/60">
+          View docs
+        </button>
+      </div>
+    </div>
+    <div class="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div class="flex items-center gap-1.5 pb-4">
+        <span class="h-2.5 w-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+        <span class="h-2.5 w-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+        <span class="h-2.5 w-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700"></span>
+      </div>
+      <pre class="overflow-x-auto rounded-lg bg-zinc-950 p-4 text-xs leading-relaxed text-zinc-100"><code>&lt;section class="mx-auto max-w-6xl px-6 py-16"&gt;
+  &lt;div class="grid gap-10 lg:grid-cols-2 lg:items-center"&gt;
+    &lt;div&gt;
+      &lt;h1 class="text-4xl font-semibold tracking-tight sm:text-5xl"&gt;
+        Ship a beautiful site fast.
+      &lt;/h1&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="buttons" class="border-t border-zinc-200 dark:border-zinc-800">
+  <div class="mx-auto max-w-6xl px-6 py-16">
+    <div class="mb-10 max-w-2xl">
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Clean CTA buttons</h2>
+      <p class="mt-2 text-zinc-600 dark:text-zinc-400">Consistent sizing, hover/active/focus states, and a visible focus ring for accessibility — the same utility recipe reused across variants.</p>
+    </div>
+    <div class="grid gap-8 lg:grid-cols-2">
+      <div class="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="flex flex-wrap items-center gap-3">
+          <button class="inline-flex items-center justify-center rounded-xl px-5 py-3 bg-brand-600 text-white font-medium hover:bg-brand-700 active:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400/60">Get started</button>
+          <button class="inline-flex items-center justify-center rounded-xl px-5 py-3 border border-zinc-200 font-medium text-zinc-900 hover:border-zinc-300 dark:border-zinc-700 dark:text-white dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-brand-400/60">Secondary</button>
+          <button disabled class="inline-flex items-center justify-center rounded-xl px-5 py-3 bg-zinc-200 text-zinc-400 font-medium cursor-not-allowed disabled:opacity-70 dark:bg-zinc-800 dark:text-zinc-600">Disabled</button>
+        </div>
+      </div>
+      <pre class="overflow-x-auto rounded-2xl bg-zinc-950 p-6 text-xs leading-relaxed text-zinc-100"><code>&lt;button class="inline-flex items-center justify-center rounded-xl px-5 py-3
+               bg-indigo-600 text-white font-medium
+               hover:bg-indigo-500 active:bg-indigo-700
+               focus:outline-none focus:ring-2 focus:ring-indigo-400/60"&gt;
+  Get started
+&lt;/button&gt;</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="components" class="border-t border-zinc-200 bg-zinc-100/60 dark:border-zinc-800 dark:bg-zinc-900/40">
+  <div class="mx-auto max-w-6xl px-6 py-16">
+    <div class="mb-10 max-w-2xl">
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Composable components</h2>
+      <p class="mt-2 text-zinc-600 dark:text-zinc-400">Prefer component composition over giant class strings. Cards, badges, and form fields below share the same spacing and radius scale.</p>
+    </div>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="group rounded-2xl border border-zinc-200 bg-white p-6 transition hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-600/20 dark:text-brand-400">⚡</div>
+        <h3 class="font-semibold">Fast by default</h3>
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Zero-runtime utilities generated at build time from your content files.</p>
+        <a href="#" class="mt-4 inline-block text-sm font-medium text-brand-600 group-hover:underline dark:text-brand-400">Learn more →</a>
+      </div>
+      <div class="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="mb-3 flex items-center justify-between">
+          <span class="text-sm font-medium">Email</span>
+          <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">Verified</span>
+        </div>
+        <input type="email" placeholder="you@company.com" class="peer w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-400/40 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white" />
+        <p class="mt-1 text-xs text-zinc-500 opacity-0 transition peer-focus:opacity-100">We'll never share your email.</p>
+      </div>
+      <div class="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div class="mb-4 flex flex-wrap gap-2">
+          <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-600/20 dark:text-brand-400">Design</span>
+          <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">Beta</span>
+          <span class="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">Deprecated</span>
+        </div>
+        <h3 class="font-semibold">Status badges</h3>
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Tone conveyed through color pairs that stay legible in both themes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="dynamic" class="border-t border-zinc-200 dark:border-zinc-800">
+  <div class="mx-auto max-w-6xl px-6 py-16">
+    <div class="mb-10 max-w-2xl">
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Handling dynamic classnames safely</h2>
+      <p class="mt-2 text-zinc-600 dark:text-zinc-400">Never build class names by concatenation — Tailwind's scanner can't see <code class="rounded bg-zinc-200 px-1 py-0.5 text-xs dark:bg-zinc-800">"bg-" + tone</code>. Map to a fixed set of literal classes instead.</p>
+    </div>
+    <div class="grid gap-8 lg:grid-cols-2">
+      <div class="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <p class="mb-4 text-sm font-medium">Live example — click to change tone</p>
+        <div id="tone-demo" class="mb-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white">
+          <span id="tone-label">Success</span>
+        </div>
+        <div class="flex gap-2">
+          <button data-tone="success" class="tone-btn rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold hover:border-zinc-300 dark:border-zinc-700">success</button>
+          <button data-tone="danger" class="tone-btn rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold hover:border-zinc-300 dark:border-zinc-700">danger</button>
+          <button data-tone="info" class="tone-btn rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold hover:border-zinc-300 dark:border-zinc-700">info</button>
+        </div>
+      </div>
+      <pre class="overflow-x-auto rounded-2xl bg-zinc-950 p-6 text-xs leading-relaxed text-zinc-100"><code>const toneClass = {
+  success: "bg-emerald-600",
+  danger: "bg-rose-600",
+  info: "bg-sky-600",
+}[tone];
+
+el.className =
+  `inline-flex items-center gap-2 rounded-xl
+   px-4 py-2 font-medium text-white ${toneClass}`;</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="pitfalls" class="border-t border-zinc-200 bg-zinc-100/60 dark:border-zinc-800 dark:bg-zinc-900/40">
+  <div class="mx-auto max-w-6xl px-6 py-16">
+    <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Common pitfalls</h2>
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 class="text-sm font-semibold">Classes missing in production</h3>
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Make sure the content/globs config includes every template and component file, or unused-looking classes get purged.</p>
+      </div>
+      <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 class="text-sm font-semibold">Overusing @apply</h3>
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Prefer component composition first. Reach for @apply only for small, truly repeated patterns.</p>
+      </div>
+      <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 class="text-sm font-semibold">Assuming class order wins</h3>
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Conflicting utilities aren't resolved by source order alone — be explicit and avoid stacking contradictory utilities.</p>
+      </div>
+      <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 class="text-sm font-semibold">Huge class lists, no structure</h3>
+        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Break markup into subcomponents, or use clsx/cva to manage variants instead of one 300-character class attribute.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-zinc-200 py-10 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
+  Built with utility-first CSS — responsive down to 390px, dark mode via the <code class="rounded bg-zinc-200 px-1 py-0.5 text-xs dark:bg-zinc-800">class</code> strategy.
+</footer>
+
+<script>
+  const toggle = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-icon');
+  const root = document.documentElement;
+  function apply(dark){
+    root.classList.toggle('dark', dark);
+    icon.textContent = dark ? '☀️' : '🌙';
+  }
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  apply(prefersDark);
+  toggle.addEventListener('click', () => apply(!root.classList.contains('dark')));
+
+  const toneClass = {
+    success: 'bg-emerald-600',
+    danger: 'bg-rose-600',
+    info: 'bg-sky-600',
+  };
+  const toneLabel = { success: 'Success', danger: 'Danger', info: 'Info' };
+  const demo = document.getElementById('tone-demo');
+  const label = document.getElementById('tone-label');
+  document.querySelectorAll('.tone-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tone = btn.dataset.tone;
+      demo.className = 'mb-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium text-white ' + toneClass[tone];
+      label.textContent = toneLabel[tone];
+    });
+  });
+</script>
+</body>

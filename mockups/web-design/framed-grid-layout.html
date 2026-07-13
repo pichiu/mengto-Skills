@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>framed-grid-layout</title>
+<style>
+  :root {
+    --fg-bg: #f7f7f4;
+    --fg-surface: rgba(255, 255, 255, 0.62);
+    --fg-line: rgba(24, 24, 27, 0.14);
+    --fg-line-strong: rgba(24, 24, 27, 0.34);
+    --fg-texture: rgba(24, 24, 27, 0.035);
+    --fg-gap: 16px;
+    --fg-pad: clamp(16px, 2vw, 28px);
+    --fg-corner: 18px;
+    --text: #18181b;
+    --muted: #6d6d6f;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+  }
+
+  .framed-grid {
+    min-height: 100vh;
+    padding: var(--fg-gap);
+    background:
+      repeating-linear-gradient(
+        135deg,
+        transparent 0 11px,
+        var(--fg-texture) 11px 12px
+      ),
+      var(--fg-bg);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--fg-gap);
+  }
+
+  .framed-grid > * { min-width: 0; }
+
+  .frame {
+    position: relative;
+    border: 1px solid var(--fg-line);
+    background: var(--fg-surface);
+    padding: var(--fg-pad);
+    overflow: hidden;
+  }
+
+  .frame-brackets {
+    background:
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) left top / var(--fg-corner) 1px no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) left top / 1px var(--fg-corner) no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) right top / var(--fg-corner) 1px no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) right top / 1px var(--fg-corner) no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) left bottom / var(--fg-corner) 1px no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) left bottom / 1px var(--fg-corner) no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) right bottom / var(--fg-corner) 1px no-repeat,
+      linear-gradient(var(--fg-line-strong), var(--fg-line-strong)) right bottom / 1px var(--fg-corner) no-repeat,
+      var(--fg-surface);
+  }
+
+  .span-12 { grid-column: span 12; }
+  .span-8 { grid-column: span 8; }
+  .span-6 { grid-column: span 6; }
+  .span-4 { grid-column: span 4; }
+  .span-3 { grid-column: span 3; }
+
+  @media (max-width: 760px) {
+    .framed-grid { grid-template-columns: 1fr; }
+    .span-12, .span-8, .span-6, .span-4, .span-3 { grid-column: 1 / -1; }
+  }
+
+  nav.frame { display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-weight: 700; font-size: 14px; letter-spacing: 0.02em; }
+  .links { display: flex; gap: 26px; font-size: 13px; color: var(--muted); }
+  .links a { color: var(--muted); text-decoration: none; }
+  .cta {
+    padding: 8px 16px;
+    border: 1px solid var(--fg-line-strong);
+    font-size: 12.5px;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 4.5vw, 52px);
+    font-weight: 500;
+    line-height: 1.08;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .hero p { color: var(--muted); font-size: 14.5px; line-height: 1.7; max-width: 480px; margin: 0 0 22px; }
+  .btn-primary { background: var(--text); color: #fff; padding: 12px 24px; font-size: 13.5px; text-decoration: none; display: inline-block; }
+
+  .side .eyebrow { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .side h3 { font-size: 16px; margin: 0 0 10px; }
+  .side p { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; }
+
+  .card .num { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; display: block; margin-bottom: 14px; }
+  .card h3 { font-size: 16px; margin: 0 0 8px; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; }
+
+  .stat .val { font-size: 30px; font-weight: 500; }
+  .stat .lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 6px; }
+
+  footer.frame { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="framed-grid">
+  <nav class="frame frame-brackets span-12">
+    <div class="brand">GRID / STUDIO</div>
+    <div class="links">
+      <a href="#">Work</a>
+      <a href="#">System</a>
+      <a href="#">Journal</a>
+    </div>
+    <a class="cta" href="#">Start a project</a>
+  </nav>
+
+  <section class="frame frame-brackets span-8 hero">
+    <div class="side">
+      <span class="eyebrow">STRUCTURED WEB DESIGN</span>
+    </div>
+    <h1>Every section snaps to the same twelve columns.</h1>
+    <p>A precise, editorial grid system — thin guide borders, L-shaped corner brackets, and one spacing scale across the whole page.</p>
+    <a class="btn-primary" href="#">View the system</a>
+  </section>
+
+  <aside class="frame frame-brackets span-4 side">
+    <span class="eyebrow">01 / PRINCIPLE</span>
+    <h3>Define the grid first</h3>
+    <p>Every frame — nav, hero, card, footer — snaps to the same columns and rows before any content is placed.</p>
+  </aside>
+
+  <div class="frame frame-brackets span-4 card">
+    <span class="num">A</span>
+    <h3>One border weight</h3>
+    <p>A single 1px line color and one bracket color are used across the entire page.</p>
+  </div>
+  <div class="frame frame-brackets span-4 card">
+    <span class="num">B</span>
+    <h3>Rectangular frames</h3>
+    <p>No floating cards, soft blobs, or uneven margins — only precise rectangles.</p>
+  </div>
+  <div class="frame frame-brackets span-4 card">
+    <span class="num">C</span>
+    <h3>Diagonal texture</h3>
+    <p>A faint repeating diagonal line sits under 0.05 opacity across the whole shell.</p>
+  </div>
+
+  <div class="frame frame-brackets span-3 stat">
+    <div class="val">12</div>
+    <div class="lbl">column grid</div>
+  </div>
+  <div class="frame frame-brackets span-3 stat">
+    <div class="val">1px</div>
+    <div class="lbl">border weight</div>
+  </div>
+  <div class="frame frame-brackets span-3 stat">
+    <div class="val">18px</div>
+    <div class="lbl">corner bracket</div>
+  </div>
+  <div class="frame frame-brackets span-3 stat">
+    <div class="val">16px</div>
+    <div class="lbl">section gap</div>
+  </div>
+
+  <section class="frame frame-brackets span-6 side">
+    <span class="eyebrow">02 / ALIGNMENT</span>
+    <h3>Padding follows the rhythm</h3>
+    <p>Headings, controls, and media edges align to the same grid rhythm as the frame itself, so nothing drifts off the baseline.</p>
+  </section>
+  <section class="frame frame-brackets span-6 side">
+    <span class="eyebrow">03 / CONSISTENCY</span>
+    <h3>Consistent gaps, not whitespace</h3>
+    <p>Sections are separated by a fixed gap value rather than arbitrary margins, keeping the whole composition measured.</p>
+  </section>
+
+  <footer class="frame frame-brackets span-12">
+    <span>© 2026 Grid Studio</span>
+    <span>Framed grid layout v1</span>
+  </footer>
+</main>
+</body>
+</html>

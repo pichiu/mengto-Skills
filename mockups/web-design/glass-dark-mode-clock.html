@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>glass-dark-mode-clock</title>
+<style>
+  :root {
+    --bg: #060607;
+    --bg-2: #0a0a0c;
+    --line: rgba(255,255,255,0.06);
+    --line-strong: rgba(255,255,255,0.12);
+    --white: #f5f5f6;
+    --zinc: #a1a1aa;
+    --zinc-dim: #6b6b71;
+    --glass-fill: rgba(20,20,22,0.55);
+    --glass-fill-2: rgba(255,255,255,0.03);
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .mono {
+    font-family: "SF Mono", "IBM Plex Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* ---------- Beam grid background ---------- */
+  .field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 40%, transparent 90%);
+    opacity: 0.7;
+  }
+
+  .beam {
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.09), transparent);
+  }
+  .beam.v1 { left: 12%; top: 0; width: 1px; height: 100%; }
+  .beam.v2 { right: 18%; top: 0; width: 1px; height: 100%; }
+  .beam.h1 {
+    top: 92px; left: 0; width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.09), transparent);
+  }
+
+  .crosshair {
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    width: 18px;
+    height: 18px;
+  }
+  .crosshair::before, .crosshair::after {
+    content: "";
+    position: absolute;
+    background: var(--line-strong);
+  }
+  .crosshair::before { top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); }
+  .crosshair::after { left: 50%; top: 0; height: 100%; width: 1px; transform: translateX(-50%); }
+  .crosshair.tl { top: 88px; left: 12%; margin: -9px; }
+  .crosshair.tr { top: 88px; right: 18%; margin: -9px; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: min(920px, calc(100% - 32px));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: var(--glass-fill);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid transparent;
+    background-image:
+      linear-gradient(var(--glass-fill), var(--glass-fill)),
+      linear-gradient(120deg, rgba(255,255,255,0.28), rgba(255,255,255,0.02) 30%, rgba(255,255,255,0.02) 70%, rgba(255,255,255,0.16));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .brand .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, #8a8a8f 60%, #3a3a3d);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    margin: 0; padding: 0;
+    font-size: 13px;
+    color: var(--zinc);
+  }
+  .nav-links a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ---------- Glass buttons / pills ---------- */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--white);
+    cursor: pointer;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--glass-fill), var(--glass-fill)) padding-box,
+      linear-gradient(140deg, rgba(255,255,255,0.35), rgba(255,255,255,0.03) 40%, rgba(255,255,255,0.14)) border-box;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  .btn.primary {
+    background:
+      linear-gradient(180deg, #f2f2f3, #d8d8da) padding-box,
+      linear-gradient(140deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2)) border-box;
+    color: #0a0a0b;
+    font-weight: 600;
+  }
+  .btn.small { padding: 8px 14px; font-size: 12px; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--zinc);
+    background:
+      linear-gradient(var(--glass-fill-2), var(--glass-fill-2)) padding-box,
+      linear-gradient(140deg, rgba(255,255,255,0.22), rgba(255,255,255,0.02)) border-box;
+    border: 1px solid transparent;
+    backdrop-filter: blur(10px);
+    text-transform: uppercase;
+  }
+  .pill .pulse {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #eaeaec;
+    box-shadow: 0 0 8px rgba(255,255,255,0.7);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* ---------- Layout ---------- */
+  main { position: relative; z-index: 1; }
+
+  section { padding: 0 24px; }
+
+  .hero {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-top: 168px;
+    padding-bottom: 96px;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-copy .pill { margin-bottom: 22px; }
+
+  .hero-copy h1 {
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    font-weight: 600;
+    background: linear-gradient(180deg, #ffffff, #b9b9be 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-copy p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--zinc);
+    max-width: 460px;
+    margin: 0 0 32px;
+  }
+
+  .hero-actions { display: flex; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
+
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .hero-meta .m-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--zinc-dim);
+    margin-bottom: 6px;
+  }
+  .hero-meta .m-value {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  /* ---------- Dial ---------- */
+  .dial-wrap {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: min(100%, 460px);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dial-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -6%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%);
+    filter: blur(6px);
+    pointer-events: none;
+  }
+  .dial-wrap svg { width: 100%; height: 100%; overflow: visible; }
+
+  .dial-shell {
+    fill: rgba(18,18,20,0.55);
+    stroke: url(#ringEdge);
+    stroke-width: 1;
+  }
+
+  .ring-outer { fill: none; stroke: rgba(255,255,255,0.14); stroke-width: 1; }
+  .ring-inner { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+  .tick-major { stroke: rgba(255,255,255,0.55); stroke-width: 1.4; }
+  .tick-minor { stroke: rgba(255,255,255,0.18); stroke-width: 1; }
+  .deg-label {
+    fill: var(--zinc-dim);
+    font-size: 7px;
+    font-family: inherit;
+    text-anchor: middle;
+  }
+  .orbit-label {
+    fill: rgba(230,230,232,0.72);
+    font-size: 6.4px;
+    letter-spacing: 3.2px;
+  }
+  .hex-frame {
+    fill: none;
+    stroke: rgba(255,255,255,0.16);
+    stroke-width: 1;
+  }
+  .core-glow {
+    fill: url(#coreGrad);
+  }
+  .core-ring { fill: none; stroke: rgba(255,255,255,0.5); stroke-width: 1; }
+  .needle { stroke: rgba(255,255,255,0.85); stroke-width: 1.2; stroke-linecap: round; }
+  .center-dot { fill: #f5f5f6; }
+
+  .rotor-slow { transform-origin: 50% 50%; animation: spin 90s linear infinite; }
+  .rotor-slower { transform-origin: 50% 50%; animation: spin 140s linear infinite reverse; }
+  .rotor-needle { transform-origin: 50% 50%; animation: spin 20s linear infinite; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rotor-slow, .rotor-slower, .rotor-needle, .pill .pulse { animation: none !important; }
+  }
+
+  /* ---------- Section shared ---------- */
+  .section-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 96px 0;
+  }
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 44px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .section-head h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    margin: 10px 0 0;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--zinc-dim);
+  }
+  .section-sub {
+    max-width: 360px;
+    color: var(--zinc);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Cards / instrument panel ---------- */
+  .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    position: relative;
+    padding: 26px 24px 24px;
+    border-radius: var(--radius);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)) padding-box,
+      linear-gradient(180deg, var(--bg-2), #0c0c0e) padding-box;
+    border: 1px solid transparent;
+    background-image:
+      linear-gradient(180deg, rgba(20,20,22,0.7), rgba(12,12,14,0.7)),
+      linear-gradient(150deg, rgba(255,255,255,0.20), rgba(255,255,255,0.02) 45%, rgba(255,255,255,0.10));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    backdrop-filter: blur(10px);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    overflow: hidden;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    top: -40%; left: -20%;
+    width: 60%; height: 140%;
+    background: radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%);
+    pointer-events: none;
+  }
+  .card:hover { transform: translateY(-3px); }
+
+  .card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02));
+    border: 1px solid var(--line-strong);
+    margin-bottom: 18px;
+  }
+  .card h3 {
+    font-size: 16px;
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  .card p {
+    font-size: 13.5px;
+    color: var(--zinc);
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  .card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--zinc-dim);
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ---------- Panel readouts ---------- */
+  .panel-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .readout {
+    background: var(--bg-2);
+    padding: 22px 20px;
+  }
+  .readout .r-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--zinc-dim);
+    margin-bottom: 10px;
+  }
+  .readout .r-value {
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .readout .r-bar {
+    margin-top: 12px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .readout .r-bar span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.3), #fff);
+  }
+
+  /* ---------- CTA band ---------- */
+  .cta-band {
+    position: relative;
+    border-radius: 24px;
+    padding: 64px 40px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.08), transparent 60%),
+      linear-gradient(180deg, rgba(18,18,20,0.75), rgba(10,10,11,0.85));
+    border: 1px solid transparent;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.08), transparent 60%),
+      linear-gradient(180deg, rgba(18,18,20,0.75), rgba(10,10,11,0.85)),
+      linear-gradient(150deg, rgba(255,255,255,0.22), rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.12));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    overflow: hidden;
+  }
+  .cta-band h2 {
+    font-size: clamp(26px, 4vw, 38px);
+    margin: 0 0 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .cta-band p {
+    color: var(--zinc);
+    margin: 0 0 30px;
+    font-size: 14.5px;
+  }
+  .cta-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 48px 24px 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    margin: 0; padding: 0;
+    font-size: 12.5px;
+    color: var(--zinc-dim);
+  }
+  .footer-links a { color: inherit; text-decoration: none; }
+  .footer-links a:hover { color: var(--zinc); }
+  .footer-meta {
+    font-size: 11px;
+    color: var(--zinc-dim);
+    text-align: right;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 940px) {
+    .hero { grid-template-columns: 1fr; padding-top: 140px; }
+    .dial-wrap { order: -1; width: min(78vw, 380px); }
+    .grid-cards { grid-template-columns: repeat(2, 1fr); }
+    .panel-strip { grid-template-columns: repeat(2, 1fr); }
+    .nav-links { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .grid-cards { grid-template-columns: 1fr; }
+    .panel-strip { grid-template-columns: 1fr; }
+    .hero-meta { gap: 20px; flex-wrap: wrap; }
+    nav { top: 12px; padding: 10px 14px; }
+    .section-inner { padding: 72px 0; }
+    .beam.v1, .beam.v2 { display: none; }
+  }
+
+  @media (max-width: 390px) {
+    section { padding: 0 16px; }
+    .hero-copy p { max-width: 100%; }
+    .cta-band { padding: 48px 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="field" aria-hidden="true"></div>
+  <div class="beam v1" aria-hidden="true"></div>
+  <div class="beam v2" aria-hidden="true"></div>
+  <div class="beam h1" aria-hidden="true"></div>
+  <div class="crosshair tl" aria-hidden="true"></div>
+  <div class="crosshair tr" aria-hidden="true"></div>
+
+  <nav>
+    <div class="brand"><span class="dot"></span> CALIBRA</div>
+    <ul class="nav-links">
+      <li><a href="#instrument">Instrument</a></li>
+      <li><a href="#panel">Panel</a></li>
+      <li><a href="#access">Access</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn small" href="#access">Sign in</a>
+      <a class="btn primary small" href="#access">Get access</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="pill"><span class="pulse"></span> Precision timing engine</span>
+        <h1>An instrument for measuring what matters, to the second.</h1>
+        <p>Calibra is a monochrome dial for tracking cycles, deadlines, and drift — built like calibration hardware, not a dashboard widget.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#access">Start calibration</a>
+          <a class="btn" href="#instrument">View instrument &darr;</a>
+        </div>
+        <div class="hero-meta">
+          <div>
+            <div class="m-label">Sync drift</div>
+            <div class="m-value">0.004s</div>
+          </div>
+          <div>
+            <div class="m-label">Active dials</div>
+            <div class="m-value">128</div>
+          </div>
+          <div>
+            <div class="m-label">Uptime</div>
+            <div class="m-value">99.99%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dial-wrap" id="instrument">
+        <svg viewBox="0 0 400 400">
+          <defs>
+            <linearGradient id="ringEdge" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.35)" />
+              <stop offset="50%" stop-color="rgba(255,255,255,0.05)" />
+              <stop offset="100%" stop-color="rgba(255,255,255,0.2)" />
+            </linearGradient>
+            <radialGradient id="coreGrad" cx="50%" cy="45%" r="60%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.9)" />
+              <stop offset="45%" stop-color="rgba(200,200,205,0.25)" />
+              <stop offset="100%" stop-color="rgba(120,120,125,0)" />
+            </radialGradient>
+            <path id="orbitPath" d="M 200,200 m -150,0 a 150,150 0 1,1 300,0 a 150,150 0 1,1 -300,0" />
+          </defs>
+
+          <circle class="dial-shell" cx="200" cy="200" r="188" />
+
+          <g class="rotor-slower">
+            <circle class="ring-outer" cx="200" cy="200" r="178" />
+            <text class="orbit-label mono">
+              <textPath href="#orbitPath" startOffset="0%">CALIBRATED &middot; SYNCED &middot; PRECISE &middot; MONITORED &middot;</textPath>
+            </text>
+          </g>
+
+          <circle class="ring-inner" cx="200" cy="200" r="150" />
+
+          <g class="rotor-slow">
+            <g id="ticks"></g>
+          </g>
+
+          <g class="deg-labels">
+            <text class="deg-label" x="200" y="42">0</text>
+            <text class="deg-label" x="358" y="205">90</text>
+            <text class="deg-label" x="200" y="368">180</text>
+            <text class="deg-label" x="42" y="205">270</text>
+          </g>
+
+          <polygon class="hex-frame" points="200,120 269,160 269,240 200,280 131,240 131,160" />
+
+          <g class="rotor-needle">
+            <line class="needle" x1="200" y1="200" x2="200" y2="128" />
+          </g>
+          <line class="needle" x1="200" y1="200" x2="245" y2="170" opacity="0.5" />
+
+          <circle class="core-glow" cx="200" cy="200" r="46" />
+          <circle class="core-ring" cx="200" cy="200" r="30" />
+          <circle class="center-dot" cx="200" cy="200" r="3.4" />
+        </svg>
+      </div>
+    </section>
+
+    <section id="instrument">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Instrument panel</div>
+            <h2>Every reading, engineered.</h2>
+          </div>
+          <p class="section-sub">Three surfaces on one dial: rotation, drift correction, and event capture — all monochrome, all glass.</p>
+        </div>
+
+        <div class="grid-cards">
+          <div class="card">
+            <div class="card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eee" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <h3>Rotational sync</h3>
+            <p>Continuous phase-locked rotation keeps every dial in the network aligned to a single master clock.</p>
+            <div class="card-foot"><span>Module 01</span><span>Active</span></div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eee" stroke-width="1.4"><path d="M4 12h4l2 7 4-14 2 7h4"/></svg>
+            </div>
+            <h3>Drift correction</h3>
+            <p>Sub-millisecond compensation smooths oscillation without a visible correction jump.</p>
+            <div class="card-foot"><span>Module 02</span><span>Active</span></div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eee" stroke-width="1.4"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 10h16"/></svg>
+            </div>
+            <h3>Event capture</h3>
+            <p>Every tick is logged to the microsecond and exposed as a queryable calibration record.</p>
+            <div class="card-foot"><span>Module 03</span><span>Active</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel">
+      <div class="section-inner">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Live readouts</div>
+            <h2>The dial, in numbers.</h2>
+          </div>
+          <p class="section-sub">A quiet readout strip mirrors the dial state so the interface never guesses.</p>
+        </div>
+
+        <div class="panel-strip">
+          <div class="readout">
+            <div class="r-label">Rotation rate</div>
+            <div class="r-value">4.0&deg;/s</div>
+            <div class="r-bar"><span style="width:72%"></span></div>
+          </div>
+          <div class="readout">
+            <div class="r-label">Phase offset</div>
+            <div class="r-value">0.6&deg;</div>
+            <div class="r-bar"><span style="width:14%"></span></div>
+          </div>
+          <div class="readout">
+            <div class="r-label">Signal integrity</div>
+            <div class="r-value">98.2%</div>
+            <div class="r-bar"><span style="width:98%"></span></div>
+          </div>
+          <div class="readout">
+            <div class="r-label">Nodes synced</div>
+            <div class="r-value">128 / 128</div>
+            <div class="r-bar"><span style="width:100%"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="access">
+      <div class="section-inner" style="padding-top: 0;">
+        <div class="cta-band">
+          <div class="eyebrow" style="margin-bottom:14px;">Instrument access</div>
+          <h2>Calibrate your first dial in minutes.</h2>
+          <p>No saturated dashboards. No noisy alerts. Just a precise, monochrome instrument you can trust.</p>
+          <div class="cta-actions">
+            <a class="btn primary" href="#">Request access</a>
+            <a class="btn" href="#">Read documentation</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="brand"><span class="dot"></span> CALIBRA</div>
+      <ul class="footer-links">
+        <li><a href="#instrument">Instrument</a></li>
+        <li><a href="#panel">Panel</a></li>
+        <li><a href="#access">Access</a></li>
+        <li><a href="#">Status</a></li>
+      </ul>
+      <div class="footer-meta mono">SYS.TIME &middot; 24H CYCLE &middot; &copy; CALIBRA</div>
+    </div>
+  </footer>
+
+<script>
+  (function () {
+    var ns = "http://www.w3.org/2000/svg";
+    var ticks = document.getElementById("ticks");
+    var cx = 200, cy = 200;
+    var rOuter = 148, rMinorOuter = 148, rMajorInner = 128, rMinorInner = 138;
+
+    for (var i = 0; i < 72; i++) {
+      var angle = (i * 5) * (Math.PI / 180);
+      var isMajor = i % 6 === 0;
+      var r1 = isMajor ? rMajorInner : rMinorInner;
+      var r2 = rOuter;
+      var x1 = cx + r1 * Math.sin(angle);
+      var y1 = cy - r1 * Math.cos(angle);
+      var x2 = cx + r2 * Math.sin(angle);
+      var y2 = cy - r2 * Math.cos(angle);
+      var line = document.createElementNS(ns, "line");
+      line.setAttribute("x1", x1.toFixed(2));
+      line.setAttribute("y1", y1.toFixed(2));
+      line.setAttribute("x2", x2.toFixed(2));
+      line.setAttribute("y2", y2.toFixed(2));
+      line.setAttribute("class", isMajor ? "tick-major" : "tick-minor");
+      ticks.appendChild(line);
+    }
+  })();
+</script>
+</body>
+</html>

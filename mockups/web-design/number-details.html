@@ -1,0 +1,189 @@
+<title>number-details</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #f1f5f9;
+    padding: 48px 24px 80px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin: 0 0 8px;
+  }
+
+  p.lead {
+    text-align: center;
+    color: #8b93a7;
+    margin: 0 0 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  figure { margin: 0; }
+
+  figcaption {
+    text-align: center;
+    color: #8b93a7;
+    font-size: 13px;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+
+  .num {
+    font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, monospace;
+    letter-spacing: 0.06em;
+    color: #4b5266;
+  }
+
+  .card {
+    position: relative;
+    background: #111119;
+    border: 1px solid #212130;
+    border-radius: 18px;
+    padding: 28px 24px 24px;
+    height: 200px;
+  }
+
+  .card .num {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-size: 13px;
+  }
+
+  .card h2 {
+    margin: 40px 0 10px;
+    font-size: 17px;
+  }
+
+  .card p {
+    margin: 0;
+    font-size: 13px;
+    color: #8b93a7;
+    line-height: 1.5;
+  }
+
+  .timeline {
+    background: #111119;
+    border: 1px solid #212130;
+    border-radius: 18px;
+    padding: 24px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .timeline-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-left: 2px solid #212130;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .timeline-row .num {
+    font-size: 12px;
+    min-width: 26px;
+  }
+
+  .timeline-row .body h3 {
+    margin: 0 0 2px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .timeline-row .body p {
+    margin: 0;
+    font-size: 12px;
+    color: #8b93a7;
+  }
+
+  .heading-block {
+    background: #111119;
+    border: 1px solid #212130;
+    border-radius: 18px;
+    padding: 28px 24px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .heading-block .num {
+    font-size: 12px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .heading-block h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+  }
+
+  .heading-block p {
+    margin: 0;
+    font-size: 13px;
+    color: #8b93a7;
+    line-height: 1.5;
+  }
+</style>
+
+<h1>Number Details</h1>
+<p class="lead">Decorative 01, 02, 03 markers as architectural, secondary structure</p>
+
+<div class="grid">
+  <figure>
+    <div class="card">
+      <span class="num">01</span>
+      <h2>Discover</h2>
+      <p>Marker sits in the corner, low contrast, mono type — never competing with the card title.</p>
+    </div>
+    <figcaption>Corner marker on a feature card</figcaption>
+  </figure>
+
+  <figure>
+    <div class="timeline">
+      <div class="timeline-row">
+        <span class="num">01</span>
+        <div class="body"><h3>Research</h3><p>Interviews and audits.</p></div>
+      </div>
+      <div class="timeline-row">
+        <span class="num">02</span>
+        <div class="body"><h3>Design</h3><p>Systemized components.</p></div>
+      </div>
+      <div class="timeline-row">
+        <span class="num">03</span>
+        <div class="body"><h3>Ship</h3><p>Roll out and measure.</p></div>
+      </div>
+    </div>
+    <figcaption>Timeline rail with consistent two-digit numbering</figcaption>
+  </figure>
+
+  <figure>
+    <div class="heading-block">
+      <span class="num">02 / Process</span>
+      <h2>Beside the heading</h2>
+      <p>Placed next to a section heading as editorial rhythm, kept low contrast so hierarchy stays clear.</p>
+    </div>
+    <figcaption>Section marker beside a heading</figcaption>
+  </figure>
+</div>

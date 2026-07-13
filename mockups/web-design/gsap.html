@@ -1,0 +1,729 @@
+<title>gsap</title>
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --bg-alt: #101216;
+    --fg: #e6e8eb;
+    --fg-dim: #8a8f98;
+    --accent: #7ee787;
+    --accent-2: #79c0ff;
+    --accent-3: #ffa657;
+    --line: #22262d;
+    --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body { overflow-x: hidden; }
+
+  a { color: var(--accent-2); }
+
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    background: rgba(126, 231, 135, 0.08);
+    border: 1px solid rgba(126, 231, 135, 0.25);
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+
+  .code-caption {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    padding: 14px 16px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .code-caption .fn { color: var(--accent-2); }
+  .code-caption .prop { color: var(--accent-3); }
+  .code-caption .str { color: var(--accent); }
+  .code-caption .com { color: var(--fg-dim); }
+
+  header.top {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid var(--line);
+  }
+
+  header.top .kicker {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--fg-dim);
+    margin-bottom: 18px;
+  }
+
+  header.top h1 {
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 1.02;
+    margin: 0 0 20px;
+    letter-spacing: -0.02em;
+  }
+
+  header.top h1 span { color: var(--fg-dim); }
+
+  header.top p.lede {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+    max-width: 640px;
+    margin: 0 0 28px;
+  }
+
+  header.top .pill-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  section {
+    padding: 120px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  section .section-head {
+    margin-bottom: 44px;
+  }
+
+  section .index {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  section h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  section p.desc {
+    color: var(--fg-dim);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 620px;
+    margin: 0 0 24px;
+  }
+
+  .demo-box {
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  .hero .badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    border: 1px solid rgba(126, 231, 135, 0.3);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .hero .title {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .hero .sub {
+    color: var(--fg-dim);
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  .hero .cta {
+    margin-top: 6px;
+    padding: 12px 22px;
+    background: var(--accent);
+    color: #04140a;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .tl-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .tl-demo .nav {
+    display: flex;
+    gap: 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--fg-dim);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+  }
+
+  .tl-demo .nav span {
+    padding: 4px 0;
+  }
+
+  .tl-demo .hero-title {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .tl-demo .hero-cta {
+    align-self: flex-start;
+    padding: 10px 20px;
+    border: 1px solid var(--accent-2);
+    color: var(--accent-2);
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .overlap-note {
+    margin-top: 22px;
+    font-size: 14px;
+    color: var(--fg-dim);
+    line-height: 1.6;
+  }
+
+  .overlap-note code {
+    font-family: var(--mono);
+    color: var(--accent-3);
+    background: rgba(255, 166, 87, 0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .story {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-alt);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .story .panels {
+    display: flex;
+    width: 300%;
+    height: 100%;
+  }
+
+  .story .panel {
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 8vw;
+    flex-shrink: 0;
+  }
+
+  .story .panel .num {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .story .panel h3 {
+    font-size: clamp(32px, 6vw, 60px);
+    margin: 0 0 14px;
+    letter-spacing: -0.02em;
+  }
+
+  .story .panel p {
+    color: var(--fg-dim);
+    max-width: 480px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .story .panel.p1 { background: linear-gradient(135deg, rgba(126,231,135,0.06), transparent); }
+  .story .panel.p2 { background: linear-gradient(135deg, rgba(121,192,255,0.06), transparent); }
+  .story .panel.p3 { background: linear-gradient(135deg, rgba(255,166,87,0.06), transparent); }
+
+  .story-spacer {
+    height: 30vh;
+  }
+
+  .stagger-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+
+  .stagger-grid .card {
+    aspect-ratio: 1;
+    background: linear-gradient(160deg, rgba(126,231,135,0.12), rgba(126,231,135,0.02));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+
+  .controls-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .controls-row button {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--fg);
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .controls-row button:hover {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+  }
+
+  .fade-rise-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .fade-rise-grid .card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 26px;
+  }
+
+  .fade-rise-grid .card .idx {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-2);
+    margin-bottom: 10px;
+  }
+
+  .fade-rise-grid .card h4 {
+    margin: 0 0 8px;
+    font-size: 18px;
+  }
+
+  .fade-rise-grid .card p {
+    margin: 0;
+    color: var(--fg-dim);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .autoalpha-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .autoalpha-grid .card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 20px;
+    will-change: transform, opacity;
+  }
+
+  .autoalpha-grid .card .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-3);
+    margin-bottom: 12px;
+  }
+
+  .autoalpha-grid .card .label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--fg);
+  }
+
+  .perf-note {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--fg-dim);
+    line-height: 1.7;
+    max-width: 640px;
+  }
+
+  .perf-note code {
+    font-family: var(--mono);
+    color: var(--accent);
+    background: rgba(126, 231, 135, 0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  footer {
+    padding: 60px 0 100px;
+    color: var(--fg-dim);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  @media (max-width: 720px) {
+    .stagger-grid { grid-template-columns: repeat(3, 1fr); }
+    .fade-rise-grid { grid-template-columns: 1fr; }
+    .autoalpha-grid { grid-template-columns: repeat(2, 1fr); }
+    section { padding: 80px 0; }
+    .demo-box { padding: 28px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story {
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+    .story .panels {
+      display: block;
+      width: 100%;
+    }
+    .story .panel {
+      width: 100%;
+      height: auto;
+      padding: 60px 8vw;
+    }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kicker">agent-skills / web-design / gsap</div>
+    <h1>GSAP <span>core API patterns,</span><br>demonstrated live.</h1>
+    <p class="lede">This page is a working gallery of the "quick recipes" from the GSAP skill doc: tweens, timelines, stagger, and ScrollTrigger scrub/pin — plus performance guidance on which properties to animate. Scroll down.</p>
+    <div class="pill-row">
+      <span class="tag">gsap.from</span>
+      <span class="tag">timeline</span>
+      <span class="tag">ScrollTrigger</span>
+      <span class="tag">stagger</span>
+      <span class="tag">autoAlpha</span>
+    </div>
+  </div>
+</header>
+
+<section id="recipe-1">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="index">01 / quick recipe</div>
+      <h2>Hero entrance (stagger)</h2>
+      <p class="desc">Elements tagged <code>data-anim</code> inside <code>.hero</code> fade and rise into place on page load, staggered by 0.06s each.</p>
+      <div class="code-caption"><span class="fn">gsap.from</span>(<span class="str">".hero [data-anim]"</span>, {
+  <span class="prop">y</span>: 24,
+  <span class="prop">autoAlpha</span>: 0,
+  <span class="prop">duration</span>: 0.8,
+  <span class="prop">ease</span>: <span class="str">"power2.out"</span>,
+  <span class="prop">stagger</span>: 0.06,
+});</div>
+    </div>
+    <div class="demo-box hero">
+      <span class="badge" data-anim>NEW · v3</span>
+      <div class="title" data-anim>Motion that feels considered</div>
+      <div class="sub" data-anim>Every element enters with the same easing curve and a small stagger, so the hero reads as one composed moment rather than a pile of separate animations.</div>
+      <div class="cta" data-anim>Get started</div>
+    </div>
+  </div>
+</section>
+
+<section id="recipe-2">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="index">02 / quick recipe</div>
+      <h2>Sequenced timeline</h2>
+      <p class="desc">A single timeline with shared defaults chains three tweens, each new tween starting slightly before the previous one finishes via a negative overlap position.</p>
+      <div class="code-caption"><span class="fn">const</span> tl = <span class="fn">gsap.timeline</span>({ <span class="prop">defaults</span>: { <span class="prop">ease</span>: <span class="str">"power2.out"</span>, <span class="prop">duration</span>: 0.6 } });
+tl.<span class="fn">from</span>(<span class="str">".nav"</span>, { <span class="prop">y</span>: -20, <span class="prop">autoAlpha</span>: 0 })
+  .<span class="fn">from</span>(<span class="str">".hero-title"</span>, { <span class="prop">y</span>: 30, <span class="prop">autoAlpha</span>: 0 }, <span class="str">"-=0.2"</span>)
+  .<span class="fn">from</span>(<span class="str">".hero-cta"</span>, { <span class="prop">scale</span>: 0.95, <span class="prop">autoAlpha</span>: 0 }, <span class="str">"-=0.2"</span>);</div>
+    </div>
+    <div class="demo-box">
+      <div class="tl-demo" id="tl-demo-target">
+        <div class="nav"><span>Home</span><span>Work</span><span>About</span><span>Contact</span></div>
+        <div class="hero-title">Timelines orchestrate, tweens execute.</div>
+        <div class="hero-cta">tl.play()</div>
+      </div>
+      <div class="overlap-note">The <code>"-=0.2"</code> position parameter means each tween starts 0.2s before the previous one ends — a small overlap that keeps the sequence feeling continuous instead of stepped. This timeline replays once, the moment this section enters the viewport (<code>ScrollTrigger</code>, <code>once: true</code>).</div>
+    </div>
+  </div>
+</section>
+
+<section id="stagger-variants">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="index">03 / stagger variants</div>
+      <h2>Stagger origin: center vs. start</h2>
+      <p class="desc">Same grid, same duration — only the stagger's <code>from</code> value changes where the wave of motion originates.</p>
+      <div class="code-caption"><span class="prop">stagger</span>: { <span class="prop">each</span>: 0.05, <span class="prop">from</span>: <span class="str">"start"</span> }
+<span class="com">// vs.</span>
+<span class="prop">stagger</span>: { <span class="prop">each</span>: 0.05, <span class="prop">from</span>: <span class="str">"center"</span> }</div>
+    </div>
+    <div class="demo-box">
+      <div class="controls-row">
+        <button id="btn-from-start">Replay: from "start"</button>
+        <button id="btn-from-center">Replay: from "center"</button>
+      </div>
+      <div class="stagger-grid" id="stagger-grid">
+        <div class="card">01</div><div class="card">02</div><div class="card">03</div><div class="card">04</div><div class="card">05</div>
+        <div class="card">06</div><div class="card">07</div><div class="card">08</div><div class="card">09</div><div class="card">10</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scroll-fade-cards">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="index">04 / scroll-driven storytelling</div>
+      <h2>Scroll-triggered fade + rise cards</h2>
+      <p class="desc">Each card animates in independently as it crosses into the viewport, using its own <code>ScrollTrigger</code> instance — no markers, no manual scroll listeners.</p>
+      <div class="code-caption"><span class="fn">gsap.from</span>(card, {
+  <span class="prop">y</span>: 40,
+  <span class="prop">autoAlpha</span>: 0,
+  <span class="prop">duration</span>: 0.7,
+  <span class="prop">ease</span>: <span class="str">"power2.out"</span>,
+  <span class="prop">scrollTrigger</span>: {
+    <span class="prop">trigger</span>: card,
+    <span class="prop">start</span>: <span class="str">"top 85%"</span>,
+    <span class="prop">end</span>: <span class="str">"top 40%"</span>,
+    <span class="prop">toggleActions</span>: <span class="str">"play none none reverse"</span>,
+  },
+});</div>
+    </div>
+    <div class="fade-rise-grid">
+      <div class="card"><div class="idx">card_01</div><h4>Discover</h4><p>Fades and rises as it enters the lower third of the viewport.</p></div>
+      <div class="card"><div class="idx">card_02</div><h4>Explore</h4><p>Each trigger is independent, so cards feel hand-timed to the scroll.</p></div>
+      <div class="card"><div class="idx">card_03</div><h4>Compare</h4><p>Reverses on scroll-up thanks to toggleActions.</p></div>
+      <div class="card"><div class="idx">card_04</div><h4>Decide</h4><p>No markers needed once the timing is tuned.</p></div>
+      <div class="card"><div class="idx">card_05</div><h4>Commit</h4><p>Scroll-driven storytelling, one beat at a time.</p></div>
+      <div class="card"><div class="idx">card_06</div><h4>Ship</h4><p>The last beat closes the sequence.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="autoalpha">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="index">05 / performance-friendly properties</div>
+      <h2>autoAlpha fade-ins</h2>
+      <p class="desc">Only transforms and <code>opacity</code>/<code>autoAlpha</code> are animated here — never <code>top</code>/<code>left</code>/<code>width</code>/<code>height</code>, which force layout and cause jank.</p>
+      <div class="code-caption"><span class="fn">gsap.from</span>(<span class="str">".autoalpha-grid .card"</span>, {
+  <span class="prop">autoAlpha</span>: 0,
+  <span class="prop">y</span>: 16,
+  <span class="prop">duration</span>: 0.5,
+  <span class="prop">stagger</span>: 0.04,
+  <span class="prop">scrollTrigger</span>: { <span class="prop">trigger</span>: <span class="str">".autoalpha-grid"</span>, <span class="prop">start</span>: <span class="str">"top 80%"</span> },
+});</div>
+    </div>
+    <div class="autoalpha-grid">
+      <div class="card"><div class="dot"></div><div class="label">opacity: 0 → 1</div></div>
+      <div class="card"><div class="dot"></div><div class="label">visibility: hidden → visible</div></div>
+      <div class="card"><div class="dot"></div><div class="label">transform: translateY</div></div>
+      <div class="card"><div class="dot"></div><div class="label">no reflow</div></div>
+    </div>
+    <p class="perf-note">
+      <code>autoAlpha</code> animates opacity and toggles <code>visibility</code> in one property, so hidden elements don't intercept clicks. Combined with <code>will-change: transform</code> on actively animating cards, the browser can composite these on the GPU instead of recalculating layout every frame.
+    </p>
+  </div>
+</section>
+
+<section id="recipe-3" style="padding:0; border-bottom:none;">
+  <div class="wrap" style="padding-top:120px;">
+    <div class="section-head">
+      <div class="index">06 / quick recipe</div>
+      <h2>Scroll-scrub pinned section</h2>
+      <p class="desc">The <code>.story</code> section pins itself to the viewport for 800px of scroll distance while its panels translate horizontally, scrubbed directly to scroll position.</p>
+      <div class="code-caption"><span class="fn">gsap.timeline</span>({
+  <span class="prop">scrollTrigger</span>: {
+    <span class="prop">trigger</span>: <span class="str">".story"</span>,
+    <span class="prop">start</span>: <span class="str">"top top"</span>,
+    <span class="prop">end</span>: <span class="str">"+=800"</span>,
+    <span class="prop">scrub</span>: 1,
+    <span class="prop">pin</span>: true,
+  },
+}).<span class="fn">to</span>(<span class="str">".story .panel"</span>, { <span class="prop">xPercent</span>: -200 });</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <div class="panels">
+      <div class="panel p1">
+        <div class="num">01 / 03</div>
+        <h3>Pin</h3>
+        <p>The section locks in place at the top of the viewport once its top edge reaches "top top".</p>
+      </div>
+      <div class="panel p2">
+        <div class="num">02 / 03</div>
+        <h3>Scrub</h3>
+        <p>Scroll position drives the timeline directly — scrub: 1 adds a 1s catch-up smoothing lag.</p>
+      </div>
+      <div class="panel p3">
+        <div class="num">03 / 03</div>
+        <h3>Unpin</h3>
+        <p>After 800px of additional scroll, the section releases and normal scrolling resumes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-spacer"></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    gsap.registerPlugin(ScrollTrigger) — recipes from agent-skills/web-design/gsap
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (prefersReduced) {
+    gsap.set(".hero [data-anim], .tl-demo .nav, .tl-demo .hero-title, .tl-demo .hero-cta, .fade-rise-grid .card, .autoalpha-grid .card, .stagger-grid .card", {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      clearProps: "transform",
+    });
+  } else {
+    gsap.from(".hero [data-anim]", {
+      y: 24,
+      autoAlpha: 0,
+      duration: 0.8,
+      ease: "power2.out",
+      stagger: 0.06,
+    });
+
+    ScrollTrigger.create({
+      trigger: "#recipe-2",
+      start: "top 70%",
+      once: true,
+      onEnter: function () {
+        var tl = gsap.timeline({ defaults: { ease: "power2.out", duration: 0.6 } });
+        tl.from("#tl-demo-target .nav", { y: -20, autoAlpha: 0 })
+          .from("#tl-demo-target .hero-title", { y: 30, autoAlpha: 0 }, "-=0.2")
+          .from("#tl-demo-target .hero-cta", { scale: 0.95, autoAlpha: 0 }, "-=0.2");
+      },
+    });
+
+    function playStagger(fromValue) {
+      var cards = gsap.utils.toArray("#stagger-grid .card");
+      gsap.fromTo(
+        cards,
+        { autoAlpha: 0, scale: 0.85 },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: "power2.out",
+          stagger: { each: 0.05, from: fromValue },
+        }
+      );
+    }
+
+    ScrollTrigger.create({
+      trigger: "#stagger-grid",
+      start: "top 80%",
+      once: true,
+      onEnter: function () {
+        playStagger("start");
+      },
+    });
+
+    document.getElementById("btn-from-start").addEventListener("click", function () {
+      playStagger("start");
+    });
+    document.getElementById("btn-from-center").addEventListener("click", function () {
+      playStagger("center");
+    });
+
+    gsap.utils.toArray(".fade-rise-grid .card").forEach(function (card) {
+      gsap.from(card, {
+        y: 40,
+        autoAlpha: 0,
+        duration: 0.7,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: card,
+          start: "top 85%",
+          end: "top 40%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    });
+
+    gsap.from(".autoalpha-grid .card", {
+      autoAlpha: 0,
+      y: 16,
+      duration: 0.5,
+      stagger: 0.04,
+      scrollTrigger: {
+        trigger: ".autoalpha-grid",
+        start: "top 80%",
+      },
+    });
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: ".story",
+        start: "top top",
+        end: "+=800",
+        scrub: 1,
+        pin: true,
+      },
+    }).to(".story .panel", { xPercent: -200 });
+  }
+</script>

@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>mesh-gradient-dark-blue-clean</title>
+<style>
+  :root {
+    --mesh-bg: #030712;
+    --mesh-bg-blue: #07111f;
+    --mesh-shell: rgba(7, 13, 25, 0.82);
+    --mesh-shell-inner: rgba(4, 9, 18, 0.72);
+    --mesh-line: rgba(191, 219, 254, 0.14);
+    --mesh-line-strong: rgba(226, 232, 240, 0.28);
+    --mesh-text: #f8fafc;
+    --mesh-copy: #9fb2ca;
+    --mesh-muted: #64748b;
+    --mesh-accent: #dbeafe;
+    --mesh-cobalt: #1d4ed8;
+    --mesh-indigo: #312e81;
+    --mesh-steel: #385a7c;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+
+  a { color: inherit; }
+
+  .mesh-page {
+    min-height: 100vh;
+    color: var(--mesh-text);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(29, 78, 216, 0.18), transparent 34rem),
+      linear-gradient(180deg, var(--mesh-bg-blue), var(--mesh-bg) 48%, #01030a);
+  }
+
+  .mesh-page::selection { color: #020617; background: var(--mesh-accent); }
+
+  .mesh-wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px clamp(16px, 4vw, 32px) 80px;
+  }
+
+  /* Hero shell */
+  .mesh-shell {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 32px;
+    background: linear-gradient(var(--mesh-shell), var(--mesh-shell)) padding-box,
+      linear-gradient(145deg, rgba(255,255,255,0.46), rgba(147,197,253,0.18), rgba(255,255,255,0.04)) border-box;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.10);
+  }
+
+  .mesh-shell__field {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.78;
+    pointer-events: none;
+  }
+
+  .mesh-shell__content {
+    position: relative;
+    z-index: 2;
+    min-height: clamp(560px, 72vh, 820px);
+    padding: clamp(28px, 6vw, 84px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mesh-rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--mesh-line), transparent);
+    z-index: 1;
+  }
+
+  .mesh-rail--left { left: 64px; }
+  .mesh-rail--right { right: 64px; }
+
+  @media (max-width: 720px) {
+    .mesh-rail { display: none; }
+  }
+
+  .mesh-corner {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--mesh-line-strong);
+    z-index: 3;
+  }
+
+  .mesh-corner--tl { top: 22px; left: 22px; }
+  .mesh-corner--tr { top: 22px; right: 22px; }
+  .mesh-corner--bl { bottom: 22px; left: 22px; }
+  .mesh-corner--br { bottom: 22px; right: 22px; }
+
+  /* Nav */
+  .mesh-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    padding: 6px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: linear-gradient(rgba(5,12,24,0.76), rgba(5,12,24,0.76)) padding-box,
+      linear-gradient(120deg, rgba(255,255,255,0.28), rgba(96,165,250,0.16), rgba(255,255,255,0.04)) border-box;
+    backdrop-filter: blur(18px);
+    font-size: 13px;
+  }
+
+  .mesh-nav a {
+    color: var(--mesh-copy);
+    border-radius: 999px;
+    padding: 9px 14px;
+    text-decoration: none;
+    transition: color 0.2s ease, background 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .mesh-nav a:hover,
+  .mesh-nav a[aria-current="page"] {
+    color: var(--mesh-text);
+    background: rgba(255,255,255,0.08);
+  }
+
+  .mesh-nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px 9px 10px;
+    color: var(--mesh-text);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .mesh-nav__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #bfdbfe;
+    box-shadow: 0 0 18px rgba(147,197,253,0.72);
+    flex-shrink: 0;
+  }
+
+  .mesh-nav__links { display: flex; align-items: center; gap: 2px; }
+
+  @media (max-width: 640px) {
+    .mesh-nav__links a:not(:first-child) { display: none; }
+  }
+
+  .mesh-nav__cta {
+    margin-left: 4px;
+    color: #020617 !important;
+    background: #f8fafc !important;
+    font-weight: 600;
+  }
+
+  /* Hero copy */
+  .mesh-hero {
+    position: relative;
+    margin-top: clamp(48px, 10vh, 110px);
+    max-width: 760px;
+  }
+
+  .mesh-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mesh-copy);
+    margin-bottom: 20px;
+  }
+
+  .mesh-kicker::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #bfdbfe;
+    box-shadow: 0 0 18px rgba(147,197,253,0.72);
+    animation: mesh-shimmer 2.6s ease-in-out infinite;
+  }
+
+  @keyframes mesh-shimmer {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mesh-kicker::before { animation: none; }
+  }
+
+  h1.mesh-title {
+    font-size: clamp(34px, 6vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 22px;
+    color: var(--mesh-text);
+  }
+
+  .mesh-title span {
+    background: linear-gradient(120deg, #f8fafc, #bfdbfe 55%, #f8fafc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .mesh-sub {
+    font-size: clamp(15px, 2vw, 18px);
+    line-height: 1.6;
+    color: var(--mesh-copy);
+    max-width: 540px;
+    margin: 0 0 36px;
+  }
+
+  .mesh-cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+
+  .mesh-cta-primary,
+  .mesh-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 13px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .mesh-cta-primary:hover,
+  .mesh-cta-secondary:hover { transform: translateY(-1px); }
+
+  .mesh-cta-primary {
+    color: #020617;
+    background: #f8fafc;
+    box-shadow: 0 16px 36px rgba(219,234,254,0.18);
+  }
+
+  .mesh-cta-secondary {
+    color: var(--mesh-text);
+    border: 1px solid transparent;
+    background: linear-gradient(rgba(5,12,24,0.62), rgba(5,12,24,0.62)) padding-box,
+      linear-gradient(135deg, rgba(255,255,255,0.28), rgba(96,165,250,0.12), rgba(255,255,255,0.04)) border-box;
+  }
+
+  .mesh-fineprint {
+    font-size: 12px;
+    color: var(--mesh-muted);
+    margin-top: 8px;
+  }
+
+  /* Floating nodes */
+  .mesh-node {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(191,219,254,0.18);
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: var(--mesh-copy);
+    background: rgba(5,12,24,0.58);
+    backdrop-filter: blur(14px);
+    font-size: 12px;
+    z-index: 2;
+  }
+
+  .mesh-node::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #bfdbfe;
+    box-shadow: 0 0 18px rgba(147,197,253,0.72);
+  }
+
+  .mesh-node--a { top: 12%; right: 8%; }
+  .mesh-node--b { bottom: 22%; right: 16%; }
+  .mesh-node--c { top: 46%; right: 4%; }
+
+  @media (max-width: 900px) {
+    .mesh-node--c { display: none; }
+  }
+
+  @media (max-width: 720px) {
+    .mesh-node { display: none; }
+  }
+
+  .mesh-connector {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, var(--mesh-line));
+    height: 1px;
+    z-index: 1;
+    transform-origin: left center;
+  }
+
+  @media (max-width: 900px) {
+    .mesh-connector { display: none; }
+  }
+
+  /* Lower framed section */
+  .mesh-framed {
+    margin-top: 56px;
+    border: 1px solid var(--mesh-line);
+    border-radius: 28px;
+    padding: clamp(24px, 5vw, 56px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    position: relative;
+  }
+
+  .mesh-framed__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .mesh-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mesh-steel);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mesh-eyebrow::before {
+    content: "01";
+    font-variant-numeric: tabular-nums;
+    color: var(--mesh-muted);
+  }
+
+  h2.mesh-h2 {
+    font-size: clamp(24px, 3.6vw, 34px);
+    letter-spacing: -0.01em;
+    margin: 10px 0 0;
+    color: var(--mesh-text);
+  }
+
+  .mesh-framed__copy {
+    color: var(--mesh-copy);
+    font-size: 14px;
+    max-width: 320px;
+    margin: 10px 0 0;
+    line-height: 1.6;
+  }
+
+  .mesh-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 860px) {
+    .mesh-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 620px) {
+    .mesh-grid { grid-template-columns: 1fr; }
+  }
+
+  .mesh-card {
+    position: relative;
+    border-radius: 20px;
+    padding: 26px;
+    border: 1px solid transparent;
+    background: linear-gradient(var(--mesh-shell), var(--mesh-shell)) padding-box,
+      linear-gradient(145deg, rgba(255,255,255,0.30), rgba(147,197,253,0.14), rgba(255,255,255,0.02)) border-box;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.32);
+  }
+
+  .mesh-card__index {
+    font-size: 12px;
+    color: var(--mesh-muted);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 18px;
+    display: block;
+  }
+
+  .mesh-card__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(140deg, var(--mesh-cobalt), var(--mesh-indigo));
+    margin-bottom: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+
+  .mesh-card h3 {
+    font-size: 17px;
+    margin: 0 0 10px;
+    color: var(--mesh-text);
+    letter-spacing: -0.01em;
+  }
+
+  .mesh-card p {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--mesh-copy);
+    margin: 0;
+  }
+
+  /* Secondary section: stats strip */
+  .mesh-stats {
+    margin-top: 56px;
+    border-top: 1px solid var(--mesh-line);
+    border-bottom: 1px solid var(--mesh-line);
+    padding: 32px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 720px) {
+    .mesh-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .mesh-stat {
+    padding: 0 20px;
+    border-left: 1px solid var(--mesh-line);
+  }
+
+  .mesh-stat:first-child { border-left: none; }
+
+  @media (max-width: 720px) {
+    .mesh-stat:nth-child(2n+1) { border-left: none; }
+  }
+
+  .mesh-stat strong {
+    display: block;
+    font-size: clamp(24px, 3vw, 32px);
+    color: var(--mesh-text);
+    letter-spacing: -0.02em;
+  }
+
+  .mesh-stat span {
+    font-size: 12.5px;
+    color: var(--mesh-muted);
+  }
+
+  /* Footer */
+  .mesh-footer {
+    margin-top: 64px;
+    padding-top: 28px;
+    border-top: 1px solid var(--mesh-line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--mesh-muted);
+  }
+
+  .mesh-footer__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--mesh-copy);
+  }
+
+  .mesh-footer__links { display: flex; gap: 20px; }
+
+  .mesh-footer__links a {
+    text-decoration: none;
+    color: var(--mesh-muted);
+    transition: color 0.2s ease;
+  }
+
+  .mesh-footer__links a:hover { color: var(--mesh-copy); }
+</style>
+</head>
+<body>
+  <div class="mesh-page">
+    <div class="mesh-wrap">
+
+      <section class="mesh-shell" aria-label="Hero">
+        <canvas class="mesh-shell__field" data-dark-blue-mesh aria-hidden="true"></canvas>
+        <span class="mesh-rail mesh-rail--left" aria-hidden="true"></span>
+        <span class="mesh-rail mesh-rail--right" aria-hidden="true"></span>
+        <span class="mesh-corner mesh-corner--tl" aria-hidden="true"></span>
+        <span class="mesh-corner mesh-corner--tr" aria-hidden="true"></span>
+        <span class="mesh-corner mesh-corner--bl" aria-hidden="true"></span>
+        <span class="mesh-corner mesh-corner--br" aria-hidden="true"></span>
+
+        <div class="mesh-shell__content">
+          <nav class="mesh-nav" aria-label="Primary">
+            <span class="mesh-nav__brand"><span class="mesh-nav__dot"></span>Meshwork</span>
+            <div class="mesh-nav__links">
+              <a href="#" aria-current="page">Product</a>
+              <a href="#features">Platform</a>
+              <a href="#stats">Customers</a>
+              <a href="#footer">Docs</a>
+            </div>
+            <a href="#" class="mesh-nav__cta">Sign in</a>
+          </nav>
+
+          <div class="mesh-hero">
+            <span class="mesh-kicker">Now shipping v2.4 &mdash; realtime mesh sync</span>
+            <h1 class="mesh-title">Infrastructure for <span>intelligent interfaces.</span></h1>
+            <p class="mesh-sub">
+              A steady, low-latency layer for streaming model output straight into your product surface.
+              Built for teams who ship interfaces that feel alive.
+            </p>
+            <div class="mesh-cta-row">
+              <a href="#" class="mesh-cta-primary">Start building</a>
+              <a href="#" class="mesh-cta-secondary">View documentation</a>
+            </div>
+            <p class="mesh-fineprint">No credit card required &middot; deploys in minutes</p>
+          </div>
+
+          <span class="mesh-connector" style="top: 18%; right: 22%; width: 140px; transform: rotate(-8deg);"></span>
+          <span class="mesh-connector" style="bottom: 30%; right: 20%; width: 110px; transform: rotate(10deg);"></span>
+
+          <span class="mesh-node mesh-node--a">Sync latency 42ms</span>
+          <span class="mesh-node mesh-node--b">Nodes online 128</span>
+          <span class="mesh-node mesh-node--c">Field stable</span>
+        </div>
+      </section>
+
+      <section class="mesh-framed" id="features" aria-label="Features">
+        <div class="mesh-framed__header">
+          <div>
+            <span class="mesh-eyebrow">Platform</span>
+            <h2 class="mesh-h2">Built for the shape of real workloads.</h2>
+          </div>
+          <p class="mesh-framed__copy">Three primitives cover ingestion, routing, and rendering &mdash; compose them or run them standalone.</p>
+        </div>
+
+        <div class="mesh-grid">
+          <article class="mesh-card">
+            <span class="mesh-card__index">01</span>
+            <div class="mesh-card__icon" aria-hidden="true"></div>
+            <h3>Streaming ingest</h3>
+            <p>Accept token and event streams from any model provider with backpressure handled at the edge.</p>
+          </article>
+          <article class="mesh-card">
+            <span class="mesh-card__index">02</span>
+            <div class="mesh-card__icon" aria-hidden="true"></div>
+            <h3>Adaptive routing</h3>
+            <p>Route requests across regions by latency and load, with automatic failover across the mesh.</p>
+          </article>
+          <article class="mesh-card">
+            <span class="mesh-card__index">03</span>
+            <div class="mesh-card__icon" aria-hidden="true"></div>
+            <h3>Live rendering</h3>
+            <p>Push partial results into the UI as they arrive, with consistent ordering guaranteed downstream.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="mesh-stats" id="stats" aria-label="Statistics">
+        <div class="mesh-stat"><strong>99.98%</strong><span>Uptime last 90 days</span></div>
+        <div class="mesh-stat"><strong>42ms</strong><span>Median field sync</span></div>
+        <div class="mesh-stat"><strong>6.2B</strong><span>Events routed monthly</span></div>
+        <div class="mesh-stat"><strong>128</strong><span>Active edge nodes</span></div>
+      </section>
+
+      <footer class="mesh-footer" id="footer">
+        <span class="mesh-footer__brand"><span class="mesh-nav__dot"></span>Meshwork &copy; 2026</span>
+        <nav class="mesh-footer__links" aria-label="Footer">
+          <a href="#">Status</a>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Contact</a>
+        </nav>
+      </footer>
+
+    </div>
+  </div>
+
+<script>
+  function initDarkBlueMesh(canvas) {
+    const ctx = canvas.getContext("2d");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let width = 0, height = 0, frame = 0, rafId = 0;
+    const points = [
+      { x: 0.18, y: 0.30, r: 0.45, color: "rgba(29, 78, 216, 0.55)" },
+      { x: 0.68, y: 0.22, r: 0.38, color: "rgba(49, 46, 129, 0.58)" },
+      { x: 0.78, y: 0.72, r: 0.52, color: "rgba(56, 90, 124, 0.48)" },
+      { x: 0.42, y: 0.58, r: 0.34, color: "rgba(219, 234, 254, 0.18)" },
+    ];
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function draw(time = 0) {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#030712";
+      ctx.fillRect(0, 0, width, height);
+      ctx.globalCompositeOperation = "screen";
+      points.forEach((point, index) => {
+        const drift = reduceMotion ? 0 : Math.sin(time * 0.00018 + index) * 24;
+        const x = point.x * width + drift;
+        const y = point.y * height + Math.cos(time * 0.00016 + index) * 18;
+        const radius = Math.max(width, height) * point.r;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, point.color);
+        gradient.addColorStop(1, "rgba(3, 7, 18, 0)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      });
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
+      for (let y = (frame % 28); y < height; y += 28) {
+        ctx.fillRect(0, y, width, 1);
+      }
+      frame += 1;
+      if (!reduceMotion) rafId = requestAnimationFrame(draw);
+    }
+    function handleResize() {
+      cancelAnimationFrame(rafId);
+      resize();
+      draw();
+    }
+    resize();
+    draw();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }
+
+  document.querySelectorAll("[data-dark-blue-mesh]").forEach((canvas) => {
+    initDarkBlueMesh(canvas);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>cobejs</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-2: #0f0f18;
+    --ink: #f5f5f7;
+    --muted: #9a9aab;
+    --accent: #b28dfc;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+  }
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 48px;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+  .nav .logo {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 15px;
+  }
+  .nav .logo span { color: var(--accent); }
+  .nav ul {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .nav a { color: inherit; text-decoration: none; }
+  .nav .cta {
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #0a0a0f;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 140px 48px 80px;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(178,141,252,0.12), transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-copy .eyebrow {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1.06;
+    margin: 0 0 20px;
+    font-weight: 650;
+    letter-spacing: -1.5px;
+  }
+  .hero-copy p {
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 440px;
+    margin: 0 0 32px;
+  }
+  .hero-actions { display: flex; gap: 14px; }
+  .btn-primary {
+    padding: 13px 24px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: #0a0a0f;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-ghost {
+    padding: 13px 24px;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.16);
+    cursor: pointer;
+  }
+  .globe-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 560px;
+  }
+  .globe-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 1 / 1;
+  }
+  #cobe-canvas {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    contain: layout paint size;
+  }
+  #cobe-canvas:active { cursor: grabbing; }
+  .badge {
+    position: absolute;
+    background: rgba(20,20,30,0.85);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--ink);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6ee7b7;
+    box-shadow: 0 0 8px #6ee7b7;
+  }
+  .badge-1 { top: 6%; left: -6%; }
+  .badge-2 { bottom: 10%; right: -4%; }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 120px; }
+    .globe-stage { height: 400px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">orbit<span>.io</span></div>
+    <ul>
+      <li><a href="#">Product</a></li>
+      <li><a href="#">Network</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">Docs</a></li>
+    </ul>
+    <div class="cta">Get started</div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">Global edge network</div>
+      <h1>Ship your app on 34 regions, instantly.</h1>
+      <p>Deploy once and let our edge network route every request to the nearest node. Drag the globe below to explore live markers.</p>
+      <div class="hero-actions">
+        <button class="btn-primary">Deploy now</button>
+        <button class="btn-ghost">View network map</button>
+      </div>
+    </div>
+    <div class="globe-stage">
+      <div class="globe-wrap">
+        <canvas id="cobe-canvas"></canvas>
+        <div class="badge badge-1"><span class="dot"></span>Singapore · 4ms</div>
+        <div class="badge badge-2"><span class="dot"></span>Frankfurt · 9ms</div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import createGlobe from "https://cdn.jsdelivr.net/npm/cobe/dist/cobe.esm.js";
+
+    const canvas = document.getElementById("cobe-canvas");
+    let phi = 0;
+    let width = 0;
+    let pointerInteracting = null;
+    let pointerInteractionMovement = 0;
+    let globe;
+
+    const markers = [
+      { location: [1.3521, 103.8198], size: 0.09 },
+      { location: [50.1109, 8.6821], size: 0.08 },
+      { location: [37.7749, -122.4194], size: 0.09 },
+      { location: [51.5074, -0.1278], size: 0.07 },
+      { location: [35.6762, 139.6503], size: 0.08 },
+      { location: [-23.5505, -46.6333], size: 0.06 },
+    ];
+
+    function setup() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = rect.width;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+
+      return createGlobe(canvas, {
+        devicePixelRatio: dpr,
+        width: canvas.width,
+        height: canvas.height,
+        phi: 0,
+        theta: 0.28,
+        dark: 1,
+        diffuse: 1.3,
+        scale: 1.05,
+        mapSamples: 16000,
+        mapBrightness: 5.5,
+        baseColor: [0.22, 0.2, 0.3],
+        markerColor: [0.7, 0.55, 1],
+        glowColor: [0.55, 0.45, 0.9],
+        markers,
+        onRender: (state) => {
+          if (!pointerInteracting) phi += 0.0035;
+          state.phi = phi + pointerInteractionMovement;
+          state.width = canvas.width;
+          state.height = canvas.height;
+        },
+      });
+    }
+
+    globe = setup();
+
+    window.addEventListener("resize", () => {
+      globe.destroy();
+      globe = setup();
+    });
+
+    function toRadians(delta) {
+      return delta / 200;
+    }
+
+    canvas.addEventListener("pointerdown", (e) => {
+      pointerInteracting = e.clientX - pointerInteractionMovement;
+      canvas.style.cursor = "grabbing";
+    });
+    window.addEventListener("pointerup", () => {
+      pointerInteracting = null;
+      canvas.style.cursor = "grab";
+    });
+    window.addEventListener("pointermove", (e) => {
+      if (pointerInteracting !== null) {
+        const delta = e.clientX - pointerInteracting;
+        pointerInteractionMovement = toRadians(delta);
+      }
+    });
+    canvas.addEventListener("touchstart", (e) => {
+      pointerInteracting = e.touches[0].clientX - pointerInteractionMovement;
+    }, { passive: true });
+    canvas.addEventListener("touchmove", (e) => {
+      if (pointerInteracting !== null && e.touches[0]) {
+        const delta = e.touches[0].clientX - pointerInteracting;
+        pointerInteractionMovement = toRadians(delta);
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>

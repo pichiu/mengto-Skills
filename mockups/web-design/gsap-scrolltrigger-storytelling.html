@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>gsap-scrolltrigger-storytelling</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #06070d;
+    --bg-alt: #0b0d18;
+    --panel: #10131f;
+    --panel-2: #161a2b;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #e9ebf5;
+    --text-dim: #8890ab;
+    --blue: #5b8cff;
+    --violet: #a463ff;
+    --grad: linear-gradient(120deg, var(--blue), var(--violet));
+    --mono: "SFMono-Regular", "JetBrains Mono", Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 0%, rgba(91, 140, 255, 0.12), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 30%, rgba(164, 99, 255, 0.1), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  a { color: inherit; }
+
+  .mono { font-family: var(--mono); }
+
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(6, 7, 13, 0.6);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .brand-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--grad);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .nav-links span { cursor: default; }
+
+  .nav-cta {
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--grad);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  header.hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 76px);
+    line-height: 1.05;
+    margin: 0 0 20px;
+    max-width: 900px;
+    background: linear-gradient(180deg, #fff, #aeb4d6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+  }
+
+  .hero p {
+    max-width: 560px;
+    color: var(--text-dim);
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0 0 36px;
+  }
+
+  .scroll-hint {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .scroll-hint .bar {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(var(--blue), transparent);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  .story {
+    position: relative;
+    z-index: 1;
+    height: 500vh;
+  }
+
+  .story-stage {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .story-progress {
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+  }
+
+  .story-progress .dot {
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .story-progress .dot i {
+    position: absolute;
+    inset: 0;
+    background: var(--grad);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .device-wrap {
+    position: relative;
+    width: min(640px, 74vw);
+    z-index: 3;
+  }
+
+  .device {
+    position: relative;
+    border-radius: 20px;
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--border);
+    box-shadow:
+      0 40px 100px -30px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    overflow: hidden;
+  }
+
+  .device-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .device-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #444a63;
+  }
+
+  .device-dot:nth-child(1) { background: #ff6169; }
+  .device-dot:nth-child(2) { background: #ffbd4c; }
+  .device-dot:nth-child(3) { background: #35cc62; }
+
+  .device-url {
+    margin-left: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    flex: 1;
+    max-width: 220px;
+  }
+
+  .device-screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: radial-gradient(circle at 30% 20%, #171b2c, #0c0e18 70%);
+    transition: none;
+    overflow: hidden;
+  }
+
+  .screen-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, #171b2c, #0c0e18 70%);
+    opacity: 1;
+  }
+
+  .screen-bg.alt {
+    background: radial-gradient(circle at 70% 80%, #1c1140, #0a0e1c 70%);
+    opacity: 0;
+  }
+
+  .screen-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.6;
+  }
+
+  .screen-card {
+    position: absolute;
+    top: 16%;
+    left: 8%;
+    width: 46%;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+  }
+
+  .screen-card .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .screen-card .value {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 600;
+    margin-top: 6px;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .screen-line {
+    position: absolute;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+  }
+
+  .highlight-region {
+    position: absolute;
+    top: 42%;
+    right: 10%;
+    width: 34%;
+    height: 30%;
+    border: 1.5px solid var(--blue);
+    border-radius: 10px;
+    box-shadow: 0 0 0 4000px rgba(4, 5, 10, 0.35);
+    opacity: 0;
+  }
+
+  .highlight-region::after {
+    content: "REGION SCAN";
+    position: absolute;
+    top: -24px;
+    left: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--blue);
+  }
+
+  .pulse-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 0 0 rgba(164, 99, 255, 0.6);
+  }
+
+  .narrative {
+    position: absolute;
+    width: min(360px, 40vw);
+    z-index: 4;
+    opacity: 0;
+  }
+
+  .narrative .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--violet);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .narrative h2 {
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.2;
+    margin: 0 0 12px;
+  }
+
+  .narrative p {
+    color: var(--text-dim);
+    font-size: 14.5px;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .narrative.left { left: 6%; top: 50%; transform: translateY(-50%); }
+  .narrative.right { right: 6%; top: 50%; transform: translateY(-50%); }
+  .narrative.top-left { left: 6%; top: 30%; }
+  .narrative.bottom-right { right: 6%; bottom: 22%; }
+
+  .callout-chip {
+    position: absolute;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(16, 19, 31, 0.9);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+  }
+
+  .callout-chip .swatch {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--blue);
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 100px 24px 60px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: linear-gradient(180deg, transparent, rgba(91, 140, 255, 0.04));
+  }
+
+  footer h3 {
+    font-size: clamp(26px, 4vw, 40px);
+    margin: 0 0 16px;
+  }
+
+  footer p {
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+
+  .footer-cta {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 10px;
+    background: var(--grad);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 56px;
+  }
+
+  .footer-meta {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .story { height: auto; }
+    .story-stage {
+      position: relative;
+      height: auto;
+      min-height: 100vh;
+      flex-direction: column;
+      padding: 120px 20px 80px;
+      gap: 40px;
+    }
+    .story-progress { display: none; }
+    .device-wrap { width: 100%; position: relative; }
+    .narrative {
+      position: relative;
+      width: 100%;
+      left: auto;
+      right: auto;
+      top: auto;
+      bottom: auto;
+      transform: none;
+      opacity: 1;
+    }
+    .callout-chip { position: relative; opacity: 1; margin: 6px 0; }
+    .highlight-region { opacity: 1; }
+    .screen-card { opacity: 1; }
+    .screen-line { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story { height: auto; }
+    .story-stage {
+      position: relative;
+      height: auto;
+      min-height: 100vh;
+      flex-direction: column;
+      padding: 120px 20px 80px;
+      gap: 32px;
+    }
+    .story-progress { display: none; }
+    .narrative {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      left: auto;
+      right: auto;
+      top: auto;
+      bottom: auto;
+      transform: none;
+      opacity: 1;
+    }
+    .callout-chip { position: relative; opacity: 1; margin: 6px auto; }
+    .highlight-region { opacity: 1; }
+    .screen-card { opacity: 1; }
+    .screen-line { opacity: 1; }
+    .screen-bg.alt { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <span class="brand-mark"></span>
+    <span>NORTHBEAM</span>
+  </div>
+  <div class="nav-links">
+    <span>Product</span>
+    <span>Platform</span>
+    <span>Docs</span>
+    <span>Pricing</span>
+  </div>
+  <div class="nav-cta">Get started</div>
+</nav>
+
+<header class="hero">
+  <span class="eyebrow">// scroll to explore</span>
+  <h1>One console. Every signal, live.</h1>
+  <p>Northbeam pins insight to the moment it matters — scroll through the product story below to see how data becomes decisions in real time.</p>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <span class="bar"></span>
+  </div>
+</header>
+
+<section class="story" id="story">
+  <div class="story-stage" id="stage">
+    <div class="story-progress" id="progress">
+      <div class="dot"><i></i></div>
+      <div class="dot"><i></i></div>
+      <div class="dot"><i></i></div>
+      <div class="dot"><i></i></div>
+    </div>
+
+    <div class="device-wrap" id="device-wrap">
+      <div class="device" id="device">
+        <div class="device-chrome">
+          <span class="device-dot"></span>
+          <span class="device-dot"></span>
+          <span class="device-dot"></span>
+          <span class="device-url">app.northbeam.io/live</span>
+        </div>
+        <div class="device-screen" id="screen">
+          <div class="screen-bg"></div>
+          <div class="screen-bg alt"></div>
+          <div class="screen-grid"></div>
+
+          <div class="screen-card" id="stat-card">
+            <span class="label">Active sessions</span>
+            <span class="value mono" id="stat-value">0</span>
+          </div>
+
+          <div class="screen-line" id="line-1" style="top:24%; left:58%; width:34%;"></div>
+          <div class="screen-line" id="line-2" style="top:34%; left:58%; width:26%;"></div>
+          <div class="screen-line" id="line-3" style="top:44%; left:58%; width:30%;"></div>
+
+          <div class="highlight-region" id="highlight"></div>
+          <div class="pulse-dot" id="pulse" style="top:58%; left:64%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narrative left" id="scene1">
+      <span class="tag">Scene 01 — Overview</span>
+      <h2>Every product event, unified.</h2>
+      <p>Northbeam ingests clickstream, backend, and billing events into a single pinned timeline — no glue code, no delay.</p>
+    </div>
+
+    <div class="narrative right" id="scene2">
+      <span class="tag">Scene 02 — Live metrics</span>
+      <h2>Numbers that move with your users.</h2>
+      <p>Session counts, conversion, and retention recompute continuously as new signal streams in, right on the screen you're already watching.</p>
+    </div>
+
+    <div class="narrative top-left" id="scene3">
+      <span class="tag">Scene 03 — Region focus</span>
+      <h2>Zoom into what changed.</h2>
+      <p>Anomaly regions are auto-highlighted on the canvas, so your team spends time deciding — not hunting.</p>
+    </div>
+
+    <div class="narrative bottom-right" id="scene4">
+      <span class="tag">Scene 04 — State swap</span>
+      <h2>One click, a new lens.</h2>
+      <p>Swap the entire dashboard state — palette, layout, and data slice — without losing your place in the story.</p>
+    </div>
+
+    <div class="callout-chip" id="chip-1" style="top:22%; left:52%;"><span class="swatch"></span>Realtime ingest</div>
+    <div class="callout-chip" id="chip-2" style="top:66%; left:10%;"><span class="swatch"></span>+312% signal density</div>
+    <div class="callout-chip" id="chip-3" style="top:14%; right:8%;"><span class="swatch"></span>Anomaly detected</div>
+    <div class="callout-chip" id="chip-4" style="bottom:16%; left:48%;"><span class="swatch"></span>State: Focus mode</div>
+  </div>
+</section>
+
+<footer>
+  <h3>Bring your product story to every scroll.</h3>
+  <p>Northbeam turns raw telemetry into a pinned, scrubbed narrative your whole team can follow — one timeline, four scenes, zero guesswork.</p>
+  <a class="footer-cta" href="#">Start free trial</a>
+  <div class="footer-meta">
+    <span class="mono">STATUS: OPERATIONAL</span>
+    <span class="mono">UPTIME: 99.99%</span>
+    <span class="mono">© 2026 NORTHBEAM INC.</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script>
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!reduceMotion) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const scenes = ["scene1", "scene2", "scene3", "scene4"];
+    const dots = document.querySelectorAll(".story-progress .dot i");
+
+    gsap.set(["#scene1"], { opacity: 1, y: 0 });
+
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 769px)", () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#story",
+          start: "top top",
+          end: `+=${scenes.length * 100}%`,
+          scrub: 1,
+          pin: "#stage",
+          anticipatePin: 1,
+          onUpdate: (self) => {
+            const idx = Math.min(
+              scenes.length - 1,
+              Math.floor(self.progress * scenes.length)
+            );
+            dots.forEach((d, i) => {
+              gsap.to(d, {
+                scaleX: i <= idx ? 1 : 0,
+                duration: 0.3,
+                overwrite: true,
+              });
+            });
+          },
+        },
+      });
+
+      gsap.set("#scene2, #scene3, #scene4", { opacity: 0, y: 30 });
+      gsap.set(".callout-chip", { opacity: 0, y: 14, scale: 0.94 });
+      gsap.set("#highlight", { opacity: 0, scale: 1.06, filter: "blur(6px)" });
+      gsap.set(".screen-line", { opacity: 0, scaleX: 0.4, transformOrigin: "left center" });
+      gsap.set(".screen-bg.alt", { opacity: 0 });
+      gsap.set("#device-wrap", { scale: 1 });
+
+      tl.addLabel("scene1")
+        .to("#scene1", { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, "scene1")
+        .to("#chip-1", { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "power2.out" }, "scene1+=0.05")
+        .to("#device-wrap", { scale: 1.02, duration: 0.4, ease: "power2.out" }, "scene1")
+
+        .addLabel("scene1-out", "+=0.3")
+        .to("#scene1", { opacity: 0, y: -24, filter: "blur(4px)", duration: 0.25, ease: "power2.in" }, "scene1-out")
+        .to("#chip-1", { opacity: 0, y: -10, duration: 0.2, ease: "power2.in" }, "scene1-out")
+
+        .addLabel("scene2", "+=0.05")
+        .to("#scene2", { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, "scene2")
+        .to("#chip-2", { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "power2.out" }, "scene2+=0.05")
+        .to(".screen-line", { opacity: 1, scaleX: 1, duration: 0.3, stagger: 0.08, ease: "power2.out" }, "scene2+=0.05")
+        .to("#stat-card", { opacity: 1, duration: 0.2, ease: "power2.out" }, "scene2+=0.05")
+        .to(
+          { val: 0 },
+          {
+            val: 8241,
+            duration: 0.5,
+            ease: "power1.out",
+            onUpdate: function () {
+              document.getElementById("stat-value").textContent = Math.floor(
+                this.targets()[0].val
+              ).toLocaleString();
+            },
+          },
+          "scene2+=0.1"
+        )
+        .to("#pulse", {
+          boxShadow: "0 0 0 10px rgba(164,99,255,0)",
+          repeat: 3,
+          yoyo: true,
+          duration: 0.15,
+        }, "scene2+=0.1")
+
+        .addLabel("scene2-out", "+=0.3")
+        .to("#scene2", { opacity: 0, y: -24, filter: "blur(4px)", duration: 0.25, ease: "power2.in" }, "scene2-out")
+        .to("#chip-2", { opacity: 0, y: -10, duration: 0.2, ease: "power2.in" }, "scene2-out")
+
+        .addLabel("scene3", "+=0.05")
+        .to("#scene3", { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, "scene3")
+        .to("#chip-3", { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "power2.out" }, "scene3+=0.05")
+        .to("#highlight", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, ease: "power2.out" }, "scene3+=0.05")
+
+        .addLabel("scene3-out", "+=0.3")
+        .to("#scene3", { opacity: 0, y: -24, filter: "blur(4px)", duration: 0.25, ease: "power2.in" }, "scene3-out")
+        .to("#chip-3", { opacity: 0, y: -10, duration: 0.2, ease: "power2.in" }, "scene3-out")
+        .to("#highlight", { opacity: 0, duration: 0.2, ease: "power2.in" }, "scene3-out")
+
+        .addLabel("scene4", "+=0.05")
+        .to("#scene4", { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, "scene4")
+        .to("#chip-4", { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "power2.out" }, "scene4+=0.05")
+        .to(".screen-bg.alt", { opacity: 1, duration: 0.4, ease: "power2.out" }, "scene4")
+        .to("#device-wrap", { scale: 1, duration: 0.4, ease: "power2.out" }, "scene4")
+
+        .addLabel("end", "+=0.3");
+
+      return () => {
+        tl.kill();
+      };
+    });
+
+    mm.add("(max-width: 768px)", () => {
+      gsap.set(
+        ["#scene1", "#scene2", "#scene3", "#scene4", ".callout-chip", "#highlight", ".screen-line"],
+        { clearProps: "all" }
+      );
+
+      gsap.utils.toArray(".narrative, .callout-chip").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+
+      gsap.to("#stat-value", {
+        innerText: 8241,
+        duration: 1.2,
+        ease: "power1.out",
+        snap: { innerText: 1 },
+        scrollTrigger: {
+          trigger: "#stat-card",
+          start: "top 85%",
+        },
+        onUpdate: function () {
+          const el = document.getElementById("stat-value");
+          el.textContent = Math.floor(Number(el.textContent)).toLocaleString();
+        },
+      });
+
+      return () => {};
+    });
+  } else {
+    document.getElementById("stat-value").textContent = "8,241";
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<title>beautiful-shadows</title>
+<style>
+  :root {
+    --sm-shadow: 0px 2px 3px -1px rgba(0,0,0,0.1), 0px 1px 0px 0px rgba(25,28,33,0.02), 0px 0px 0px 1px rgba(25,28,33,0.08);
+    --md-shadow: 0px 0px 0px 1px rgba(0,0,0,0.06), 0px 1px 1px -0.5px rgba(0,0,0,0.06), 0px 3px 3px -1.5px rgba(0,0,0,0.06), 0px 6px 6px -3px rgba(0,0,0,0.06), 0px 12px 12px -6px rgba(0,0,0,0.06), 0px 24px 24px -12px rgba(0,0,0,0.06);
+    --lg-shadow: 0 2.8px 2.2px rgba(0,0,0,0.034), 0 6.7px 5.3px rgba(0,0,0,0.048), 0 12.5px 10px rgba(0,0,0,0.06), 0 22.3px 17.9px rgba(0,0,0,0.072), 0 41.8px 33.4px rgba(0,0,0,0.086), 0 100px 80px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #eef0f3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    color: #1a1c22;
+    padding: clamp(24px, 6vw, 64px) clamp(16px, 5vw, 48px);
+  }
+  h1 {
+    font-size: clamp(22px, 3vw, 28px);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  p.lede {
+    margin: 0 0 40px;
+    color: #6b7280;
+    max-width: 60ch;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+  }
+  figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+  }
+  .card.sm { box-shadow: var(--sm-shadow); border-radius: 12px; }
+  .card.md { box-shadow: var(--md-shadow); }
+  .card.lg { box-shadow: var(--lg-shadow); }
+  .dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+  }
+  .card h3 { margin: 0; font-size: 15px; }
+  .card p { margin: 0; font-size: 13px; color: #6b7280; line-height: 1.5; }
+  .pill-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    background: #fff;
+    box-shadow: var(--sm-shadow);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .hero-media {
+    background: linear-gradient(135deg, #fef3c7, #fecaca);
+    border-radius: 20px;
+    box-shadow: var(--lg-shadow);
+    height: 160px;
+    display: flex;
+    align-items: flex-end;
+    padding: 18px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #7c2d12;
+  }
+  figcaption {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.5;
+  }
+  code {
+    background: #e5e7eb;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+<body>
+  <h1>Beautiful Shadows</h1>
+  <p class="lede">Three exact shadow utilities for neutral, layered elevation — no colored glow, no default Tailwind scale.</p>
+  <div class="grid">
+    <figure>
+      <div class="card sm">
+        <div class="dot"></div>
+        <h3>Compact control</h3>
+        <p>Quiet lift for a form-like surface.</p>
+      </div>
+      <figcaption><code>shadow-sm</code>: tight, low-contrast edge for cards, pills, and controls that shouldn't compete.</figcaption>
+    </figure>
+    <figure>
+      <div class="card md">
+        <div class="dot"></div>
+        <h3>Elevated panel</h3>
+        <p>Default surface treatment for cards and popovers.</p>
+      </div>
+      <figcaption><code>shadow-md</code>: six stacked layers give a soft, believable lift — the default elevated surface.</figcaption>
+    </figure>
+    <figure>
+      <div class="hero-media">Feature callout</div>
+      <figcaption><code>shadow-lg</code>: wide, diffuse spread for hero media and modal-like containers — the strongest lift.</figcaption>
+    </figure>
+    <figure>
+      <div class="pill-row">
+        <span class="pill">Design</span>
+        <span class="pill">Engineering</span>
+        <span class="pill">Growth</span>
+      </div>
+      <figcaption>Same <code>shadow-sm</code> reused across pills so the whole row reads as one system, not one-off effects.</figcaption>
+    </figure>
+  </div>
+</body>

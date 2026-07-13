@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>globe-gl</title>
+<style>
+  :root {
+    --bg: #060912;
+    --ink: #eef1f7;
+    --muted: #8993a8;
+    --accent: #4fd1c5;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    overflow-x: hidden;
+  }
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 48px;
+  }
+  .logo { font-weight: 700; font-size: 15px; letter-spacing: 0.4px; }
+  .logo span { color: var(--accent); }
+  .nav ul {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .nav a { color: inherit; text-decoration: none; }
+  .nav .cta {
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #04211d;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 24px 60px;
+  }
+  .hero .eyebrow {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5.2vw, 56px);
+    line-height: 1.08;
+    margin: 0 0 18px;
+    font-weight: 650;
+    letter-spacing: -1.4px;
+    max-width: 780px;
+  }
+  .hero p {
+    color: var(--muted);
+    max-width: 520px;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 12px;
+  }
+  #globeViz {
+    width: min(100%, 900px);
+    height: 620px;
+    margin-top: 8px;
+  }
+  .stat-row {
+    position: relative;
+    display: flex;
+    gap: 48px;
+    margin-top: -30px;
+    z-index: 2;
+    padding-bottom: 60px;
+  }
+  .stat { text-align: center; }
+  .stat b { display: block; font-size: 26px; color: var(--ink); }
+  .stat span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  @media (max-width: 720px) {
+    #globeViz { height: 460px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">route<span>flow</span></div>
+    <ul>
+      <li><a href="#">Platform</a></li>
+      <li><a href="#">Routes</a></li>
+      <li><a href="#">Pricing</a></li>
+    </ul>
+    <div class="cta">Book a demo</div>
+  </nav>
+
+  <section class="hero">
+    <div class="eyebrow">Live logistics intelligence</div>
+    <h1>Track every shipment, on one living globe.</h1>
+    <p>Arcs show active freight lanes, points mark distribution hubs. Drag to rotate and see the network breathe in real time.</p>
+    <div id="globeViz"></div>
+  </section>
+
+  <div class="stat-row" style="justify-content:center; width:100%;">
+    <div class="stat"><b>182</b><span>Active lanes</span></div>
+    <div class="stat"><b>46</b><span>Hub cities</span></div>
+    <div class="stat"><b>99.98%</b><span>On-time rate</span></div>
+  </div>
+
+  <script type="module">
+    import Globe from "https://cdn.jsdelivr.net/npm/globe.gl/+esm";
+
+    const hubs = [
+      { name: "Singapore", lat: 1.3521, lng: 103.8198 },
+      { name: "Rotterdam", lat: 51.9244, lng: 4.4777 },
+      { name: "Los Angeles", lat: 34.0522, lng: -118.2437 },
+      { name: "Shanghai", lat: 31.2304, lng: 121.4737 },
+      { name: "Dubai", lat: 25.2048, lng: 55.2708 },
+      { name: "Sao Paulo", lat: -23.5505, lng: -46.6333 },
+      { name: "Lagos", lat: 6.5244, lng: 3.3792 },
+      { name: "Sydney", lat: -33.8688, lng: 151.2093 },
+      { name: "New York", lat: 40.7128, lng: -74.006 },
+      { name: "Mumbai", lat: 19.076, lng: 72.8777 },
+    ];
+
+    function pick(exclude) {
+      let h;
+      do { h = hubs[Math.floor(Math.random() * hubs.length)]; } while (h === exclude);
+      return h;
+    }
+
+    const arcs = hubs.map((start) => {
+      const end = pick(start);
+      return {
+        startLat: start.lat,
+        startLng: start.lng,
+        endLat: end.lat,
+        endLng: end.lng,
+        color: ["rgba(79,209,197,0.9)", "rgba(120,180,255,0.7)"],
+      };
+    });
+
+    const globe = new Globe(document.getElementById("globeViz"))
+      .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-dark.jpg")
+      .bumpImageUrl("https://unpkg.com/three-globe/example/img/earth-topology.png")
+      .backgroundColor("rgba(0,0,0,0)")
+      .showAtmosphere(true)
+      .atmosphereColor("#4fd1c5")
+      .atmosphereAltitude(0.18)
+      .pointsData(hubs)
+      .pointLat("lat")
+      .pointLng("lng")
+      .pointColor(() => "#4fd1c5")
+      .pointAltitude(0.01)
+      .pointRadius(0.45)
+      .pointLabel((d) => d.name)
+      .arcsData(arcs)
+      .arcColor("color")
+      .arcDashLength(0.4)
+      .arcDashGap(2)
+      .arcDashAnimateTime(2600)
+      .arcStroke(0.4)
+      .arcAltitudeAutoScale(0.35);
+
+    globe.controls().autoRotate = true;
+    globe.controls().autoRotateSpeed = 0.6;
+    globe.controls().enableZoom = false;
+
+    function resize() {
+      const el = document.getElementById("globeViz");
+      globe.width(el.clientWidth).height(el.clientHeight);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+  </script>
+</body>
+</html>

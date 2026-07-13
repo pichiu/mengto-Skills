@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>corner-lasers</title>
+<style>
+  :root {
+    --bg: #07070a;
+    --bg-2: #0b0b10;
+    --accent: #ff9640;
+    --accent-soft: rgba(255, 150, 64, 0.35);
+    --white-hot: #fff7ec;
+    --text: #f3f1ec;
+    --muted: #9a978f;
+    --line: rgba(255, 255, 255, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    overflow-x: hidden;
+  }
+
+  canvas#laser {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px clamp(20px, 5vw, 64px);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(6px);
+  }
+
+  .brand {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent), 0 0 22px var(--accent-soft);
+  }
+
+  .links {
+    display: flex;
+    gap: 32px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .links a { color: var(--muted); text-decoration: none; }
+  .links a:hover { color: var(--text); }
+
+  .cta-nav {
+    padding: 9px 18px;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  header.hero {
+    min-height: 78vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 clamp(20px, 5vw, 64px);
+    position: relative;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: clamp(38px, 7vw, 84px);
+    font-weight: 500;
+    line-height: 1.02;
+    margin: 0 0 22px;
+    max-width: 900px;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span { color: var(--muted); }
+
+  .hero p {
+    max-width: 520px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 34px;
+  }
+
+  .hero-actions { display: flex; gap: 14px; }
+
+  .btn-primary {
+    background: linear-gradient(180deg, var(--white-hot), var(--accent));
+    color: #1a0e00;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 13px 26px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 0 30px var(--accent-soft);
+  }
+
+  .btn-secondary {
+    padding: 13px 26px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 8px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  section {
+    padding: 90px clamp(20px, 5vw, 64px);
+    border-top: 1px solid var(--line);
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 44px;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .section-head h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .section-head p { color: var(--muted); max-width: 420px; font-size: 14px; margin: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -40%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+    opacity: 0.5;
+  }
+
+  .card .num {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+
+  .card p {
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  .panel {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 100% 0%, var(--accent-soft), transparent 55%);
+  }
+
+  .split h2 { font-size: 30px; font-weight: 500; margin: 0 0 16px; }
+  .split p { color: var(--muted); font-size: 14.5px; line-height: 1.7; margin-bottom: 24px; max-width: 440px; }
+
+  footer {
+    padding: 40px clamp(20px, 5vw, 64px) 60px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 12.5px;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .split { grid-template-columns: 1fr; }
+    .links { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="laser"></canvas>
+<div class="page">
+  <nav>
+    <div class="brand"><span class="dot"></span> APEX / SYSTEMS</div>
+    <div class="links">
+      <a href="#">Platform</a>
+      <a href="#">Solutions</a>
+      <a href="#">Docs</a>
+      <a href="#">Pricing</a>
+    </div>
+    <a class="cta-nav" href="#">Get access</a>
+  </nav>
+
+  <header class="hero">
+    <div class="eyebrow">CORNER-EMITTER RENDERING ENGINE</div>
+    <h1>Light finds its origin<br><span>in the corner of the frame.</span></h1>
+    <p>A rendering core built around a single luminous point — thin beams converge, bloom, and drift outward into volumetric haze.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#">Launch console</a>
+      <a class="btn-secondary" href="#">View documentation</a>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-head">
+      <h2>Built around the emitter</h2>
+      <p>Three primitives compose every corner-laser scene: the node, the beam, and the atmosphere.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <span class="num">01 / NODE</span>
+        <h3>Emitter hotspot</h3>
+        <p>A concentrated bloom marks the brightest point in the composition, anchored off-axis at the frame corner.</p>
+      </div>
+      <div class="card">
+        <span class="num">02 / BEAM</span>
+        <h3>Signed-distance rays</h3>
+        <p>Two or three thin rays extend from the node using line-distance falloff for a crisp, continuous core.</p>
+      </div>
+      <div class="card">
+        <span class="num">03 / HAZE</span>
+        <h3>Volumetric atmosphere</h3>
+        <p>Soft accent-tinted fog diffuses around the beams so the corner feels spatial, not flat.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="split">
+      <div>
+        <div class="eyebrow">MOTION PROFILE</div>
+        <h2>Restrained, cinematic pulse.</h2>
+        <p>Slow bloom breathing and faint traveling energy along each beam — never chaotic flicker, always a controlled shimmer that reads as premium engineering.</p>
+        <a class="btn-secondary" href="#">Read the tuning guide</a>
+      </div>
+      <div class="panel">Preview surface</div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Apex Systems</span>
+    <span>Corner emitter v2.3</span>
+  </footer>
+</div>
+
+<script>
+  const canvas = document.getElementById("laser");
+  const ctx = canvas.getContext("2d");
+  let w, h, dpr;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  const accent = [255, 150, 64];
+
+  function drawBeam(ox, oy, angle, length, coreWidth, t) {
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const ex = ox + dx * length;
+    const ey = oy + dy * length;
+
+    const grad = ctx.createLinearGradient(ox, oy, ex, ey);
+    grad.addColorStop(0, `rgba(${accent[0]},${accent[1]},${accent[2]},0.9)`);
+    grad.addColorStop(0.15, `rgba(${accent[0]},${accent[1]},${accent[2]},0.35)`);
+    grad.addColorStop(1, `rgba(${accent[0]},${accent[1]},${accent[2]},0)`);
+
+    ctx.save();
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = coreWidth * 6;
+    ctx.filter = "blur(8px)";
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = `rgba(255,247,236,${0.75 + 0.2 * Math.sin(t * 1.4)})`;
+    ctx.lineWidth = coreWidth;
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function render(time) {
+    const t = time * 0.001;
+    ctx.clearRect(0, 0, w, h);
+
+    const ox = w * 0.06;
+    const oy = h * 0.08;
+
+    const pulse = 0.85 + 0.15 * Math.sin(t * 1.1);
+    const bloomRadius = 220 * pulse;
+    const bloom = ctx.createRadialGradient(ox, oy, 0, ox, oy, bloomRadius);
+    bloom.addColorStop(0, `rgba(255,247,236,${0.55 * pulse})`);
+    bloom.addColorStop(0.25, `rgba(${accent[0]},${accent[1]},${accent[2]},${0.28 * pulse})`);
+    bloom.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = bloom;
+    ctx.fillRect(ox - bloomRadius, oy - bloomRadius, bloomRadius * 2, bloomRadius * 2);
+
+    const fogRadius = Math.max(w, h) * 0.55;
+    const fog = ctx.createRadialGradient(ox, oy, 0, ox, oy, fogRadius);
+    fog.addColorStop(0, `rgba(${accent[0]},${accent[1]},${accent[2]},0.10)`);
+    fog.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = fog;
+    ctx.fillRect(0, 0, w, h);
+
+    drawBeam(ox, oy, 0.28, Math.hypot(w, h) * 0.9, 1.4, t);
+    drawBeam(ox, oy, 1.15, Math.hypot(w, h) * 0.75, 1.1, t + 1.4);
+    drawBeam(ox, oy, 0.72, Math.hypot(w, h) * 0.6, 0.9, t + 2.6);
+
+    ctx.save();
+    ctx.fillStyle = `rgba(255,247,236,${0.9 * pulse})`;
+    ctx.filter = "blur(1px)";
+    ctx.beginPath();
+    ctx.arc(ox, oy, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    requestAnimationFrame(render);
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+  requestAnimationFrame(render);
+</script>
+</body>
+</html>

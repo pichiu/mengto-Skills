@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>threejs</title>
+<style>
+  :root {
+    --bg: #0d0d10;
+    --ink: #f4f3f6;
+    --muted: #97949f;
+    --accent: #7c3aed;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: linear-gradient(180deg, #101014 0%, #0d0d10 100%);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    overflow-x: hidden;
+  }
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 48px;
+  }
+  .logo { font-weight: 700; font-size: 15px; }
+  .logo span { color: var(--accent); }
+  .nav ul { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; font-size: 14px; color: var(--muted); }
+  .nav a { color: inherit; text-decoration: none; }
+  .nav .cta {
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 140px 48px 80px;
+    gap: 24px;
+  }
+  .hero-copy .eyebrow {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.08;
+    margin: 0 0 20px;
+    font-weight: 650;
+    letter-spacing: -1.4px;
+  }
+  .hero-copy p {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 440px;
+    margin: 0 0 32px;
+  }
+  .btn-primary {
+    padding: 13px 26px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+  }
+  .stage-wrap {
+    position: relative;
+    height: 520px;
+  }
+  #scene-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 120px; }
+    .stage-wrap { height: 380px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">form<span>lab</span></div>
+    <ul>
+      <li><a href="#">Product</a></li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Docs</a></li>
+    </ul>
+    <div class="cta">Launch studio</div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">Real-time 3D on the web</div>
+      <h1>Bring your product to life in three dimensions.</h1>
+      <p>A fully lit, rotating scene built with Three.js — reflections, shadows, and material response, all in the browser.</p>
+      <button class="btn-primary">Explore the toolkit</button>
+    </div>
+    <div class="stage-wrap">
+      <canvas id="scene-canvas"></canvas>
+    </div>
+  </section>
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+
+    const canvas = document.getElementById("scene-canvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0.6, 5.2);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const geom = new THREE.IcosahedronGeometry(1.15, 1);
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: 0x7c3aed,
+      metalness: 0.25,
+      roughness: 0.15,
+      clearcoat: 0.8,
+      clearcoatRoughness: 0.2,
+      flatShading: true,
+    });
+    const mesh = new THREE.Mesh(geom, mat);
+    group.add(mesh);
+
+    const ringGeom = new THREE.TorusGeometry(1.9, 0.02, 16, 100);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x7c3aed, emissiveIntensity: 0.4, roughness: 0.4 });
+    const ring = new THREE.Mesh(ringGeom, ringMat);
+    ring.rotation.x = Math.PI / 2.6;
+    group.add(ring);
+
+    const ring2 = ring.clone();
+    ring2.rotation.x = -Math.PI / 3;
+    ring2.rotation.y = Math.PI / 5;
+    ring2.scale.setScalar(1.15);
+    group.add(ring2);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const key = new THREE.DirectionalLight(0xffffff, 1.4);
+    key.position.set(3, 4, 5);
+    scene.add(key);
+    const rim = new THREE.PointLight(0x7c3aed, 6, 20);
+    rim.position.set(-4, -2, -3);
+    scene.add(rim);
+    const fill = new THREE.PointLight(0x4fd1c5, 2, 20);
+    fill.position.set(2, -3, 2);
+    scene.add(fill);
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const pointer = new THREE.Vector2(0, 0);
+
+    function resize() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      renderer.setSize(w, h, false);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    window.addEventListener("pointermove", (e) => {
+      pointer.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      pointer.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    function animate(t) {
+      const time = t * 0.001;
+      if (!reduceMotion) {
+        mesh.rotation.y = time * 0.35;
+        mesh.rotation.x = time * 0.18;
+        ring.rotation.z = time * 0.22;
+        ring2.rotation.z = -time * 0.16;
+        group.position.y = Math.sin(time * 0.6) * 0.08;
+      }
+      group.rotation.y += (pointer.x * 0.4 - group.rotation.y) * 0.02;
+      group.rotation.x += (-pointer.y * 0.25 - group.rotation.x) * 0.02;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
