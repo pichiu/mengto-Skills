@@ -35,7 +35,7 @@ git clone https://github.com/pichiu/mengto-skills.git   # 或對應的來源 rep
 | [`CODEBASE_MAP.md`](./CODEBASE_MAP.md) | 目錄地圖、「我想改 X 要看哪裡」速查表、模組依賴圖 |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | 內容庫架構：技能發現/載入機制、分類邊界、設計決策 |
 | [`SKILL_TAXONOMY.md`](./SKILL_TAXONOMY.md) | 技能分類體系（置換原 DATA_MODEL.md）：entity 關聯、frontmatter schema、生命週期 |
-| [`SKILL_CATALOG.md`](./SKILL_CATALOG.md) | 完整技能目錄（置換原 API_SURFACE.md）：全部技能的觸發時機與用途 |
+| [`SKILL_CATALOG_part1.md`](./SKILL_CATALOG_part1.md) + [`SKILL_CATALOG_part2.md`](./SKILL_CATALOG_part2.md) | 完整技能目錄（置換原 API_SURFACE.md，因篇幅拆分為兩份）：全部 95 個技能的觸發時機與用途。Part 1 為 codex/media/ui（33 個），Part 2 為 web-design（62 個） |
 | [`DEV_GUIDE.md`](./DEV_GUIDE.md) | 貢獻新技能的上手指南 |
 | [`DISCOVERY_LOG.md`](./DISCOVERY_LOG.md) | 探索紀錄、文件落差、待解問題 |
 | [`TRACE_META.md`](./TRACE_META.md) | Trace metadata，供未來增量更新使用 |
