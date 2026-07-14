@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>個人跑位動線 — 原型 ② + ③</title>
+<style>
+:root{
+  --bg:oklch(0.17 0.014 255); --surface:oklch(0.213 0.016 255); --surface-2:oklch(0.255 0.018 255);
+  --surface-3:oklch(0.30 0.02 255); --line:oklch(0.34 0.018 255); --line-soft:oklch(1 0 0 / 0.08);
+  --ink:oklch(0.97 0.004 255); --ink-2:oklch(0.82 0.010 255); --ink-3:oklch(0.70 0.012 255);
+  --brand:oklch(0.68 0.115 245); --brand-2:oklch(0.60 0.12 248); --brand-ink:oklch(0.16 0.02 255);
+  --brand-soft:oklch(0.68 0.115 245 / 0.14); --focus:oklch(0.78 0.11 240);
+  --ok:oklch(0.74 0.15 155); --ok-soft:oklch(0.74 0.15 155 / 0.15);
+  --warn:oklch(0.82 0.13 82); --warn-soft:oklch(0.82 0.13 82 / 0.15);
+  --danger:oklch(0.68 0.19 25); --danger-soft:oklch(0.68 0.19 25 / 0.15);
+  --white:oklch(0.90 0.01 255); --blue:oklch(0.66 0.12 245);
+  --fs-sm:0.86rem; --sp:16px; --r:16px;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",monospace;
+}
+*{box-sizing:border-box}
+html{font-size:18px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6;
+  padding:max(16px,env(safe-area-inset-top)) 16px 64px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:1.75rem;margin:.2em 0 .1em;text-wrap:balance}
+h2.sec{font-size:1.375rem;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+.sub{color:var(--ink-2);font-size:var(--fs-sm);margin:0 0 18px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;
+  padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2)}
+.badge.proto{color:var(--warn);border-color:color-mix(in oklch,var(--warn) 45%,var(--line));background:var(--warn-soft)}
+.card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:var(--sp)}
+.mt{margin-top:18px}
+/* persona switcher */
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);font:inherit;font-weight:700;
+  padding:10px 18px;border-radius:999px;cursor:pointer;min-height:44px}
+.seg button.on{background:var(--brand);color:var(--brand-ink)}
+/* person card */
+.me{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.avatar{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  color:var(--brand-ink);display:grid;place-items:center;font-size:1.5rem;font-weight:800}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.chip{font-size:.78rem;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2)}
+.chip.mono{font-family:var(--mono);font-weight:700;color:var(--ink)}
+/* approach layout */
+.approach{margin-top:26px}
+.two{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:760px){.two{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
+/* map */
+.mapwrap{position:relative;background:radial-gradient(120% 120% at 50% 0%,var(--surface-2),var(--surface));
+  border:1px solid var(--line-soft);border-radius:14px;overflow:hidden}
+svg.map{display:block;width:100%;height:auto;touch-action:none}
+.locator{position:absolute;right:10px;bottom:10px;width:82px;height:64px;background:oklch(0.17 0.014 255 / .82);
+  border:1px solid var(--line);border-radius:8px;backdrop-filter:blur(2px)}
+.maptag{position:absolute;left:10px;top:10px;font-size:.7rem;color:var(--ink-3);
+  background:oklch(0.17 0.014 255 / .7);border:1px solid var(--line-soft);border-radius:8px;padding:3px 8px}
+/* legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.76rem;color:var(--ink-2);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:5px;vertical-align:-2px}
+.legend .ln{width:22px;height:0;border-top:3px solid var(--brand)}
+.legend .lnd{width:22px;height:0;border-top:3px dashed var(--ink-3)}
+/* list timeline */
+.tl{position:relative;padding-left:6px}
+.tl .row{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:start;
+  padding:11px 0;border-top:1px solid var(--line-soft)}
+.tl .row:first-child{border-top:0}
+.num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem;
+  color:#0d1420;border:2px solid var(--line)}
+.nm{font-weight:700}
+.mv{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.mv.move{color:var(--brand);background:var(--brand-soft)}
+.mv.hold{color:var(--ink-3);background:var(--surface-2)}
+.mv.home{color:var(--warn);background:var(--warn-soft)}
+.meta{font-size:var(--fs-sm);color:var(--ink-2);margin-top:2px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:0;margin-right:4px;border:1px solid var(--line-soft)}
+.teach{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.teach a{font-size:.72rem;text-decoration:none;padding:4px 9px;border-radius:8px;border:1px solid var(--line);
+  color:var(--ink-2);background:var(--surface-2);min-height:32px;display:inline-flex;align-items:center;gap:5px}
+.teach a.canva{color:var(--brand)}
+.teach a.yt{color:var(--danger)}
+.teach a:hover{border-color:var(--brand)}
+.teach .more{color:var(--ink-3);font-size:.72rem;align-self:center}
+/* animation controls */
+.ctrls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;
+  font-weight:700;border-radius:12px;padding:0 18px;min-height:48px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:transparent;min-width:120px;justify-content:center}
+.btn:active{transform:translateY(1px)}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--brand);height:44px}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-2);cursor:pointer}
+.switch input{width:20px;height:20px;accent-color:var(--brand)}
+.nowcap{margin-top:8px;font-size:var(--fs-sm);color:var(--ink-2)}
+.nowcap b{color:var(--ink);font-size:1.05rem}
+.foot{margin-top:34px;color:var(--ink-3);font-size:.78rem;border-top:1px solid var(--line-soft);padding-top:14px}
+.foot code{font-family:var(--mono);color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge proto">● PROTOTYPE · 真實資料 · 種子人物</span>
+  <h1>個人跑位動線</h1>
+  <p class="sub">來源:seat-lookup 完整抽出 · 以「列-排｜側」對映 mockup 座位身份 · 逐場解析(含繼承「原地」)。下面同時呈現 <b>②靜態地圖＋清單</b> 與 <b>③動畫跑位</b>,請比較。</p>
+
+  <div class="card">
+    <div class="me">
+      <div class="avatar" id="mAvatar">黃</div>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:1.25rem;font-weight:800" id="mName">黃志明</div>
+        <div class="chips" id="mChips"></div>
+      </div>
+      <div class="seg" id="switcher"></div>
+    </div>
+  </div>
+
+  <!-- ② -->
+  <section class="approach">
+    <h2 class="sec">② 靜態動線地圖 ＋ 逐場清單</h2>
+    <p class="sub">一眼看完整條動線的空間感,加上逐場可讀清單與「我這區」的教材連結。無動畫,長者友善、資料最小。</p>
+    <div class="two">
+      <div>
+        <div class="mapwrap">
+          <span class="maptag">我的動線 · 縮放至我的活動範圍</span>
+          <svg class="map" id="map2" viewBox="0 0 440 340" preserveAspectRatio="xMidYMid meet" aria-label="靜態個人動線地圖"></svg>
+          <svg class="locator" id="loc2" viewBox="0 0 82 64" aria-hidden="true"></svg>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--brand)"></i>移動到</span>
+          <span><i style="background:var(--warn)"></i>回基本隊形</span>
+          <span><i style="background:var(--ink-3)"></i>原地延續</span>
+          <span><span class="ln"></span> 動線</span>
+          <span><span class="lnd"></span> 回位</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tl" id="list2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ -->
+  <section class="approach">
+    <h2 class="sec">③ 動畫跑位</h2>
+    <p class="sub">同一張地圖,「我」的圓點依演出順序一場場跑過去;附播放/刷選/速度與<b>減少動態</b>(無障礙預設)。</p>
+    <div class="card">
+      <div class="mapwrap">
+        <span class="maptag" id="tag3">▶ 準備播放</span>
+        <svg class="map" id="map3" viewBox="0 0 440 340" preserveAspectRatio="xMidYMid meet" aria-label="動畫個人動線地圖"></svg>
+        <svg class="locator" id="loc3" viewBox="0 0 82 64" aria-hidden="true"></svg>
+      </div>
+      <div class="nowcap" id="now3">第 1 場 · <b>基本隊形</b> — 起始站位</div>
+      <div class="ctrls">
+        <button class="btn primary" id="play3">▶ 播放</button>
+        <input type="range" id="scrub3" min="0" max="14" value="0" step="1" aria-label="跑位進度">
+        <button class="btn" id="speed3">1×</button>
+        <label class="switch"><input type="checkbox" id="reduce3"> 減少動態</label>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">原型使用真實抽出資料的兩位種子人物(<code>48-21｜L 陳美玲</code>、<code>12-18｜L 黃志明</code>,皆西一·台南)。座標經各場 <code>anchor</code> 正規化到共用座標框;教材依分區裁切自 <code>teach</code>。此頁為離線自足 HTML,無外部請求。</p>
+</div>
+
+<script>
+const PEOPLE = {
+ "48-21|L": {
+  "id": "48-21",
+  "side": "L",
+  "sideLabel": "西",
+  "zone": "西一",
+  "area": "台南",
+  "arena": {
+   "minx": -7.895,
+   "miny": -4.934,
+   "maxx": 7.895,
+   "maxy": 4.54
+  },
+  "steps": [
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 1,
+    "kind": "move",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "01",
+    "name": "圓形",
+    "order": 2,
+    "kind": "move",
+    "color": "#BE6C50",
+    "nx": -6.805,
+    "ny": -2.184,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "序",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=9xXoD2XVbNY&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=1"
+     },
+     {
+      "name": "老苦",
+      "canva": null,
+      "youtube": "https://youtu.be/LJZo0hH3nos?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "病苦",
+      "canva": null,
+      "youtube": "https://youtu.be/glh-1pF4StQ?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "死苦",
+      "canva": null,
+      "youtube": "https://youtu.be/gx0R8wK_Wkg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "六度",
+      "canva": null,
+      "youtube": "https://youtu.be/gZ9C6HM6keg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name": "行願千手",
+    "order": 3,
+    "kind": "move",
+    "color": "#0B954B",
+    "nx": -7.792,
+    "ny": -2.904,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "行願-船",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=2bMOTOZnnsofu5CD&t=154"
+     },
+     {
+      "name": "行願-船槳",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=NIaMkvS_dC5C9xtc&t=57"
+     },
+     {
+      "name": "行願-白站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-白跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "開經偈-千手",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     },
+     {
+      "name": "開經偈-蓮花池",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     }
+    ]
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 4,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name": "靜思家風",
+    "order": 5,
+    "kind": "move",
+    "color": "#80CEF3",
+    "nx": -7.11,
+    "ny": -2.304,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "靜思家風",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FxOew30sJoU&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=10"
+     }
+    ]
+   },
+   {
+    "code": "05-1",
+    "name": "法船",
+    "order": 6,
+    "kind": "move",
+    "color": "#ACCE22",
+    "nx": -7.108,
+    "ny": -2.962,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "一盞燈-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/qBMy7Q4ol7U?si=b_E6Xwke11lvBUQ4&t=140"
+     }
+    ]
+   },
+   {
+    "code": "05-2",
+    "name": "法船(異動)",
+    "order": 7,
+    "kind": "hold",
+    "color": "#ACCE22",
+    "nx": -7.108,
+    "ny": -2.962,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "五角錢",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=pzkatOInyss&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=11"
+     },
+     {
+      "name": "圍爐-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/vYxBbQ5FWu0?si=RnV_MBR8W0EaBxb3&t=134"
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 8,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name": "大船師",
+    "order": 9,
+    "kind": "hold",
+    "color": "#FDD100",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 10,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name": "教育",
+    "order": 11,
+    "kind": "move",
+    "color": "#A6ADD6",
+    "nx": -6.851,
+    "ny": -2.06,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 12,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name": "人文",
+    "order": 13,
+    "kind": "move",
+    "color": "#0061AE",
+    "nx": -7.874,
+    "ny": -2.842,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-1",
+    "name": "五大洲(台灣)",
+    "order": 14,
+    "kind": "move",
+    "color": "#4F9DA8",
+    "nx": -7.375,
+    "ny": -2.305,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-2",
+    "name": "五大洲",
+    "order": 15,
+    "kind": "hold",
+    "color": "#4F9DA8",
+    "nx": -7.375,
+    "ny": -2.305,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   }
+  ],
+  "name": "陳美玲"
+ },
+ "12-18|L": {
+  "id": "12-18",
+  "side": "L",
+  "sideLabel": "西",
+  "zone": "西一",
+  "area": "台南",
+  "arena": {
+   "minx": -7.895,
+   "miny": -4.934,
+   "maxx": 7.895,
+   "maxy": 4.54
+  },
+  "steps": [
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 1,
+    "kind": "move",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "01",
+    "name": "圓形",
+    "order": 2,
+    "kind": "move",
+    "color": "#BE6C50",
+    "nx": -1.574,
+    "ny": -2.28,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "序",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=9xXoD2XVbNY&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=1"
+     },
+     {
+      "name": "老苦",
+      "canva": null,
+      "youtube": "https://youtu.be/LJZo0hH3nos?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "病苦",
+      "canva": null,
+      "youtube": "https://youtu.be/glh-1pF4StQ?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "死苦",
+      "canva": null,
+      "youtube": "https://youtu.be/gx0R8wK_Wkg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "六度",
+      "canva": null,
+      "youtube": "https://youtu.be/gZ9C6HM6keg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name": "行願千手",
+    "order": 3,
+    "kind": "move",
+    "color": "#0B954B",
+    "nx": -2.37,
+    "ny": -3.595,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "行願-船",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=2bMOTOZnnsofu5CD&t=154"
+     },
+     {
+      "name": "行願-船槳",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=NIaMkvS_dC5C9xtc&t=57"
+     },
+     {
+      "name": "行願-白站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-白跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "開經偈-千手",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     },
+     {
+      "name": "開經偈-蓮花池",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     }
+    ]
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 4,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name": "靜思家風",
+    "order": 5,
+    "kind": "move",
+    "color": "#80CEF3",
+    "nx": -2.37,
+    "ny": -2.7,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "靜思家風",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FxOew30sJoU&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=10"
+     }
+    ]
+   },
+   {
+    "code": "05-1",
+    "name": "法船",
+    "order": 6,
+    "kind": "move",
+    "color": "#ACCE22",
+    "nx": -2.369,
+    "ny": -3.278,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "一盞燈-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/qBMy7Q4ol7U?si=b_E6Xwke11lvBUQ4&t=140"
+     }
+    ]
+   },
+   {
+    "code": "05-2",
+    "name": "法船(異動)",
+    "order": 7,
+    "kind": "hold",
+    "color": "#ACCE22",
+    "nx": -2.369,
+    "ny": -3.278,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "五角錢",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=pzkatOInyss&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=11"
+     },
+     {
+      "name": "圍爐-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/vYxBbQ5FWu0?si=RnV_MBR8W0EaBxb3&t=134"
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 8,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -2.753,
+    "ny": -2.807,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name": "大船師",
+    "order": 9,
+    "kind": "move",
+    "color": "#FDD100",
+    "nx": -2.928,
+    "ny": -2.699,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 10,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -2.753,
+    "ny": -2.807,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name": "教育",
+    "order": 11,
+    "kind": "move",
+    "color": "#A6ADD6",
+    "nx": -1.976,
+    "ny": -2.895,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 12,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name": "人文",
+    "order": 13,
+    "kind": "move",
+    "color": "#0061AE",
+    "nx": -3.671,
+    "ny": -2.693,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-1",
+    "name": "五大洲(台灣)",
+    "order": 14,
+    "kind": "move",
+    "color": "#4F9DA8",
+    "nx": -3.951,
+    "ny": -2.042,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-2",
+    "name": "五大洲",
+    "order": 15,
+    "kind": "hold",
+    "color": "#4F9DA8",
+    "nx": -3.951,
+    "ny": -2.042,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   }
+  ],
+  "name": "黃志明"
+ }
+};
+const RING = {W:'var(--white)', B:'var(--blue)'};
+const RINGLABEL = {W:'白服裝', B:'藍服裝'};
+const KLABEL = {move:'移動', hold:'原地', home:'回位'};
+const KCSS = {move:'move', hold:'hold', home:'home'};
+let curKey = '12-18|L';
+
+/* ---------- geometry: fit person path bbox into an svg inner rect ---------- */
+function fitFn(steps, W, H, pad){
+  const xs=steps.map(s=>s.nx), ys=steps.map(s=>s.ny);
+  let minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  let bw=Math.max(maxx-minx,.001), bh=Math.max(maxy-miny,.001);
+  const s=Math.min((W-2*pad)/bw,(H-2*pad)/bh);
+  const cx=(minx+maxx)/2, cy=(miny+maxy)/2;
+  return (nx,ny)=>[ (nx-cx)*s + W/2, (ny-cy)*s + H/2 ];
+}
+function uniqNodes(steps){ // merge coincident positions
+  const m=new Map();
+  steps.forEach(s=>{const k=s.nx.toFixed(2)+','+s.ny.toFixed(2);
+    if(!m.has(k))m.set(k,{nx:s.nx,ny:s.ny,steps:[],color:s.color,ring:s.ring});
+    m.get(k).steps.push(s);});
+  return [...m.values()];
+}
+const SVGNS='http://www.w3.org/2000/svg';
+function el(n,a){const e=document.createElementNS(SVGNS,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+/* ---------- static map (②) ---------- */
+function drawMap(svg, person, opts){
+  opts=opts||{}; svg.innerHTML='';
+  const W=440,H=340,pad=44, steps=person.steps;
+  const P=fitFn(steps,W,H,pad);
+  // full-line path in order (segments styled by destination kind)
+  for(let i=1;i<steps.length;i++){
+    const [x1,y1]=P(steps[i-1].nx,steps[i-1].ny), [x2,y2]=P(steps[i].nx,steps[i].ny);
+    if(Math.hypot(x2-x1,y2-y1)<0.5) continue; // hold: no visible segment
+    const home = steps[i].kind==='home';
+    svg.appendChild(el('line',{x1,y1,x2,y2,
+      stroke: home?'var(--ink-3)':'var(--brand)', 'stroke-width':home?2:3.2,
+      'stroke-linecap':'round','stroke-dasharray':home?'2 7':'', opacity:home?.55:.9}));
+  }
+  // arrowheads at midpoints of move segments
+  for(let i=1;i<steps.length;i++){
+    if(steps[i].kind!=='move') continue;
+    const [x1,y1]=P(steps[i-1].nx,steps[i-1].ny), [x2,y2]=P(steps[i].nx,steps[i].ny);
+    if(Math.hypot(x2-x1,y2-y1)<12) continue;
+    const mx=(x1+x2)/2,my=(y1+y2)/2, a=Math.atan2(y2-y1,x2-x1), s=5;
+    svg.appendChild(el('path',{d:`M ${mx+Math.cos(a)*s} ${my+Math.sin(a)*s}
+      L ${mx+Math.cos(a+2.5)*s} ${my+Math.sin(a+2.5)*s}
+      L ${mx+Math.cos(a-2.5)*s} ${my+Math.sin(a-2.5)*s} Z`, fill:'var(--brand)', opacity:.85}));
+  }
+  // nodes (merged)
+  uniqNodes(steps).forEach(n=>{
+    const [x,y]=P(n.nx,n.ny);
+    const orders=n.steps.map(s=>s.order);
+    const isHome=n.steps.some(s=>s.kind==='home')||n.steps[0].code==='00';
+    svg.appendChild(el('circle',{cx:x,cy:y,r:13,fill:'var(--surface)','stroke':n.color||'var(--brand)','stroke-width':3}));
+    const t=el('text',{x,y:y+4,'text-anchor':'middle','font-size':11,'font-weight':800,fill:'var(--ink)'});
+    t.textContent = orders.length>1 ? orders[0]+'·'+orders[orders.length-1] : orders[0];
+    if(orders.length>1) t.setAttribute('font-size','9');
+    svg.appendChild(t);
+    // scene name label
+    const lbl=el('text',{x,y:y-18,'text-anchor':'middle','font-size':10,fill:'var(--ink-2)','font-weight':600});
+    lbl.textContent = n.steps[0].code==='00' ? '基本' : n.steps[0].name.slice(0,4);
+    svg.appendChild(lbl);
+  });
+  // "me" marker on the first step (static shows start)
+  if(opts.marker!==false){
+    const [x,y]=P(steps[0].nx,steps[0].ny);
+    svg.appendChild(el('circle',{cx:x,cy:y,r:7,fill:'var(--ink)',opacity:.0})); // spacer
+  }
+  return P;
+}
+
+/* ---------- locator inset: full arena + my box ---------- */
+function drawLocator(svg, person){
+  svg.innerHTML='';
+  const W=82,H=64,pad=7, a=person.arena;
+  const bw=a.maxx-a.minx, bh=a.maxy-a.miny;
+  const s=Math.min((W-2*pad)/bw,(H-2*pad)/bh);
+  const cx=(a.minx+a.maxx)/2, cy=(a.miny+a.maxy)/2;
+  const P=(nx,ny)=>[ (nx-cx)*s+W/2, (ny-cy)*s+H/2 ];
+  const [ax,ay]=P(a.minx,a.miny), [bx,by]=P(a.maxx,a.maxy);
+  svg.appendChild(el('rect',{x:ax,y:ay,width:bx-ax,height:by-ay,rx:4,fill:'var(--surface-3)',stroke:'var(--line)','stroke-width':1}));
+  // center
+  const [ox,oy]=P(0,0);
+  svg.appendChild(el('circle',{cx:ox,cy:oy,r:2.2,fill:'var(--ink-3)'}));
+  // my region
+  const xs=person.steps.map(s=>s.nx), ys=person.steps.map(s=>s.ny);
+  const [mx1,my1]=P(Math.min(...xs),Math.min(...ys)), [mx2,my2]=P(Math.max(...xs),Math.max(...ys));
+  svg.appendChild(el('rect',{x:mx1-3,y:my1-3,width:(mx2-mx1)+6,height:(my2-my1)+6,rx:3,
+    fill:'var(--brand-soft)',stroke:'var(--brand)','stroke-width':1.4}));
+}
+
+/* ---------- list (②) ---------- */
+function renderList(person){
+  const box=document.getElementById('list2'); box.innerHTML='';
+  person.steps.forEach(s=>{
+    const row=document.createElement('div'); row.className='row';
+    const teach=(s.teach||[]).filter(t=>t.canva||t.youtube);
+    const shown=teach.slice(0,2);
+    const chips=shown.map(t=>{
+      let h='';
+      if(t.canva) h+=`<a class="canva" href="${t.canva}" target="_blank" rel="noopener">🎨 ${t.name}</a>`;
+      else if(t.youtube) h+=`<a class="yt" href="${t.youtube}" target="_blank" rel="noopener">▶ ${t.name}</a>`;
+      return h;}).join('');
+    const more=teach.length>shown.length?`<span class="more">+${teach.length-shown.length} 教材</span>`:'';
+    row.innerHTML=`
+      <div class="num" style="border-color:${s.color}">${s.order}</div>
+      <div>
+        <div class="nm"><span class="dot" style="background:${s.color}"></span>${s.name}</div>
+        <div class="meta">${s.zone||''}·${s.area||''} · ${RINGLABEL[s.ring]||''}</div>
+        ${(chips||more)?`<div class="teach">${chips}${more}</div>`:''}
+      </div>
+      <div class="mv ${KCSS[s.kind]}">${KLABEL[s.kind]}</div>`;
+    box.appendChild(row);
+  });
+}
+
+/* ---------- animation (③) ---------- */
+let anim={raf:0,playing:false,t:0,speed:1,reduce:false,P:null,person:null,me:null};
+function setupAnim(person){
+  const svg=document.getElementById('map3');
+  anim.P=drawMap(svg,person,{marker:false});
+  anim.person=person; anim.t=0;
+  drawLocator(document.getElementById('loc3'),person);
+  // me token
+  anim.me=el('g',{});
+  const halo=el('circle',{r:16,fill:'var(--brand)',opacity:.18}); halo.id='halo';
+  const core=el('circle',{r:9,fill:'var(--brand)',stroke:'var(--brand-ink)','stroke-width':2});
+  anim.me.appendChild(halo); anim.me.appendChild(core);
+  svg.appendChild(anim.me);
+  document.getElementById('scrub3').max=person.steps.length-1;
+  positionMe(0); updateNow(0);
+}
+function lerp(a,b,t){return a+(b-a)*t;}
+function positionMe(t){ // t in [0, n-1] fractional
+  const st=anim.person.steps; const i=Math.floor(t); const f=t-i;
+  const a=st[Math.min(i,st.length-1)], b=st[Math.min(i+1,st.length-1)];
+  const nx=lerp(a.nx,b.nx,anim.reduce?0:f), ny=lerp(a.ny,b.ny,anim.reduce?0:f);
+  const [x,y]=anim.P(nx,ny);
+  anim.me.setAttribute('transform',`translate(${x} ${y})`);
+}
+function updateNow(idx){
+  const s=anim.person.steps[Math.round(idx)];
+  const tip = s.kind==='home'?'回到基本隊形':(s.kind==='hold'?'原地延續(不換位)':'移動就位');
+  document.getElementById('now3').innerHTML=`第 ${s.order} 場 · <b>${s.name}</b> — ${tip} · ${s.zone}·${s.area}`;
+  document.getElementById('tag3').textContent = anim.playing?'● 播放中':'▶ 準備播放';
+}
+let lastTs=0;
+function tick(ts){
+  if(!anim.playing) return;
+  if(!lastTs)lastTs=ts; const dt=(ts-lastTs)/1000; lastTs=ts;
+  // pace: ~1.1s move + brief dwell, scaled by speed; reduce → step every .8s
+  const rate=anim.reduce?(1/0.8):(1/1.15)*anim.speed;
+  anim.t+=dt*rate;
+  const n=anim.person.steps.length-1;
+  if(anim.reduce) anim.t=Math.round(anim.t); // snap
+  if(anim.t>=n){ anim.t=n; anim.playing=false; positionMe(n);
+    document.getElementById('scrub3').value=n; updateNow(n);
+    document.getElementById('play3').textContent='↻ 重播'; return; }
+  positionMe(anim.t);
+  document.getElementById('scrub3').value=Math.round(anim.t);
+  updateNow(anim.t);
+  anim.raf=requestAnimationFrame(tick);
+}
+function playPause(){
+  const btn=document.getElementById('play3');
+  if(anim.playing){ anim.playing=false; cancelAnimationFrame(anim.raf); btn.textContent='▶ 播放'; updateNow(anim.t); return; }
+  if(anim.t>=anim.person.steps.length-1) anim.t=0;
+  anim.playing=true; lastTs=0; btn.textContent='⏸ 暫停'; anim.raf=requestAnimationFrame(tick); updateNow(anim.t);
+}
+
+/* ---------- persona wiring ---------- */
+function renderAll(){
+  const person=PEOPLE[curKey];
+  document.getElementById('mAvatar').textContent=person.name[0];
+  document.getElementById('mName').textContent=person.name;
+  const seat=curKey.split('|')[0];
+  document.getElementById('mChips').innerHTML=
+    `<span class="chip">${person.zone}·${person.area}</span>`+
+    `<span class="chip">${person.sideLabel}側</span>`+
+    `<span class="chip mono">座位 ${seat}</span>`+
+    `<span class="chip">${person.steps.length} 場站位</span>`;
+  drawMap(document.getElementById('map2'),person);
+  drawLocator(document.getElementById('loc2'),person);
+  renderList(person);
+  // reset anim
+  anim.playing=false; cancelAnimationFrame(anim.raf); anim.t=0;
+  document.getElementById('play3').textContent='▶ 播放';
+  setupAnim(person);
+}
+function buildSwitcher(){
+  const sw=document.getElementById('switcher'); sw.innerHTML='';
+  Object.entries(PEOPLE).forEach(([k,p])=>{
+    const b=document.createElement('button'); b.textContent=p.name; b.className=k===curKey?'on':'';
+    b.onclick=()=>{curKey=k; buildSwitcher(); renderAll();}; sw.appendChild(b);
+  });
+}
+document.getElementById('play3').onclick=playPause;
+document.getElementById('scrub3').oninput=(e)=>{
+  anim.playing=false; cancelAnimationFrame(anim.raf);
+  document.getElementById('play3').textContent='▶ 播放';
+  anim.t=+e.target.value; positionMe(anim.t); updateNow(anim.t);
+};
+document.getElementById('speed3').onclick=(e)=>{
+  anim.speed = anim.speed===1?2:(anim.speed===2?0.5:1);
+  e.target.textContent=anim.speed+'×';
+};
+document.getElementById('reduce3').onchange=(e)=>{ anim.reduce=e.target.checked; positionMe(anim.t); };
+if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.getElementById('reduce3').checked=true; anim.reduce=true;
+}
+buildSwitcher(); renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,704 @@
+{
+ "48-21|L": {
+  "id": "48-21",
+  "side": "L",
+  "sideLabel": "西",
+  "zone": "西一",
+  "area": "台南",
+  "arena": {
+   "minx": -7.895,
+   "miny": -4.934,
+   "maxx": 7.895,
+   "maxy": 4.54
+  },
+  "steps": [
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 1,
+    "kind": "move",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "01",
+    "name": "圓形",
+    "order": 2,
+    "kind": "move",
+    "color": "#BE6C50",
+    "nx": -6.805,
+    "ny": -2.184,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "序",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=9xXoD2XVbNY&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=1"
+     },
+     {
+      "name": "老苦",
+      "canva": null,
+      "youtube": "https://youtu.be/LJZo0hH3nos?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "病苦",
+      "canva": null,
+      "youtube": "https://youtu.be/glh-1pF4StQ?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "死苦",
+      "canva": null,
+      "youtube": "https://youtu.be/gx0R8wK_Wkg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "六度",
+      "canva": null,
+      "youtube": "https://youtu.be/gZ9C6HM6keg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name": "行願千手",
+    "order": 3,
+    "kind": "move",
+    "color": "#0B954B",
+    "nx": -7.792,
+    "ny": -2.904,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "行願-船",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=2bMOTOZnnsofu5CD&t=154"
+     },
+     {
+      "name": "行願-船槳",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=NIaMkvS_dC5C9xtc&t=57"
+     },
+     {
+      "name": "行願-白站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-白跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "開經偈-千手",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     },
+     {
+      "name": "開經偈-蓮花池",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     }
+    ]
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 4,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name": "靜思家風",
+    "order": 5,
+    "kind": "move",
+    "color": "#80CEF3",
+    "nx": -7.11,
+    "ny": -2.304,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "靜思家風",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FxOew30sJoU&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=10"
+     }
+    ]
+   },
+   {
+    "code": "05-1",
+    "name": "法船",
+    "order": 6,
+    "kind": "move",
+    "color": "#ACCE22",
+    "nx": -7.108,
+    "ny": -2.962,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "一盞燈-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/qBMy7Q4ol7U?si=b_E6Xwke11lvBUQ4&t=140"
+     }
+    ]
+   },
+   {
+    "code": "05-2",
+    "name": "法船(異動)",
+    "order": 7,
+    "kind": "hold",
+    "color": "#ACCE22",
+    "nx": -7.108,
+    "ny": -2.962,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "五角錢",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=pzkatOInyss&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=11"
+     },
+     {
+      "name": "圍爐-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/vYxBbQ5FWu0?si=RnV_MBR8W0EaBxb3&t=134"
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 8,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name": "大船師",
+    "order": 9,
+    "kind": "hold",
+    "color": "#FDD100",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 10,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name": "教育",
+    "order": 11,
+    "kind": "move",
+    "color": "#A6ADD6",
+    "nx": -6.851,
+    "ny": -2.06,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 12,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name": "人文",
+    "order": 13,
+    "kind": "move",
+    "color": "#0061AE",
+    "nx": -7.874,
+    "ny": -2.842,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-1",
+    "name": "五大洲(台灣)",
+    "order": 14,
+    "kind": "move",
+    "color": "#4F9DA8",
+    "nx": -7.375,
+    "ny": -2.305,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-2",
+    "name": "五大洲",
+    "order": 15,
+    "kind": "hold",
+    "color": "#4F9DA8",
+    "nx": -7.375,
+    "ny": -2.305,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   }
+  ],
+  "name": "陳美玲"
+ },
+ "12-18|L": {
+  "id": "12-18",
+  "side": "L",
+  "sideLabel": "西",
+  "zone": "西一",
+  "area": "台南",
+  "arena": {
+   "minx": -7.895,
+   "miny": -4.934,
+   "maxx": 7.895,
+   "maxy": 4.54
+  },
+  "steps": [
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 1,
+    "kind": "move",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "01",
+    "name": "圓形",
+    "order": 2,
+    "kind": "move",
+    "color": "#BE6C50",
+    "nx": -1.574,
+    "ny": -2.28,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "序",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=9xXoD2XVbNY&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=1"
+     },
+     {
+      "name": "老苦",
+      "canva": null,
+      "youtube": "https://youtu.be/LJZo0hH3nos?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "病苦",
+      "canva": null,
+      "youtube": "https://youtu.be/glh-1pF4StQ?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "死苦",
+      "canva": null,
+      "youtube": "https://youtu.be/gx0R8wK_Wkg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "六度",
+      "canva": null,
+      "youtube": "https://youtu.be/gZ9C6HM6keg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name": "行願千手",
+    "order": 3,
+    "kind": "move",
+    "color": "#0B954B",
+    "nx": -2.37,
+    "ny": -3.595,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "行願-船",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=2bMOTOZnnsofu5CD&t=154"
+     },
+     {
+      "name": "行願-船槳",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=NIaMkvS_dC5C9xtc&t=57"
+     },
+     {
+      "name": "行願-白站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-白跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "開經偈-千手",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     },
+     {
+      "name": "開經偈-蓮花池",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     }
+    ]
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 4,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name": "靜思家風",
+    "order": 5,
+    "kind": "move",
+    "color": "#80CEF3",
+    "nx": -2.37,
+    "ny": -2.7,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "靜思家風",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FxOew30sJoU&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=10"
+     }
+    ]
+   },
+   {
+    "code": "05-1",
+    "name": "法船",
+    "order": 6,
+    "kind": "move",
+    "color": "#ACCE22",
+    "nx": -2.369,
+    "ny": -3.278,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "一盞燈-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/qBMy7Q4ol7U?si=b_E6Xwke11lvBUQ4&t=140"
+     }
+    ]
+   },
+   {
+    "code": "05-2",
+    "name": "法船(異動)",
+    "order": 7,
+    "kind": "hold",
+    "color": "#ACCE22",
+    "nx": -2.369,
+    "ny": -3.278,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "五角錢",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=pzkatOInyss&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=11"
+     },
+     {
+      "name": "圍爐-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/vYxBbQ5FWu0?si=RnV_MBR8W0EaBxb3&t=134"
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 8,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -2.753,
+    "ny": -2.807,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name": "大船師",
+    "order": 9,
+    "kind": "move",
+    "color": "#FDD100",
+    "nx": -2.928,
+    "ny": -2.699,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 10,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -2.753,
+    "ny": -2.807,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name": "教育",
+    "order": 11,
+    "kind": "move",
+    "color": "#A6ADD6",
+    "nx": -1.976,
+    "ny": -2.895,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 12,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name": "人文",
+    "order": 13,
+    "kind": "move",
+    "color": "#0061AE",
+    "nx": -3.671,
+    "ny": -2.693,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-1",
+    "name": "五大洲(台灣)",
+    "order": 14,
+    "kind": "move",
+    "color": "#4F9DA8",
+    "nx": -3.951,
+    "ny": -2.042,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-2",
+    "name": "五大洲",
+    "order": 15,
+    "kind": "hold",
+    "color": "#4F9DA8",
+    "nx": -3.951,
+    "ny": -2.042,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   }
+  ],
+  "name": "黃志明"
+ }
+}
