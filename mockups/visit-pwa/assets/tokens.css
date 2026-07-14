@@ -1,0 +1,129 @@
+/* ==========================================================================
+   visit-pwa — design tokens
+   Pure CSS, no build step, safe to open via file://
+   Dark, large-type, accessible baseline for a home-visit PWA prototype.
+   ========================================================================== */
+
+:root {
+  /* ---- Core palette ------------------------------------------------- */
+  --bg: #0B0E14;
+  --surface: #141922;
+  --surface-raised: #1B2130;
+  --text: #F2F5FA;
+  --text-dim: #A7B0C0;
+  --accent: #4C9AFF;
+
+  /* ---- Semantic colors ------------------------------------------------
+     Each foreground value below is contrast-checked (WCAG relative
+     luminance) against BOTH --surface (#141922) and --surface-raised
+     (#1B2130). --surface-raised is the lighter of the two, so it is the
+     binding constraint; every color here clears it with margin to spare:
+       --info    #22D3EE on --surface-raised ≈ 8.9:1
+       --success #4ADE80 on --surface-raised ≈ 9.6:1
+       --warning #FBBF24 on --surface-raised ≈ 9.7:1
+       --danger  #FF6B6B on --surface-raised ≈ 5.8:1
+       --muted   #9CA8B8 on --surface-raised ≈ 6.7:1
+     (all comfortably above the 4.5:1 AA floor for body text; --danger has
+     the smallest margin because red weighs least in perceptual luminance)
+     Each also ships an "-bg" tint (~16% alpha of the same hue) for badges/
+     banners — the tint sits over a dark surface so it barely moves the
+     effective background luminance, preserving the ratios above.
+  ---------------------------------------------------------------------- */
+  --info: #22D3EE;
+  --info-bg: rgba(34, 211, 238, 0.16);
+  --success: #4ADE80;
+  --success-bg: rgba(74, 222, 128, 0.16);
+  --warning: #FBBF24;
+  --warning-bg: rgba(251, 191, 36, 0.16);
+  --danger: #FF6B6B;
+  --danger-bg: rgba(255, 107, 107, 0.16);
+  --muted: #9CA8B8;
+  --muted-bg: rgba(156, 168, 184, 0.14);
+
+  /* ---- Type ----------------------------------------------------------- */
+  --font-sans: -apple-system, "Segoe UI", "Noto Sans TC", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --fs-base: 18px;
+  --fs-body: 17px;
+  --fs-body-lg: 19px;
+  --fs-h1: 38px;
+  --fs-h2: 29px;
+  --fs-h3: 22px;
+  --lh: 1.6;
+
+  /* ---- Spacing scale (4px base, roughly 1.5x-ish progression) -------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  /* ---- Radius ----------------------------------------------------------*/
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+
+  /* ---- Shadows: soft, layered, tinted toward --bg (not dead black) --- */
+  --shadow-sm: 0 1px 2px rgba(4, 7, 14, 0.45);
+  --shadow-md: 0 6px 16px rgba(4, 7, 14, 0.45), 0 1px 3px rgba(4, 7, 14, 0.35);
+  --shadow-lg: 0 20px 48px rgba(4, 7, 14, 0.55), 0 4px 12px rgba(4, 7, 14, 0.4);
+
+  /* ---- Motion ----------------------------------------------------------*/
+  --dur-fast: 120ms;
+  --dur: 220ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Density: touch by default, dense opt-in via [data-density] ---- */
+  --control-h-touch: 52px;
+  --control-h-dense: 36px;
+  --control-h: var(--control-h-touch);
+
+  /* ---- Route color chips -----------------------------------------------
+     a-e are hand-picked, spaced hues for maximum distinction on a dark
+     background. Anything beyond e (route-f, route-g, ...) should cycle
+     hue by a fixed ~47deg step off the last hand-picked hue so colors
+     never repeat within a short list:
+       hsl(calc(210deg + (var(--route-index) - 5) * 47deg) 75% 60%)
+     e.g. route-f = hsl(257 75% 60%), route-g = hsl(304 75% 60%), etc.
+     All route colors sit at ~L58-65% so dark text (--bg) on top of them
+     stays well above 4.5:1 (see .route-chip in components.css).
+  ---------------------------------------------------------------------- */
+  --route-a: hsl(210 75% 60%); /* blue */
+  --route-b: hsl(150 60% 45%); /* green */
+  --route-c: hsl(38 85% 58%);  /* amber */
+  --route-d: hsl(280 65% 65%); /* purple */
+  --route-e: hsl(350 70% 62%); /* rose */
+}
+
+[data-density="dense"] {
+  --control-h: var(--control-h-dense);
+}
+
+/* ---- Base document styles ----------------------------------------------*/
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
