@@ -679,6 +679,72 @@ table.list-table{ width:100%; border-collapse:collapse; font-size: var(--fs-sm);
 .mt-5{ margin-top: var(--sp-5); }
 .vis-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .persona-transition{ animation: fadein var(--dur) var(--ease); }
+
+/* ============ Runway (個人跑位動線) — 我的 § replaces 跑位備註 placeholder ============ */
+/* Ported from personal-runway/proto.html; namespaced `.runway-*` throughout to avoid
+   colliding with existing generic classes (.map/.tl/.row/.num/.nm/.mv/.meta/.dot/.switch…
+   are already used or reserved elsewhere in this file). Reuses .card/.grid/.btn/.chip/
+   .section-title/.text-2/.text-3 and the existing design tokens — no new :root vars. */
+.runway-two{ display:grid; grid-template-columns:1fr; gap: var(--sp-4); }
+@media (min-width:1024px){ .runway-two{ grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); } }
+
+.runway-mapwrap{
+  position:relative; background: radial-gradient(120% 120% at 50% 0%, var(--surface-2), var(--surface));
+  border:1px solid var(--line-soft); border-radius: var(--radius-lg); overflow:hidden;
+}
+.runway-mapwrap svg.runway-map-svg{ display:block; width:100%; height:auto; touch-action:none; }
+.runway-locator-svg{
+  position:absolute; right:10px; bottom:10px; width:82px; height:64px;
+  background: oklch(0.17 0.014 255 / .82); border:1px solid var(--line); border-radius: var(--radius-sm);
+  backdrop-filter: blur(2px);
+}
+.runway-maptag{
+  position:absolute; left:10px; top:10px; font-size: var(--fs-xs); color: var(--ink-3);
+  background: oklch(0.17 0.014 255 / .7); border:1px solid var(--line-soft); border-radius: var(--radius-sm); padding:3px 8px;
+}
+.runway-legend{ display:flex; gap:14px; flex-wrap:wrap; font-size: var(--fs-sm); color: var(--ink-2); margin-top:10px; }
+.runway-legend i{ display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:5px; vertical-align:-2px; }
+.runway-legend .runway-ln{ display:inline-block; width:22px; height:0; border-top:3px solid var(--brand); vertical-align:2px; }
+.runway-legend .runway-lnd{ display:inline-block; width:22px; height:0; border-top:3px dashed var(--ink-3); vertical-align:2px; }
+
+.runway-tl{ position:relative; padding-left:6px; }
+.runway-tl .runway-row{
+  display:grid; grid-template-columns:34px 1fr auto; gap:10px; align-items:start;
+  padding:11px 0; border-top:1px solid var(--line-soft);
+}
+.runway-tl .runway-row:first-child{ border-top:0; }
+.runway-num{
+  width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+  font-weight:800; font-size: var(--fs-xs); color:#0d1420; border:2px solid var(--line);
+}
+.runway-nm{ font-weight:700; }
+.runway-mv{ font-size: var(--fs-xs); font-weight:700; padding:2px 8px; border-radius: var(--radius-pill); white-space:nowrap; }
+.runway-mv.move{ color: var(--brand); background: var(--brand-soft); }
+.runway-mv.hold{ color: var(--ink-3); background: var(--surface-2); }
+.runway-mv.home{ color: var(--warn); background: var(--warn-soft); }
+.runway-meta{ font-size: var(--fs-sm); color: var(--ink-2); margin-top:2px; }
+.runway-dot{ display:inline-block; width:10px; height:10px; border-radius:50%; vertical-align:0; margin-right:4px; border:1px solid var(--line-soft); }
+.runway-teach{ display:flex; gap:6px; flex-wrap:wrap; margin-top:7px; }
+.runway-teach a{
+  font-size: var(--fs-xs); text-decoration:none; padding:4px 9px; border-radius: var(--radius-sm);
+  border:1px solid var(--line); color: var(--ink-2); background: var(--surface-2);
+  min-height:32px; display:inline-flex; align-items:center; gap:5px;
+  transition: border-color var(--dur) var(--ease);
+}
+.runway-teach a.runway-canva{ color: var(--brand); }
+.runway-teach a.runway-yt{ color: var(--danger); }
+.runway-teach a:hover{ border-color: var(--brand); }
+.runway-teach .runway-more{ color: var(--ink-3); font-size: var(--fs-xs); align-self:center; }
+
+.runway-anim-body{ margin-top: var(--sp-4); }
+.runway-ctrls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+.runway-ctrls .btn.runway-play{ background: var(--brand); color: var(--brand-ink); border-color: var(--brand); min-width:120px; justify-content:center; }
+.runway-ctrls .btn.runway-play:hover{ background: var(--brand-2); border-color: var(--brand-2); }
+.runway-ctrls input[type=range]{ flex:1; min-width:140px; accent-color: var(--brand); height:44px; }
+.runway-switch{ display:inline-flex; align-items:center; gap:8px; font-size: var(--fs-sm); color: var(--ink-2); cursor:pointer; min-height:44px; }
+.runway-switch input{ width:20px; height:20px; accent-color: var(--brand); }
+.runway-nowcap{ margin-top:8px; font-size: var(--fs-sm); color: var(--ink-2); }
+.runway-nowcap b{ color: var(--ink); font-size: var(--fs-md); }
 </style>
 </head>
 <body>
@@ -1569,6 +1635,720 @@ const PERSONAS = [
     caps:['manage_users','assign_any_seat','crud_registration','confirm_84',
           'edit_seat_attrs','edit_pii','manage_registration','manage_staff'] },
 ];
+
+/* =====================================================================
+   RUNWAY DATA — 個人跑位動線(§ 我的 頁 ②靜態地圖/清單 + ③動畫)
+   Ported/embedded from mockups/tzuchi-dome/personal-runway/{proto.html,person_paths.json}
+   (see personal-runway/SPEC.md). Seed-only: 2 personas, join key `列-排|側`
+   (side is always "L" = 西一 in this mockup). 100% self-contained — no fetch.
+===================================================================== */
+const RUNWAY_PATHS = {
+ "48-21|L": {
+  "id": "48-21",
+  "side": "L",
+  "sideLabel": "西",
+  "zone": "西一",
+  "area": "台南",
+  "arena": {
+   "minx": -7.895,
+   "miny": -4.934,
+   "maxx": 7.895,
+   "maxy": 4.54
+  },
+  "steps": [
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 1,
+    "kind": "move",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "01",
+    "name": "圓形",
+    "order": 2,
+    "kind": "move",
+    "color": "#BE6C50",
+    "nx": -6.805,
+    "ny": -2.184,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "序",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=9xXoD2XVbNY&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=1"
+     },
+     {
+      "name": "老苦",
+      "canva": null,
+      "youtube": "https://youtu.be/LJZo0hH3nos?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "病苦",
+      "canva": null,
+      "youtube": "https://youtu.be/glh-1pF4StQ?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "死苦",
+      "canva": null,
+      "youtube": "https://youtu.be/gx0R8wK_Wkg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "六度",
+      "canva": null,
+      "youtube": "https://youtu.be/gZ9C6HM6keg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name": "行願千手",
+    "order": 3,
+    "kind": "move",
+    "color": "#0B954B",
+    "nx": -7.792,
+    "ny": -2.904,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "行願-船",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=2bMOTOZnnsofu5CD&t=154"
+     },
+     {
+      "name": "行願-船槳",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=NIaMkvS_dC5C9xtc&t=57"
+     },
+     {
+      "name": "行願-白站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-白跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "開經偈-千手",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     },
+     {
+      "name": "開經偈-蓮花池",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     }
+    ]
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 4,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name": "靜思家風",
+    "order": 5,
+    "kind": "move",
+    "color": "#80CEF3",
+    "nx": -7.11,
+    "ny": -2.304,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "靜思家風",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FxOew30sJoU&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=10"
+     }
+    ]
+   },
+   {
+    "code": "05-1",
+    "name": "法船",
+    "order": 6,
+    "kind": "move",
+    "color": "#ACCE22",
+    "nx": -7.108,
+    "ny": -2.962,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "一盞燈-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/qBMy7Q4ol7U?si=b_E6Xwke11lvBUQ4&t=140"
+     }
+    ]
+   },
+   {
+    "code": "05-2",
+    "name": "法船(異動)",
+    "order": 7,
+    "kind": "hold",
+    "color": "#ACCE22",
+    "nx": -7.108,
+    "ny": -2.962,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "五角錢",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=pzkatOInyss&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=11"
+     },
+     {
+      "name": "圍爐-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/vYxBbQ5FWu0?si=RnV_MBR8W0EaBxb3&t=134"
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 8,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name": "大船師",
+    "order": 9,
+    "kind": "hold",
+    "color": "#FDD100",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 10,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -6.274,
+    "ny": -1.859,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name": "教育",
+    "order": 11,
+    "kind": "move",
+    "color": "#A6ADD6",
+    "nx": -6.851,
+    "ny": -2.06,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 12,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -7.105,
+    "ny": -2.303,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name": "人文",
+    "order": 13,
+    "kind": "move",
+    "color": "#0061AE",
+    "nx": -7.874,
+    "ny": -2.842,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-1",
+    "name": "五大洲(台灣)",
+    "order": 14,
+    "kind": "move",
+    "color": "#4F9DA8",
+    "nx": -7.375,
+    "ny": -2.305,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-2",
+    "name": "五大洲",
+    "order": 15,
+    "kind": "hold",
+    "color": "#4F9DA8",
+    "nx": -7.375,
+    "ny": -2.305,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   }
+  ],
+  "name": "陳美玲"
+ },
+ "12-18|L": {
+  "id": "12-18",
+  "side": "L",
+  "sideLabel": "西",
+  "zone": "西一",
+  "area": "台南",
+  "arena": {
+   "minx": -7.895,
+   "miny": -4.934,
+   "maxx": 7.895,
+   "maxy": 4.54
+  },
+  "steps": [
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 1,
+    "kind": "move",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "01",
+    "name": "圓形",
+    "order": 2,
+    "kind": "move",
+    "color": "#BE6C50",
+    "nx": -1.574,
+    "ny": -2.28,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "序",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=9xXoD2XVbNY&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=1"
+     },
+     {
+      "name": "老苦",
+      "canva": null,
+      "youtube": "https://youtu.be/LJZo0hH3nos?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "病苦",
+      "canva": null,
+      "youtube": "https://youtu.be/glh-1pF4StQ?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "死苦",
+      "canva": null,
+      "youtube": "https://youtu.be/gx0R8wK_Wkg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     },
+     {
+      "name": "六度",
+      "canva": null,
+      "youtube": "https://youtu.be/gZ9C6HM6keg?list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo"
+     }
+    ]
+   },
+   {
+    "code": "02",
+    "name": "行願千手",
+    "order": 3,
+    "kind": "move",
+    "color": "#0B954B",
+    "nx": -2.37,
+    "ny": -3.595,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "行願-船",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=2bMOTOZnnsofu5CD&t=154"
+     },
+     {
+      "name": "行願-船槳",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=NIaMkvS_dC5C9xtc&t=57"
+     },
+     {
+      "name": "行願-白站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-白跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍站",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "行願-藍跪",
+      "canva": null,
+      "youtube": "https://youtu.be/9up0Hn_Z8LA?si=Gyb7CiRJaaUQda3e&t=106"
+     },
+     {
+      "name": "開經偈-千手",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     },
+     {
+      "name": "開經偈-蓮花池",
+      "canva": null,
+      "youtube": "https://youtu.be/Prve-DAF5Fw"
+     }
+    ]
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 4,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "04",
+    "name": "靜思家風",
+    "order": 5,
+    "kind": "move",
+    "color": "#80CEF3",
+    "nx": -2.37,
+    "ny": -2.7,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "靜思家風",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FxOew30sJoU&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=10"
+     }
+    ]
+   },
+   {
+    "code": "05-1",
+    "name": "法船",
+    "order": 6,
+    "kind": "move",
+    "color": "#ACCE22",
+    "nx": -2.369,
+    "ny": -3.278,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "一盞燈-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/qBMy7Q4ol7U?si=b_E6Xwke11lvBUQ4&t=140"
+     }
+    ]
+   },
+   {
+    "code": "05-2",
+    "name": "法船(異動)",
+    "order": 7,
+    "kind": "hold",
+    "color": "#ACCE22",
+    "nx": -2.369,
+    "ny": -3.278,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "五角錢",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=pzkatOInyss&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=11"
+     },
+     {
+      "name": "圍爐-其他",
+      "canva": null,
+      "youtube": "https://youtu.be/vYxBbQ5FWu0?si=RnV_MBR8W0EaBxb3&t=134"
+     }
+    ]
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 8,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -2.753,
+    "ny": -2.807,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "07",
+    "name": "大船師",
+    "order": 9,
+    "kind": "move",
+    "color": "#FDD100",
+    "nx": -2.928,
+    "ny": -2.699,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "06",
+    "name": "四弘誓願",
+    "order": 10,
+    "kind": "move",
+    "color": "#F19EA8",
+    "nx": -2.753,
+    "ny": -2.807,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "山脈",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=zb5CV8hthEo&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=14"
+     },
+     {
+      "name": "大船師梵唄",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=vsf-UEEjM_Q&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=15"
+     },
+     {
+      "name": "四弘誓願",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=FHv_4kQxo9M&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=16"
+     }
+    ]
+   },
+   {
+    "code": "08",
+    "name": "教育",
+    "order": 11,
+    "kind": "move",
+    "color": "#A6ADD6",
+    "nx": -1.976,
+    "ny": -2.895,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "00",
+    "name": "基本隊形",
+    "order": 12,
+    "kind": "home",
+    "color": "#7FA8D0",
+    "nx": -2.368,
+    "ny": -2.697,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": [
+     {
+      "name": "米籮",
+      "canva": null,
+      "youtube": "https://www.youtube.com/watch?v=xmwAu0XBonE&list=PLzElczFBtIPKBRQc_SS_l2Ia0-IB0wfWo&index=9"
+     }
+    ]
+   },
+   {
+    "code": "09",
+    "name": "人文",
+    "order": 13,
+    "kind": "move",
+    "color": "#0061AE",
+    "nx": -3.671,
+    "ny": -2.693,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-1",
+    "name": "五大洲(台灣)",
+    "order": 14,
+    "kind": "move",
+    "color": "#4F9DA8",
+    "nx": -3.951,
+    "ny": -2.042,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   },
+   {
+    "code": "10-2",
+    "name": "五大洲",
+    "order": 15,
+    "kind": "hold",
+    "color": "#4F9DA8",
+    "nx": -3.951,
+    "ny": -2.042,
+    "zone": "西一",
+    "area": "台南",
+    "ring": "B",
+    "teach": []
+   }
+  ],
+  "name": "黃志明"
+ }
+};
+const RUNWAY_KIND_LABEL = { move:'移動', hold:'原地', home:'回位' };
+const RUNWAY_KIND_CSS = { move:'move', hold:'hold', home:'home' };
+const RUNWAY_RING_LABEL = { W:'白服裝', B:'藍服裝' };
 
 const state = { persona: PERSONAS.find((p) => p.id === "heqi-admin") };
 
@@ -3210,6 +3990,339 @@ function leaderPassengerRowsHtml(passengers){
   }).join("");
 }
 
+/* =====================================================================
+   RUNWAY (個人跑位動線) — 我的 § ②靜態地圖/清單(常駐)+ ③動畫跑位(可展開)
+   Ported from personal-runway/proto.html (validated prototype); functions/ids renamed
+   with a `runway` / `Runway` / `RUNWAY_` prefix to avoid clashing with this file's own
+   `renderList()` (line ~3495 at time of writing), `el`, `anim`, etc.
+===================================================================== */
+
+/* ---------- identity join: mirrors personaSeat()'s row/col parsing (seat "BLOCK-列-排"),
+   but pure w.r.t. a given persona object so both renderBoundMe() and bindMeEvents() can
+   resolve the same runway person independently without depending on global state.persona
+   already being in sync. side is always "L" (西一) for every seat in this mockup. ---------- */
+function runwayJoinKey(p){
+  if (!p || !p.bound || !p.person || !p.person.sessions || !p.person.sessions.length) return null;
+  const seatStr = p.person.sessions[0].seat;
+  if (!seatStr) return null;
+  const parts = seatStr.split("-"); // [blockLetter, row, col] — same shape personaSeat() parses
+  if (parts.length < 3) return null;
+  return parts[1] + "-" + parts[2] + "|L";
+}
+function runwayResolvePerson(p){
+  const key = runwayJoinKey(p);
+  return key ? (RUNWAY_PATHS[key] || null) : null;
+}
+
+/* ---------- geometry: fit person path bbox into an svg inner rect ---------- */
+function runwayFitFn(steps, W, H, pad){
+  const xs = steps.map((s) => s.nx), ys = steps.map((s) => s.ny);
+  const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
+  const bw = Math.max(maxx - minx, .001), bh = Math.max(maxy - miny, .001);
+  const s = Math.min((W - 2 * pad) / bw, (H - 2 * pad) / bh);
+  const cx = (minx + maxx) / 2, cy = (miny + maxy) / 2;
+  return (nx, ny) => [(nx - cx) * s + W / 2, (ny - cy) * s + H / 2];
+}
+function runwayUniqNodes(steps){ // merge coincident positions (e.g. a 回位 point shows "4·12")
+  const m = new Map();
+  steps.forEach((s) => {
+    const k = s.nx.toFixed(2) + ',' + s.ny.toFixed(2);
+    if (!m.has(k)) m.set(k, { nx:s.nx, ny:s.ny, steps:[], color:s.color, ring:s.ring });
+    m.get(k).steps.push(s);
+  });
+  return [...m.values()];
+}
+const RUNWAY_SVGNS = 'http://www.w3.org/2000/svg';
+function runwayEl(n, a){
+  const e = document.createElementNS(RUNWAY_SVGNS, n);
+  for (const k in a) e.setAttribute(k, a[k]);
+  return e;
+}
+
+/* ---------- static map (②, also reused to draw the ③ animated map background) ---------- */
+function runwayDrawMap(svg, person){
+  if (!svg) return null;
+  svg.innerHTML = '';
+  const W = 440, H = 340, pad = 44, steps = person.steps;
+  const P = runwayFitFn(steps, W, H, pad);
+  // full-line path in order (segments styled by destination kind)
+  for (let i = 1; i < steps.length; i++){
+    const [x1, y1] = P(steps[i - 1].nx, steps[i - 1].ny), [x2, y2] = P(steps[i].nx, steps[i].ny);
+    if (Math.hypot(x2 - x1, y2 - y1) < 0.5) continue; // hold: no visible segment
+    const home = steps[i].kind === 'home';
+    svg.appendChild(runwayEl('line', {
+      x1, y1, x2, y2,
+      stroke: home ? 'var(--ink-3)' : 'var(--brand)', 'stroke-width': home ? 2 : 3.2,
+      'stroke-linecap':'round', 'stroke-dasharray': home ? '2 7' : '', opacity: home ? .55 : .9,
+    }));
+  }
+  // arrowheads at midpoints of move segments
+  for (let i = 1; i < steps.length; i++){
+    if (steps[i].kind !== 'move') continue;
+    const [x1, y1] = P(steps[i - 1].nx, steps[i - 1].ny), [x2, y2] = P(steps[i].nx, steps[i].ny);
+    if (Math.hypot(x2 - x1, y2 - y1) < 12) continue;
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, a = Math.atan2(y2 - y1, x2 - x1), s = 5;
+    svg.appendChild(runwayEl('path', {
+      d: `M ${mx + Math.cos(a) * s} ${my + Math.sin(a) * s}
+        L ${mx + Math.cos(a + 2.5) * s} ${my + Math.sin(a + 2.5) * s}
+        L ${mx + Math.cos(a - 2.5) * s} ${my + Math.sin(a - 2.5) * s} Z`,
+      fill: 'var(--brand)', opacity: .85,
+    }));
+  }
+  // nodes (merged, scene_color stroke — data-mark only, never chrome)
+  runwayUniqNodes(steps).forEach((n) => {
+    const [x, y] = P(n.nx, n.ny);
+    const orders = n.steps.map((s) => s.order);
+    svg.appendChild(runwayEl('circle', { cx:x, cy:y, r:13, fill:'var(--surface)', stroke:n.color || 'var(--brand)', 'stroke-width':3 }));
+    const t = runwayEl('text', { x, y: y + 4, 'text-anchor':'middle', 'font-size':11, 'font-weight':800, fill:'var(--ink)' });
+    t.textContent = orders.length > 1 ? orders[0] + '·' + orders[orders.length - 1] : orders[0];
+    if (orders.length > 1) t.setAttribute('font-size', '9');
+    svg.appendChild(t);
+    const lbl = runwayEl('text', { x, y: y - 18, 'text-anchor':'middle', 'font-size':10, fill:'var(--ink-2)', 'font-weight':600 });
+    lbl.textContent = n.steps[0].code === '00' ? '基本' : n.steps[0].name.slice(0, 4);
+    svg.appendChild(lbl);
+  });
+  return P;
+}
+
+/* ---------- locator inset: full arena outline + my activity-range box ---------- */
+function runwayDrawLocator(svg, person){
+  if (!svg) return;
+  svg.innerHTML = '';
+  const W = 82, H = 64, pad = 7, a = person.arena;
+  const bw = a.maxx - a.minx, bh = a.maxy - a.miny;
+  const s = Math.min((W - 2 * pad) / bw, (H - 2 * pad) / bh);
+  const cx = (a.minx + a.maxx) / 2, cy = (a.miny + a.maxy) / 2;
+  const P = (nx, ny) => [(nx - cx) * s + W / 2, (ny - cy) * s + H / 2];
+  const [ax, ay] = P(a.minx, a.miny), [bx, by] = P(a.maxx, a.maxy);
+  svg.appendChild(runwayEl('rect', { x:ax, y:ay, width:bx - ax, height:by - ay, rx:4, fill:'var(--surface-3)', stroke:'var(--line)', 'stroke-width':1 }));
+  const [ox, oy] = P(0, 0);
+  svg.appendChild(runwayEl('circle', { cx:ox, cy:oy, r:2.2, fill:'var(--ink-3)' }));
+  const xs = person.steps.map((s) => s.nx), ys = person.steps.map((s) => s.ny);
+  const [mx1, my1] = P(Math.min(...xs), Math.min(...ys)), [mx2, my2] = P(Math.max(...xs), Math.max(...ys));
+  svg.appendChild(runwayEl('rect', {
+    x:mx1 - 3, y:my1 - 3, width:(mx2 - mx1) + 6, height:(my2 - my1) + 6, rx:3,
+    fill:'var(--brand-soft)', stroke:'var(--brand)', 'stroke-width':1.4,
+  }));
+}
+
+/* ---------- list (②): 編號 + 隊形名 + 移動/原地/回位 badge + 分區·服裝 + 我這區教材 chips ---------- */
+function runwayRenderList(box, person){
+  if (!box) return;
+  box.innerHTML = '';
+  person.steps.forEach((s) => {
+    const row = document.createElement('div');
+    row.className = 'runway-row';
+    row.setAttribute('role', 'listitem');
+    const teach = (s.teach || []).filter((t) => t.canva || t.youtube);
+    const shown = teach.slice(0, 2);
+    const chips = shown.map((t) => {
+      if (t.canva) return `<a class="runway-canva" href="${esc(t.canva)}" target="_blank" rel="noopener">🎨 ${esc(t.name)}</a>`;
+      if (t.youtube) return `<a class="runway-yt" href="${esc(t.youtube)}" target="_blank" rel="noopener">▶ ${esc(t.name)}</a>`;
+      return '';
+    }).join('');
+    const more = teach.length > shown.length ? `<span class="runway-more">+${teach.length - shown.length} 教材</span>` : '';
+    row.innerHTML = `
+      <div class="runway-num" style="border-color:${s.color}">${s.order}</div>
+      <div>
+        <div class="runway-nm"><span class="runway-dot" style="background:${s.color}"></span>${esc(s.name)}</div>
+        <div class="runway-meta">${esc(s.zone || '')}·${esc(s.area || '')} · ${esc(RUNWAY_RING_LABEL[s.ring] || '')}</div>
+        ${(chips || more) ? `<div class="runway-teach">${chips}${more}</div>` : ''}
+      </div>
+      <div class="runway-mv ${RUNWAY_KIND_CSS[s.kind]}">${RUNWAY_KIND_LABEL[s.kind]}</div>`;
+    box.appendChild(row);
+  });
+}
+
+/* ---------- ②+③ card markup ---------- */
+function runwayCardHtml(person){
+  return `
+  <div class="card runway-card">
+    <h2 class="section-title">跑位動線</h2>
+    <p class="text-3" style="font-size:var(--fs-sm); margin-top:-10px; margin-bottom:var(--sp-4)">全程 ${person.steps.length} 場站位 · ${esc(person.zone)}·${esc(person.area)} · 座位 ${esc(person.id)}</p>
+    <div class="runway-two">
+      <div>
+        <div class="runway-mapwrap">
+          <span class="runway-maptag">我的動線 · 縮放至我的活動範圍</span>
+          <svg class="runway-map-svg" id="runwayMap" viewBox="0 0 440 340" preserveAspectRatio="xMidYMid meet" role="img" aria-label="靜態個人動線地圖：顯示逐場站位與移動路徑"></svg>
+          <svg class="runway-locator-svg" id="runwayLoc" viewBox="0 0 82 64" role="img" aria-label="全場定位縮圖：我的活動範圍在整場座位中的位置"></svg>
+        </div>
+        <div class="runway-legend">
+          <span><i style="background:var(--brand)"></i>移動到</span>
+          <span><i style="background:var(--warn)"></i>回基本隊形</span>
+          <span><i style="background:var(--ink-3)"></i>原地延續</span>
+          <span><span class="runway-ln"></span> 動線</span>
+          <span><span class="runway-lnd"></span> 回位</span>
+        </div>
+      </div>
+      <div class="runway-tl" id="runwayList" role="list" aria-label="逐場跑位清單"></div>
+    </div>
+    <div class="runway-anim-wrap mt-6">
+      <button type="button" class="btn btn-ghost btn-block" id="runwayAnimToggle" aria-expanded="false" aria-controls="runwayAnimBody">▶ 播放跑位</button>
+      <div class="runway-anim-body" id="runwayAnimBody" hidden>
+        <div class="runway-mapwrap mt-5">
+          <span class="runway-maptag" id="runwayTag">▶ 準備播放</span>
+          <svg class="runway-map-svg" id="runwayAnimMap" viewBox="0 0 440 340" preserveAspectRatio="xMidYMid meet" role="img" aria-label="動畫個人動線地圖：我的位置隨場次移動"></svg>
+          <svg class="runway-locator-svg" id="runwayAnimLoc" viewBox="0 0 82 64" aria-hidden="true"></svg>
+        </div>
+        <div class="runway-nowcap" id="runwayNow" aria-live="polite">第 1 場 · <b>基本隊形</b> — 起始站位</div>
+        <div class="runway-ctrls">
+          <button type="button" class="btn runway-play" id="runwayPlay">▶ 播放</button>
+          <input type="range" id="runwayScrub" min="0" max="${person.steps.length - 1}" value="0" step="1" aria-label="跑位進度">
+          <button type="button" class="btn" id="runwaySpeed">1×</button>
+          <label class="runway-switch"><input type="checkbox" id="runwayReduce"> 減少動態</label>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- animation (③): single namespaced state object (no stray module-level `anim`/`lastTs`) ---------- */
+let runwayAnim = { raf:0, playing:false, t:0, speed:1, reduce:false, P:null, person:null, me:null, lastTs:0 };
+
+function runwaySetupAnim(person){
+  const svg = document.getElementById('runwayAnimMap');
+  if (!svg) return;
+  runwayAnim.P = runwayDrawMap(svg, person);
+  runwayAnim.person = person;
+  runwayAnim.t = 0;
+  runwayDrawLocator(document.getElementById('runwayAnimLoc'), person);
+  runwayAnim.me = runwayEl('g', {});
+  const halo = runwayEl('circle', { r:16, fill:'var(--brand)', opacity:.18 });
+  const core = runwayEl('circle', { r:9, fill:'var(--brand)', stroke:'var(--brand-ink)', 'stroke-width':2 });
+  runwayAnim.me.appendChild(halo);
+  runwayAnim.me.appendChild(core);
+  svg.appendChild(runwayAnim.me);
+  const scrub = document.getElementById('runwayScrub');
+  if (scrub) scrub.max = person.steps.length - 1;
+  runwayPositionMe(0);
+  runwayUpdateNow(0);
+}
+function runwayLerp(a, b, t){ return a + (b - a) * t; }
+function runwayPositionMe(t){ // t in [0, n-1] fractional
+  if (!runwayAnim.person || !runwayAnim.me || !runwayAnim.P) return;
+  const st = runwayAnim.person.steps;
+  const i = Math.floor(t), f = t - i;
+  const a = st[Math.min(i, st.length - 1)], b = st[Math.min(i + 1, st.length - 1)];
+  const nx = runwayLerp(a.nx, b.nx, runwayAnim.reduce ? 0 : f), ny = runwayLerp(a.ny, b.ny, runwayAnim.reduce ? 0 : f);
+  const [x, y] = runwayAnim.P(nx, ny);
+  runwayAnim.me.setAttribute('transform', `translate(${x} ${y})`);
+}
+function runwayUpdateNow(idx){
+  if (!runwayAnim.person) return;
+  const s = runwayAnim.person.steps[Math.round(idx)];
+  const tip = s.kind === 'home' ? '回到基本隊形' : (s.kind === 'hold' ? '原地延續（不換位）' : '移動就位');
+  const nowEl = document.getElementById('runwayNow');
+  if (nowEl) nowEl.innerHTML = `第 ${s.order} 場 · <b>${esc(s.name)}</b> — ${tip} · ${esc(s.zone)}·${esc(s.area)}`;
+  const tagEl = document.getElementById('runwayTag');
+  if (tagEl) tagEl.textContent = runwayAnim.playing ? '● 播放中' : '▶ 準備播放';
+}
+function runwayTick(ts){
+  if (!runwayAnim.playing) return;
+  if (!runwayAnim.lastTs) runwayAnim.lastTs = ts;
+  const dt = (ts - runwayAnim.lastTs) / 1000;
+  runwayAnim.lastTs = ts;
+  // pace: ~1.1s move + brief dwell, scaled by speed; reduce → step every .8s (no tween)
+  const rate = runwayAnim.reduce ? (1 / 0.8) : (1 / 1.15) * runwayAnim.speed;
+  runwayAnim.t += dt * rate;
+  const n = runwayAnim.person.steps.length - 1;
+  if (runwayAnim.reduce) runwayAnim.t = Math.round(runwayAnim.t); // snap, no tween
+  if (runwayAnim.t >= n){
+    runwayAnim.t = n;
+    runwayAnim.playing = false;
+    runwayPositionMe(n);
+    const scrub = document.getElementById('runwayScrub');
+    if (scrub) scrub.value = n;
+    runwayUpdateNow(n);
+    const playBtn = document.getElementById('runwayPlay');
+    if (playBtn) playBtn.textContent = '↻ 重播';
+    return;
+  }
+  runwayPositionMe(runwayAnim.t);
+  const scrub = document.getElementById('runwayScrub');
+  if (scrub) scrub.value = Math.round(runwayAnim.t);
+  runwayUpdateNow(runwayAnim.t);
+  runwayAnim.raf = requestAnimationFrame(runwayTick);
+}
+function runwayPlayPause(){
+  const btn = document.getElementById('runwayPlay');
+  if (!btn || !runwayAnim.person) return;
+  if (runwayAnim.playing){
+    runwayAnim.playing = false;
+    cancelAnimationFrame(runwayAnim.raf);
+    btn.textContent = '▶ 播放';
+    runwayUpdateNow(runwayAnim.t);
+    return;
+  }
+  if (runwayAnim.t >= runwayAnim.person.steps.length - 1) runwayAnim.t = 0;
+  runwayAnim.playing = true;
+  runwayAnim.lastTs = 0;
+  btn.textContent = '⏸ 暫停';
+  runwayAnim.raf = requestAnimationFrame(runwayTick);
+  runwayUpdateNow(runwayAnim.t);
+}
+function runwayStop(){ // cancel any in-flight RAF; safe to call even if nothing is running
+  runwayAnim.playing = false;
+  cancelAnimationFrame(runwayAnim.raf);
+}
+function runwayToggleAnim(){
+  const btn = document.getElementById('runwayAnimToggle');
+  const body = document.getElementById('runwayAnimBody');
+  if (!btn || !body) return;
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  if (expanded){
+    runwayStop();
+    const playBtn = document.getElementById('runwayPlay');
+    if (playBtn) playBtn.textContent = '▶ 播放';
+    body.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = '▶ 播放跑位';
+  } else {
+    body.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    btn.textContent = '▲ 收合跑位動畫';
+  }
+}
+
+/* ---------- lifecycle: (re)draw ② + reset/wire ③ for the given runway person.
+   Called from bindMeEvents() every time 我的 renders a bound persona with a matching
+   runway path. renderMe() calls runwayStop() first, before the DOM it targets is
+   replaced, so a RAF from a previous persona never keeps ticking against stale ids. ---------- */
+function runwayInit(person){
+  runwayDrawMap(document.getElementById('runwayMap'), person);
+  runwayDrawLocator(document.getElementById('runwayLoc'), person);
+  runwayRenderList(document.getElementById('runwayList'), person);
+
+  runwayAnim = { raf:0, playing:false, t:0, speed:1, reduce:false, P:null, person:null, me:null, lastTs:0 };
+  const reduceEl = document.getElementById('runwayReduce');
+  const prefersReduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  runwayAnim.reduce = prefersReduce;
+  if (reduceEl) reduceEl.checked = prefersReduce;
+
+  runwaySetupAnim(person);
+
+  const speedBtn = document.getElementById('runwaySpeed');
+  if (speedBtn) speedBtn.textContent = '1×';
+  const playBtn = document.getElementById('runwayPlay');
+  if (playBtn) playBtn.onclick = runwayPlayPause;
+  const scrub = document.getElementById('runwayScrub');
+  if (scrub) scrub.oninput = (e) => {
+    runwayAnim.playing = false;
+    cancelAnimationFrame(runwayAnim.raf);
+    if (playBtn) playBtn.textContent = '▶ 播放';
+    runwayAnim.t = +e.target.value;
+    runwayPositionMe(runwayAnim.t);
+    runwayUpdateNow(runwayAnim.t);
+  };
+  if (speedBtn) speedBtn.onclick = (e) => {
+    runwayAnim.speed = runwayAnim.speed === 1 ? 2 : (runwayAnim.speed === 2 ? 0.5 : 1);
+    e.target.textContent = runwayAnim.speed + '×';
+  };
+  if (reduceEl) reduceEl.onchange = (e) => { runwayAnim.reduce = e.target.checked; runwayPositionMe(runwayAnim.t); };
+  const toggleBtn = document.getElementById('runwayAnimToggle');
+  if (toggleBtn) toggleBtn.onclick = runwayToggleAnim;
+}
+
 function meNotesCardHtml(person){
   return `
   <div class="card">
@@ -3226,7 +4339,16 @@ function renderBoundMe(p){
   html += `<div class="card mt-6">${meTimelineHtml(p, person)}</div>`;
   html += `<div class="grid grid-2 mt-6">${meBusSignupFormHtml(person)}${meSeatCardHtml(person)}</div>`;
   html += `<div class="mt-6">${meBusCardHtml(person)}</div>`;
-  html += `<div class="grid grid-2 mt-6">${icsBoxHtml()}${meNotesCardHtml(person)}</div>`;
+  /* 跑位動線(personal-runway/SPEC.md §4/§5):有對應種子人物資料就換掉靜態「跑位備註」,
+     改為全寬的 ②地圖+清單 + ③可展開動畫;未綁定到種子路徑的人(未來新增的綁定 persona)
+     則完整降級回到原本的靜態短文字,不會壞。 */
+  const runwayPerson = runwayResolvePerson(p);
+  if (runwayPerson){
+    html += `<div class="mt-6">${runwayCardHtml(runwayPerson)}</div>`;
+    html += `<div class="mt-6">${icsBoxHtml()}</div>`;
+  } else {
+    html += `<div class="grid grid-2 mt-6">${icsBoxHtml()}${meNotesCardHtml(person)}</div>`;
+  }
   return html;
 }
 
@@ -3234,6 +4356,7 @@ function renderMe(){
   const p = state.persona;
   const sub = document.getElementById("mePageSub");
   if (sub) sub.textContent = p.bound ? "個人行程、座位、車次與行事曆" : "綁定帳號後即可查看您的個人場次與座位";
+  runwayStop(); // persona switch / re-render: cancel a running ③ RAF before its DOM ids go stale
   const body = document.getElementById("meBody");
   body.innerHTML = p.bound ? renderBoundMe(p) : renderUnboundMe();
   bindMeEvents();
@@ -3265,6 +4388,8 @@ function bindMeEvents(){
     e.preventDefault();
     showToast("遊覽車登記已送出(Demo)", "ok");
   });
+  const runwayPerson = runwayResolvePerson(state.persona);
+  if (runwayPerson) runwayInit(runwayPerson);
 }
 
 /* ---------- global delegated handlers: 報名/請假 toggle, 車上點名 toggle, 需要坐車 switch ---------- */
