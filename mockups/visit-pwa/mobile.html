@@ -1,0 +1,922 @@
+<title>家訪 PWA 原型 — 手機端</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="家訪 PWA 手機端可點擊原型 — whoami、事件列表、案件列表、案件詳情、照片上傳、規劃地圖六個畫面,依 persona 即時變化。">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* ---- page-local styles (mobile.html only; do not touch tokens/components) ---- */
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+
+  .skip-link {
+    position: absolute;
+    left: var(--sp-3);
+    top: -60px;
+    z-index: 100;
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    border-radius: var(--r-md);
+    transition: top var(--dur) var(--ease);
+  }
+  .skip-link:focus { top: var(--sp-3); }
+
+  .mono { font-family: var(--font-mono); }
+  .dim { color: var(--text-dim); }
+
+  a.btn, a.back-link { text-decoration: none; }
+
+  /* ---- top bar (page chrome, not part of the phone) ---- */
+  .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: var(--sp-3) var(--sp-5);
+    background: rgba(11, 14, 20, 0.85);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .top-bar a {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    color: var(--text);
+    font-weight: 800;
+    font-size: var(--fs-h3);
+  }
+  .top-bar a span {
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 13px;
+  }
+  #persona-note {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .stage-wrap {
+    min-height: calc(100vh - 61px);
+    display: flex;
+    justify-content: center;
+    padding: var(--sp-8) var(--sp-4);
+  }
+
+  #phone-stage { position: relative; }
+
+  /* ---- screens ---- */
+  .screen-host { position: relative; }
+  .screen {
+    padding: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+  .screen[hidden] { display: none; }
+  .screen-transition-in { animation: screen-fade-in var(--dur) var(--ease); }
+  @keyframes screen-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-title h2 { margin: 0 0 var(--sp-1); font-size: var(--fs-h3); font-weight: 800; }
+  .screen-sub { margin: 0; color: var(--text-dim); font-size: 14px; }
+  .back-link { color: var(--accent); font-weight: 700; }
+  .card-heading { margin: 0 0 var(--sp-3); font-size: 16px; font-weight: 800; }
+
+  /* ---- whoami ---- */
+  .whoami-card { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .whoami-card__row { display: flex; flex-direction: column; gap: 2px; }
+  .whoami-card__label {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .whoami-card__value { font-size: var(--fs-body); font-weight: 600; }
+
+  .signal-table { width: 100%; border-collapse: collapse; }
+  .signal-table th, .signal-table td {
+    text-align: left;
+    padding: var(--sp-2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 14px;
+    vertical-align: top;
+  }
+  .signal-table th {
+    color: var(--text-dim);
+    font-weight: 600;
+    width: 42%;
+    font-family: var(--font-mono);
+  }
+  .signal-table tr:last-child th, .signal-table tr:last-child td { border-bottom: none; }
+
+  /* ---- events ---- */
+  button.card { appearance: none; -webkit-appearance: none; border: none; font: inherit; color: inherit; cursor: pointer; }
+  .event-card { display: flex; flex-direction: column; gap: var(--sp-2); text-align: left; width: 100%; }
+  .event-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+  .event-card__top h3 { margin: 0; font-size: 16px; }
+  .event-card__meta, .event-card__access { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .event-card__access span { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+  .event-card__note { margin: 0; font-size: 13px; color: var(--warning); }
+
+  /* ---- cases ---- */
+  .queue-section { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .case-list { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .case-card { display: flex; flex-direction: column; gap: var(--sp-2); text-align: left; width: 100%; }
+  .case-card__top { display: flex; align-items: center; justify-content: space-between; }
+  .case-card__no { font-size: 13px; color: var(--text-dim); }
+  .case-card__name { font-weight: 700; font-size: var(--fs-body); }
+  .case-card__addr { color: var(--text-dim); font-size: 14px; }
+  .case-card__meta { display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: center; }
+  .case-card__reject { color: var(--danger); font-size: 13px; font-weight: 700; }
+
+  /* ---- case detail form ---- */
+  .field-group { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .field-grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-3); }
+  .pii-note { margin: 0; color: var(--warning); font-size: 13px; }
+
+  .geocode-preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin-top: var(--sp-2);
+    padding-top: var(--sp-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .geocode-preview__map {
+    height: 96px;
+    border-radius: var(--r-md);
+    background:
+      linear-gradient(135deg, rgba(76, 154, 255, 0.25), rgba(76, 154, 255, 0.05)),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 24px),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 24px);
+    background-color: var(--surface);
+  }
+  .geocode-preview__meta { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+
+  .case-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+  /* ---- photo ---- */
+  .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--sp-3); }
+  .photo-card { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3); }
+  .photo-card__thumb {
+    height: 84px;
+    border-radius: var(--r-sm);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02));
+  }
+  .photo-card__title { font-size: 14px; font-weight: 700; }
+  .photo-card__meta { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+
+  /* ---- map ---- */
+  .fake-map { padding: var(--sp-2); }
+  .fake-map__canvas {
+    position: relative;
+    height: 320px;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 28% 22%, rgba(76, 154, 255, 0.25), transparent 55%),
+      radial-gradient(circle at 78% 72%, rgba(74, 222, 128, 0.18), transparent 50%),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 28px);
+    background-color: var(--surface);
+  }
+  button.map-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    min-width: 36px;
+    height: 36px;
+    padding: 0 var(--sp-2);
+    border: 2px solid rgba(6, 7, 11, 0.5);
+    font: inherit;
+    cursor: pointer;
+  }
+  .map-detail { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .tile-loading { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+
+  /* ---- overlays (revoked / full_resync) ---- */
+  .phone-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-5);
+    background: rgba(6, 7, 11, 0.84);
+    border-radius: 40px;
+  }
+  /* :not([hidden]) outranks the base rule above regardless of source order,
+     so this only takes effect once the "hidden" attribute is removed by JS. */
+  .phone-overlay:not([hidden]) { display: flex; }
+  .phone-overlay__inner { width: 100%; }
+  .banner-card { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+  .phone-toast {
+    position: absolute;
+    left: var(--sp-4);
+    right: var(--sp-4);
+    bottom: 84px;
+    z-index: 50;
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--r-md);
+    background: var(--surface-raised);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: var(--shadow-lg);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* ---- bottom nav ---- */
+  .bottom-tabs {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    display: flex;
+    justify-content: space-around;
+    padding: var(--sp-2);
+    background: rgba(11, 14, 20, 0.92);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .bottom-tabs__item {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font: inherit;
+  }
+
+  @media (max-width: 480px) {
+    .stage-wrap { padding: var(--sp-5) var(--sp-2); }
+  }
+</style>
+
+<a class="skip-link" href="#phone-stage">跳到手機畫面</a>
+
+<header class="top-bar">
+  <a href="index.html">家訪 PWA 原型 <span>手機端原型 · flood-2026</span></a>
+  <div id="persona-note" aria-live="polite"></div>
+</header>
+
+<main class="stage-wrap">
+  <div id="phone-stage"></div>
+</main>
+
+<div id="persona-switcher-mount"></div>
+
+<script src="assets/mock-data.js"></script>
+<script src="assets/persona.js"></script>
+<script src="assets/prototype.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var EVENT_SLUG = 'flood-2026';
+  var EVENT_CFG = window.VisitMock.EVENT_CONFIG[EVENT_SLUG];
+  var OPT = EVENT_CFG.options;
+  var EVENT_OBJ = window.VisitMock.EVENTS.filter(function (e) { return e.slug === EVENT_SLUG; })[0];
+  var EVENT_NAME = EVENT_OBJ ? EVENT_OBJ.name : EVENT_SLUG;
+
+  var FIELD_BY_KEY = {};
+  window.VisitMock.FIELD_CATALOG.forEach(function (f) { FIELD_BY_KEY[f.key] = f; });
+
+  // Fake per-persona identity for the whoami screen. Reuses names/emails that
+  // already exist in mock-data.js (MEMBERS / DIRECTORY) rather than inventing new PII.
+  var PERSONA_IDENTITY = {
+    office: { email: 'lin.office@charity.org.tw', name: '林哲宇' },
+    visitor: { email: 'wu.teamA1@charity.org.tw', name: '吳建志' },
+    advisor: { email: 'a1@charity.org.tw', name: '曾榮森' },
+    revoked: { email: 'huang.teamA2@charity.org.tw', name: '黃淑芬' },
+    orgAdmin: { email: 's1@charity.org.tw', name: '陳雅琪' },
+    eventAdmin: { email: 'chen.admin@charity.org.tw', name: '陳美惠' },
+    sysAdmin: { email: 'hong.office2@charity.org.tw', name: '洪國樑' }
+  };
+
+  // In-memory demo overrides (geocodeSource etc.) so "重新定位" / "手動釘選" have
+  // something visible to change. Never persisted, never mutates VisitMock.CASES.
+  var caseOverrides = {};
+
+  var frame = null;
+  var content = null;
+  var screenHost = null;
+  var bottomTabs = null;
+  var revokedOverlayEl = null;
+  var resyncOverlayEl = null;
+  var toastEl = null;
+  var currentScreenEl = null;
+  var currentRouteKey = null;
+  var syncPhase = 0;
+  var resyncTimer = null;
+  var toastTimer = null;
+  var dispatch = null;
+
+  // ---- small helpers ----------------------------------------------------
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  function routeLower(r) { return String(r).toLowerCase(); }
+
+  function arrOrDash(arr) {
+    return arr && arr.length ? esc(arr.join('、')) : '<span class="dim">—</span>';
+  }
+
+  function rejectReasonLabel(reason) {
+    if (reason === 'permission') return 'permission(路線權限不符)';
+    if (reason && reason.indexOf('restricted_field') === 0) return reason + '(欄位受限)';
+    return reason;
+  }
+
+  // ---- toast --------------------------------------------------------------
+
+  function showToast(msg, ms) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, ms || 2400);
+  }
+
+  // ---- screen host / transitions ------------------------------------------
+
+  function renderScreen(html, afterMount) {
+    var el = document.createElement('div');
+    el.className = 'screen';
+    el.hidden = true;
+    el.innerHTML = html;
+    screenHost.appendChild(el);
+    var prev = currentScreenEl;
+    window.VisitProto.screenTransition(prev, el);
+    if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+    currentScreenEl = el;
+    if (afterMount) afterMount(el);
+  }
+
+  function setRoute(key) {
+    currentRouteKey = key;
+    updateBottomTabs();
+    updateGlobalSyncBar();
+  }
+
+  function updateBottomTabs() {
+    if (!bottomTabs) return;
+    var items = bottomTabs.querySelectorAll('[data-key]');
+    for (var i = 0; i < items.length; i++) {
+      var btn = items[i];
+      var active = btn.getAttribute('data-key') === currentRouteKey;
+      btn.classList.toggle('active', active);
+      if (active) btn.setAttribute('aria-current', 'page');
+      else btn.removeAttribute('aria-current');
+    }
+  }
+
+  function updateGlobalSyncBar() {
+    var textEl = document.getElementById('syncbar-text');
+    if (!textEl) return;
+    var p = window.VisitPersona.getPersona();
+    if (currentRouteKey === 'cases') {
+      var vis = window.VisitPersona.visibleCases(p, window.VisitMock.CASES, EVENT_SLUG);
+      var pendingCount = vis.filter(function (c) { return c.syncState === 'pending'; }).length;
+      var phaseText = syncPhase === 0 ? '同步中…載入第 2 頁' : '已同步';
+      textEl.textContent = phaseText + ' · 離線佇列 ' + pendingCount + ' 筆 · 批次上限 500 筆/次';
+    } else {
+      textEl.textContent = '身分:' + p.label + '(' + p.id + ') · ' + EVENT_NAME;
+    }
+  }
+
+  function updateHeaderPersonaNote() {
+    var note = document.getElementById('persona-note');
+    if (!note) return;
+    var p = window.VisitPersona.getPersona();
+    note.textContent = '目前身分:' + p.label + '(' + p.id + ')';
+  }
+
+  // ---- tab bar --------------------------------------------------------------
+
+  function tabButtonsHtml() {
+    var tabs = [
+      { key: 'whoami', hash: '#/whoami', label: '我' },
+      { key: 'events', hash: '#/events', label: '活動' },
+      { key: 'cases', hash: '#/cases', label: '案件' },
+      { key: 'map', hash: '#/map', label: '地圖' }
+    ];
+    return tabs.map(function (t) {
+      return '<button type="button" class="admin-tab bottom-tabs__item" data-nav="' + t.hash + '" data-key="' + t.key + '">' + esc(t.label) + '</button>';
+    }).join('');
+  }
+
+  // ---- field rendering --------------------------------------------------------
+
+  function buildFieldGroups() {
+    var order = [];
+    var byGroup = {};
+    EVENT_CFG.enabledFields.forEach(function (key) {
+      var cat = FIELD_BY_KEY[key];
+      if (!cat) return;
+      if (!byGroup[cat.group]) { byGroup[cat.group] = []; order.push(cat.group); }
+      byGroup[cat.group].push(key);
+    });
+    return { order: order, byGroup: byGroup };
+  }
+
+  function renderField(cat, value, disabled) {
+    var id = 'f-' + cat.key;
+    var val = value === undefined || value === null ? '' : value;
+    var dis = disabled ? 'disabled' : '';
+    var control;
+    if (cat.type === 'select') {
+      var options = OPT[cat.key] ? OPT[cat.key].slice() : [];
+      if (val !== '' && options.indexOf(val) === -1) options.unshift(val);
+      control = '<select id="' + id + '" ' + dis + '>' + options.map(function (o) {
+        return '<option value="' + esc(o) + '"' + (o === val ? ' selected' : '') + '>' + esc(o) + '</option>';
+      }).join('') + '</select>';
+    } else if (cat.type === 'textarea') {
+      control = '<textarea id="' + id + '" ' + dis + '>' + esc(val) + '</textarea>';
+    } else {
+      var inputType = cat.type === 'date' ? 'date' : cat.type === 'number' ? 'number' : 'text';
+      control = '<input type="' + inputType + '" id="' + id + '" value="' + esc(val) + '" ' + dis + '>';
+    }
+    return '<div class="field"><label for="' + id + '">' + esc(cat.label) + '</label>' + control + '</div>';
+  }
+
+  function addressExtrasHtml(c, viewer) {
+    var geoLabel = c.geocodeSource === 'auto' ? '已定位' : c.geocodeSource === 'manual' ? '手動釘選' : '未定位';
+    var geoBadge = c.geocodeSource === 'auto' ? 'badge--success' : c.geocodeSource === 'manual' ? 'badge--info' : 'badge--muted';
+    var suggestions = window.VisitMock.ADDR_POINTS.slice(0, 5);
+    return (
+      '<div class="geocode-preview">' +
+        '<div class="geocode-preview__map" aria-hidden="true"></div>' +
+        '<div class="geocode-preview__meta">' +
+          '<span class="badge ' + geoBadge + '">geocode:' + geoLabel + '</span>' +
+          '<span class="mono dim">' + esc(c.lat) + ', ' + esc(c.lng) + '</span>' +
+        '</div>' +
+        (c.geocodeSource === 'manual' ? (
+          '<div class="banner banner--warning">手動釘選鎖定中,按下「重新定位」將解凍:清空座標 → 重新以地址定位。</div>' +
+          '<button type="button" class="btn ghost" id="relocate-btn"' + (viewer ? ' disabled' : '') + '>重新定位</button>'
+        ) : '') +
+        '<datalist id="address-suggest-list">' +
+          suggestions.map(function (s) { return '<option value="' + esc(s.displayAddress) + '"></option>'; }).join('') +
+        '</datalist>' +
+        '<p class="screen-sub">地址欄支援自動完成建議(靜態假清單,示意 geocode suggest)+ 村里/鄰下拉見上方欄位。</p>' +
+      '</div>'
+    );
+  }
+
+  function lwwConflictHtml(c) {
+    return (
+      '<div class="card">' +
+        '<h3 class="card-heading">逐欄 LWW 衝突示意</h3>' +
+        '<p class="screen-sub">案件 #' + c.caseNo + ':訪視員 A 於 10:32 修改「災損程度」,訪視員 B 於 10:35(離線佇列同步時)修改「聯絡電話」。' +
+        '兩筆變更命中不同欄位,依到達伺服器的順序逐欄覆蓋(field-level LWW),不是整筆記錄互相覆蓋 —— 最終結果同時保留兩人的修改。</p>' +
+      '</div>'
+    );
+  }
+
+  // ---- screen: #/whoami ------------------------------------------------------
+
+  function renderWhoami() {
+    var p = window.VisitPersona.getPersona();
+    var identity = PERSONA_IDENTITY[p.id] || { email: 'unknown@charity.org.tw', name: p.label };
+    var scope = window.VisitPersona.adminScope(p);
+    var showAdminEntry = scope.manageEvents || scope.createEvent || scope.manageMembers || scope.planningDesk || scope.org;
+    var sig = p.adminSignal;
+
+    var html =
+      '<div class="screen-title"><h2>我的身分</h2><p class="screen-sub">目前登入的假身分與四維 admin 訊號矩陣。</p></div>' +
+      '<div class="card whoami-card">' +
+        '<div class="whoami-card__row"><span class="whoami-card__label">Email</span><span class="whoami-card__value mono">' + esc(identity.email) + '</span></div>' +
+        '<div class="whoami-card__row"><span class="whoami-card__label">姓名</span><span class="whoami-card__value">' + esc(identity.name) + '</span></div>' +
+        '<div class="whoami-card__row"><span class="whoami-card__label">角色</span><span class="whoami-card__value">' + esc(p.label) + '<span class="mono dim"> (' + esc(p.id) + ')</span></span></div>' +
+        '<div class="whoami-card__row"><span class="whoami-card__label">團隊 / 可視路線</span><span class="whoami-card__value">' + esc(p.team) + ' · ' + (p.bypass ? '略過路線限制(bypass)' : esc(p.availableRoutes.join('、'))) + '</span></div>' +
+        (p.revoked ? '<div class="banner banner--danger">此身分已被停權(revoked)</div>' : '') +
+      '</div>' +
+      '<div class="card">' +
+        '<h3 class="card-heading">四維 Admin 訊號矩陣</h3>' +
+        '<table class="signal-table"><tbody>' +
+          '<tr><th scope="row">isAdmin</th><td>' + (sig.isAdmin ? '<span class="badge badge--info">是</span>' : '<span class="badge badge--muted">否</span>') + '</td></tr>' +
+          '<tr><th scope="row">eventAdminSlugs</th><td>' + arrOrDash(sig.eventAdminSlugs) + '</td></tr>' +
+          '<tr><th scope="row">hexinAdminOf</th><td>' + arrOrDash(sig.hexinAdminOf) + '</td></tr>' +
+          '<tr><th scope="row">deptAdminOf</th><td>' + arrOrDash(sig.deptAdminOf) + '</td></tr>' +
+        '</tbody></table>' +
+      '</div>' +
+      (showAdminEntry ?
+        '<div class="card">' +
+          '<h3 class="card-heading">管理後台</h3>' +
+          '<p class="screen-sub">依 adminScope(persona) 判斷,此身分可進入桌面 Admin 後台。</p>' +
+          '<a class="btn btn-primary" href="admin.html">進入管理後台 →</a>' +
+        '</div>'
+        : '<div class="banner banner--muted">此身分在三層授權模型中沒有 admin 平面訊號,不顯示管理後台入口。</div>');
+
+    renderScreen(html);
+  }
+
+  // ---- screen: #/events ------------------------------------------------------
+
+  function renderEvents() {
+    var p = window.VisitPersona.getPersona();
+    var html =
+      '<div class="screen-title"><h2>事件列表</h2><p class="screen-sub">以目前身分(' + esc(p.label) + ')檢視每個事件的存取狀態。原型固定示範 ' + esc(EVENT_SLUG) + ',點卡片進入案件列表。</p></div>' +
+      window.VisitMock.EVENTS.map(function (evt) {
+        var statusBadge = evt.status === 'active' ? 'badge--success' : evt.status === 'closing' ? 'badge--warning' : 'badge--muted';
+        var statusLabel = evt.status === 'active' ? '進行中' : evt.status === 'closing' ? '結案中' : '已結案';
+        var isPrimary = evt.slug === EVENT_SLUG;
+        return (
+          '<button type="button" class="card event-card" data-evt="' + esc(evt.slug) + '">' +
+            '<div class="event-card__top"><h3>' + esc(evt.name) + '</h3><span class="badge ' + statusBadge + '">' + statusLabel + '</span></div>' +
+            '<div class="event-card__meta">' +
+              '<span class="badge badge--muted">' + esc(evt.county) + '</span>' +
+              (evt.openSupport ? '<span class="badge badge--info">跨合心支援</span>' : '') +
+              (!evt.driveConfigured ? '<span class="badge badge--warning">drive 未設定</span>' : '') +
+            '</div>' +
+            '<div class="event-card__access"><span>team=' + esc(p.team) + '</span><span>bypass=' + (p.bypass ? '是' : '否') + '</span><span>role=' + esc(p.role) + '</span></div>' +
+            (!isPrimary ? '<p class="event-card__note">此原型的案件列表固定示範 ' + esc(EVENT_SLUG) + ',點此仍會導向該案件列表。</p>' : '') +
+          '</button>'
+        );
+      }).join('');
+
+    renderScreen(html, function (el) {
+      var btns = el.querySelectorAll('[data-evt]');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function () { window.VisitProto.navigate('#/cases'); });
+      }
+    });
+  }
+
+  // ---- screen: #/cases -------------------------------------------------------
+
+  function caseCardHtml(c, kind) {
+    var geoLabel = c.geocodeSource === 'auto' ? '已定位' : c.geocodeSource === 'manual' ? '手動釘選' : '未定位';
+    var geoBadge = c.geocodeSource === 'auto' ? 'badge--success' : c.geocodeSource === 'manual' ? 'badge--info' : 'badge--muted';
+    return (
+      '<button type="button" class="card case-card" data-case="' + esc(c.id) + '">' +
+        '<div class="case-card__top"><span class="mono case-card__no">#' + c.caseNo + '</span><span class="route-chip" data-route="' + routeLower(c.route) + '">路線 ' + esc(c.route) + '</span></div>' +
+        '<div class="case-card__name">' + esc(c.name) + '</div>' +
+        '<div class="case-card__addr">' + esc(c.address) + '</div>' +
+        '<div class="case-card__meta"><span class="badge ' + geoBadge + '">' + geoLabel + '</span></div>' +
+        (kind === 'rejected' && c.rejectReason ? '<div class="case-card__reject">拒絕原因:' + esc(rejectReasonLabel(c.rejectReason)) + '</div>' : '') +
+      '</button>'
+    );
+  }
+
+  function caseSectionHtml(title, list, kind) {
+    if (!list.length) {
+      return '<div class="queue-section"><h3 class="card-heading">' + esc(title) + ' · 0</h3><p class="screen-sub">無案件。</p></div>';
+    }
+    return (
+      '<div class="queue-section">' +
+        '<h3 class="card-heading">' + esc(title) + ' · ' + list.length + '</h3>' +
+        '<div class="case-list">' + list.map(function (c) { return caseCardHtml(c, kind); }).join('') + '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderCases() {
+    var p = window.VisitPersona.getPersona();
+    var vis = window.VisitPersona.visibleCases(p, window.VisitMock.CASES, EVENT_SLUG);
+    var pending = vis.filter(function (c) { return c.syncState === 'pending'; });
+    var synced = vis.filter(function (c) { return c.syncState === 'synced'; });
+    var rejected = vis.filter(function (c) { return c.syncState === 'rejected'; });
+
+    var html =
+      '<div class="screen-title"><h2>案件列表</h2><p class="screen-sub">' + esc(EVENT_NAME) + ' · 依 visibleCases(persona) 篩選,共 ' + vis.length + ' 筆。</p></div>' +
+      (p.revoked ? '<div class="banner banner--danger">帳號已停權,無法檢視任何案件。</div>' : '') +
+      caseSectionHtml('待送(pending)', pending, 'pending') +
+      caseSectionHtml('已同步(synced)', synced, 'synced') +
+      caseSectionHtml('被拒(rejected)', rejected, 'rejected');
+
+    renderScreen(html, function (el) {
+      var btns = el.querySelectorAll('[data-case]');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function (e) {
+          var id = e.currentTarget.getAttribute('data-case');
+          window.VisitProto.navigate('#/case/' + encodeURIComponent(id));
+        });
+      }
+    });
+    updateGlobalSyncBar();
+  }
+
+  // ---- screen: #/case/:id ----------------------------------------------------
+
+  function renderCaseDetail(id) {
+    var p = window.VisitPersona.getPersona();
+    var raw = window.VisitMock.CASES.filter(function (c) { return c.id === id; })[0];
+    if (!raw) {
+      renderScreen('<div class="screen-title"><h2>找不到案件</h2></div><a class="btn ghost" href="#/cases">← 回案件列表</a>');
+      return;
+    }
+
+    var override = caseOverrides[id] || {};
+    var merged = {};
+    for (var k in raw) { if (Object.prototype.hasOwnProperty.call(raw, k)) merged[k] = raw[k]; }
+    for (var ok in override) { if (Object.prototype.hasOwnProperty.call(override, ok)) merged[ok] = override[ok]; }
+
+    var stripped = window.VisitPersona.stripPII(merged, p);
+    var viewer = !window.VisitPersona.canPush(p);
+    var piiHidden = !window.VisitPersona.canSeePII(p);
+    var groups = buildFieldGroups();
+
+    var parts = [];
+    parts.push('<div class="screen-title"><h2>案件 #' + raw.caseNo + '</h2><p class="screen-sub"><a class="back-link" href="#/cases">← 回案件列表</a></p></div>');
+
+    if (viewer) {
+      parts.push('<div class="banner banner--muted">唯讀模式:目前身分為「' + esc(p.label) + '」,所有欄位唯讀,無法儲存或送出。</div>');
+    }
+
+    var outOfScope = !p.bypass && !p.revoked && p.availableRoutes.indexOf(raw.route) === -1;
+    if (outOfScope) {
+      parts.push('<div class="banner banner--warning">此案件路線(' + esc(raw.route) + ')不在你目前的可視路線範圍內,原型仍顯示以利走查。</div>');
+    }
+
+    if (p.id === 'visitor') {
+      parts.push('<div class="banner banner--warning">身分為訪視志工:可視路線僅 A、B。若嘗試 push 非 A/B 路線的案件,伺服器會回 403 permission 拒絕寫入。</div>');
+    }
+
+    groups.order.forEach(function (groupName) {
+      var keys = groups.byGroup[groupName];
+      var fieldsHtml = keys.map(function (key) {
+        var cat = FIELD_BY_KEY[key];
+        if (cat.pii && !(key in stripped)) return '';
+        return renderField(cat, stripped[key], viewer);
+      }).join('');
+
+      var hasDroppedPii = piiHidden && keys.some(function (key) { return FIELD_BY_KEY[key].pii; });
+
+      parts.push(
+        '<div class="card field-group">' +
+          '<h3 class="card-heading">' + esc(groupName) + '</h3>' +
+          '<div class="field-grid">' + fieldsHtml + '</div>' +
+          (hasDroppedPii ? '<p class="pii-note">此身分不可見個資欄位(已隱藏)。</p>' : '') +
+          (groupName === '地址組' ? addressExtrasHtml(merged, viewer) : '') +
+        '</div>'
+      );
+    });
+
+    parts.push(lwwConflictHtml(raw));
+
+    parts.push(
+      '<div class="case-actions">' +
+        '<a class="btn ghost" href="#/case/' + esc(raw.id) + '/photo">查看照片 →</a>' +
+        '<button type="button" class="btn btn-primary" id="save-case-btn"' + (viewer ? ' disabled' : '') + '>' + (viewer ? '唯讀,無法儲存' : '儲存(加入離線佇列)') + '</button>' +
+      '</div>'
+    );
+
+    renderScreen(parts.join(''), function (el) {
+      var saveBtn = el.querySelector('#save-case-btn');
+      if (saveBtn && !viewer) {
+        saveBtn.addEventListener('click', function () {
+          showToast('已加入離線佇列,等待下次同步(單次批次上限 500 筆)');
+        });
+      }
+      var relocateBtn = el.querySelector('#relocate-btn');
+      if (relocateBtn) {
+        relocateBtn.addEventListener('click', function () {
+          var next = {};
+          for (var kk in caseOverrides[id]) { if (Object.prototype.hasOwnProperty.call(caseOverrides[id], kk)) next[kk] = caseOverrides[id][kk]; }
+          next.geocodeSource = 'auto';
+          caseOverrides[id] = next;
+          showToast('已解凍手動釘選:清空座標 → 重新以地址定位(示意)');
+          renderCaseDetail(id);
+        });
+      }
+      var addrInput = el.querySelector('#f-address');
+      if (addrInput) addrInput.setAttribute('list', 'address-suggest-list');
+    });
+  }
+
+  // ---- screen: #/case/:id/photo -----------------------------------------------
+
+  function photoCardHtml(ph) {
+    var statusBadge = ph.uploadStatus === 'uploaded' ? 'badge--success' : ph.uploadStatus === 'uploading' ? 'badge--warning' : 'badge--muted';
+    var statusLabel = ph.uploadStatus === 'uploaded' ? '已上傳' : ph.uploadStatus === 'uploading' ? '上傳中' : '待上傳';
+    return (
+      '<div class="card photo-card">' +
+        '<div class="photo-card__thumb" aria-hidden="true"></div>' +
+        '<div class="photo-card__title">' + esc(ph.title) + '</div>' +
+        '<div class="photo-card__meta"><span class="mono dim">' + esc(ph.takenAt) + '</span><span class="badge ' + statusBadge + '">' + statusLabel + '</span></div>' +
+      '</div>'
+    );
+  }
+
+  function renderCasePhoto(id) {
+    var p = window.VisitPersona.getPersona();
+    var raw = window.VisitMock.CASES.filter(function (c) { return c.id === id; })[0];
+    if (!raw) {
+      renderScreen('<div class="screen-title"><h2>找不到案件</h2></div><a class="btn ghost" href="#/cases">← 回案件列表</a>');
+      return;
+    }
+    var canPhotos = window.VisitPersona.canSeePhotos(p);
+    var photos = window.VisitMock.PHOTOS.filter(function (ph) { return ph.caseId === raw.id; });
+    var otherNoDrive = window.VisitMock.EVENTS.filter(function (e) { return !e.driveConfigured; })[0];
+
+    var html =
+      '<div class="screen-title"><h2>案件照片 #' + raw.caseNo + '</h2><p class="screen-sub"><a class="back-link" href="#/case/' + esc(raw.id) + '">← 回案件詳情</a></p></div>' +
+      '<div class="banner banner--muted">兩段式上傳:先 push 照片 metadata 建立一筆 row,再對該 row POST 實際檔案。任一步失敗都可重試,不會產生孤兒檔案。</div>' +
+      (EVENT_OBJ.driveConfigured ? '' : '<div class="banner banner--danger">此事件 drive_folder_id 未設定,照片功能停用:上傳會收到 409 drive_not_configured(reactive,前端事前無法得知)。</div>') +
+      (otherNoDrive ? '<p class="screen-sub">參考:事件「' + esc(otherNoDrive.name) + '」(' + esc(otherNoDrive.slug) + ')driveConfigured=false,在該事件操作會出現同樣的 409 drive_not_configured。</p>' : '') +
+      (!canPhotos
+        ? '<div class="banner banner--warning">目前身分為 viewer / 停權,拿不到照片(canSeePhotos=false)。</div>'
+        : (photos.length ? '<div class="photo-grid">' + photos.map(photoCardHtml).join('') + '</div>' : '<p class="screen-sub">此案件尚無照片。</p>'));
+
+    renderScreen(html);
+  }
+
+  // ---- screen: #/map ----------------------------------------------------------
+
+  function renderMap() {
+    var p = window.VisitPersona.getPersona();
+    var vis = window.VisitPersona.visibleCases(p, window.VisitMock.CASES, EVENT_SLUG).filter(function (c) {
+      return typeof c.lat === 'number' && typeof c.lng === 'number';
+    });
+
+    var canvasHtml;
+    if (!vis.length) {
+      canvasHtml = '<p class="screen-sub">目前身分可視案件為 0 筆,無座標可標示於地圖。</p>';
+    } else {
+      var lats = vis.map(function (c) { return c.lat; });
+      var lngs = vis.map(function (c) { return c.lng; });
+      var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+      var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+      var latRange = (maxLat - minLat) || 1;
+      var lngRange = (maxLng - minLng) || 1;
+
+      var markers = vis.map(function (c) {
+        var x = ((c.lng - minLng) / lngRange) * 84 + 8;
+        var y = (1 - (c.lat - minLat) / latRange) * 76 + 10;
+        return '<button type="button" class="route-chip map-marker" data-route="' + routeLower(c.route) + '" data-case="' + esc(c.id) + '" style="left:' + x.toFixed(1) + '%; top:' + y.toFixed(1) + '%;" title="#' + c.caseNo + ' ' + esc(c.address) + '">' + esc(c.route) + '</button>';
+      }).join('');
+
+      canvasHtml = '<div class="fake-map__canvas" id="fake-map-canvas">' + markers + '</div>';
+    }
+
+    var html =
+      '<div class="screen-title"><h2>規劃地圖</h2><p class="screen-sub">CSS 假地圖 · ' + vis.length + ' 個門牌點(依目前身分可視路線)。點標記可示意手動釘選。</p></div>' +
+      '<div class="fake-map card">' + canvasHtml + '</div>' +
+      '<div id="map-detail" class="card map-detail" hidden></div>' +
+      '<div class="card">' +
+        '<h3 class="card-heading">圖磚產製中</h3>' +
+        '<p class="screen-sub">圖磚尚未產製完成時,tile server 回傳 0-byte 內容,前端視為 503,顯示重試中(暫態,非永久錯誤)。</p>' +
+        '<div class="tile-loading"><span class="badge badge--warning">產製中…</span><span class="mono dim">tile 12/34/56 → 0-byte → 503</span></div>' +
+      '</div>';
+
+    renderScreen(html, function (el) {
+      var markerBtns = el.querySelectorAll('.map-marker');
+      for (var i = 0; i < markerBtns.length; i++) {
+        markerBtns[i].addEventListener('click', function (e) {
+          var cid = e.currentTarget.getAttribute('data-case');
+          var c = window.VisitMock.CASES.filter(function (x) { return x.id === cid; })[0];
+          if (!c) return;
+          var detail = el.querySelector('#map-detail');
+          detail.hidden = false;
+          detail.innerHTML =
+            '<div class="case-card__top"><span class="mono">#' + c.caseNo + '</span><span class="route-chip" data-route="' + routeLower(c.route) + '">路線 ' + esc(c.route) + '</span></div>' +
+            '<p>' + esc(c.address) + '</p>' +
+            '<button type="button" class="btn ghost" id="pin-btn">手動釘選此點</button>';
+          detail.querySelector('#pin-btn').addEventListener('click', function () {
+            var next = {};
+            for (var kk in caseOverrides[cid]) { if (Object.prototype.hasOwnProperty.call(caseOverrides[cid], kk)) next[kk] = caseOverrides[cid][kk]; }
+            next.geocodeSource = 'manual';
+            caseOverrides[cid] = next;
+            showToast('已手動釘選 #' + c.caseNo + ',geocodeSource → manual(示意)');
+          });
+        });
+      }
+    });
+  }
+
+  // ---- overlays: revoked / full_resync ----------------------------------------
+
+  function revokedOverlayHtml() {
+    return (
+      '<div class="phone-overlay__inner"><div class="card banner-card">' +
+        '<div class="banner banner--danger"><strong>您已被移出此事件,本地資料將清除。</strong></div>' +
+        '<p class="screen-sub">此為破壞性、永久性的移除,無法復原。請使用右下角 persona 切換器切換回其他身分以繼續走查原型。</p>' +
+      '</div></div>'
+    );
+  }
+
+  function resyncOverlayHtml() {
+    return (
+      '<div class="phone-overlay__inner"><div class="card banner-card">' +
+        '<div class="banner banner--warning"><strong>偵測到成員資料變動</strong></div>' +
+        '<p class="screen-sub">清空本地資料 → cursor 歸零 → resync=1 重新載入…</p>' +
+        '<p class="screen-sub dim">(非破壞性復原,與帳號停權明確不同)</p>' +
+      '</div></div>'
+    );
+  }
+
+  function handlePersonaChange(detail) {
+    var prev = detail.prev;
+    var next = detail.next;
+    updateHeaderPersonaNote();
+
+    if (next.revoked) {
+      revokedOverlayEl.hidden = false;
+      resyncOverlayEl.hidden = true;
+      if (dispatch) dispatch();
+      updateGlobalSyncBar();
+      return;
+    }
+    revokedOverlayEl.hidden = true;
+
+    var teamChanged = prev.team !== next.team;
+    var prevRoutes = prev.availableRoutes.slice().sort().join(',');
+    var nextRoutes = next.availableRoutes.slice().sort().join(',');
+    var routesChanged = prevRoutes !== nextRoutes;
+
+    if (dispatch) dispatch();
+    updateGlobalSyncBar();
+
+    if (!prev.revoked && (teamChanged || routesChanged)) {
+      resyncOverlayEl.hidden = false;
+      clearTimeout(resyncTimer);
+      resyncTimer = setTimeout(function () { resyncOverlayEl.hidden = true; }, 2400);
+    } else {
+      resyncOverlayEl.hidden = true;
+    }
+  }
+
+  // ---- boot -----------------------------------------------------------------
+
+  function init() {
+    var stageMount = document.getElementById('phone-stage');
+    content = window.VisitProto.mountPhoneFrame(stageMount);
+    frame = content.parentNode;
+
+    content.innerHTML =
+      '<div class="sync-bar" id="global-syncbar"><span class="sync-bar__dot"></span><span id="syncbar-text">—</span></div>' +
+      '<div class="screen-host" id="screen-host"></div>' +
+      '<nav class="bottom-tabs" id="bottom-tabs" aria-label="主要導覽">' + tabButtonsHtml() + '</nav>';
+
+    screenHost = document.getElementById('screen-host');
+    bottomTabs = document.getElementById('bottom-tabs');
+
+    revokedOverlayEl = document.createElement('div');
+    revokedOverlayEl.className = 'phone-overlay';
+    revokedOverlayEl.hidden = true;
+    revokedOverlayEl.innerHTML = revokedOverlayHtml();
+    frame.appendChild(revokedOverlayEl);
+
+    resyncOverlayEl = document.createElement('div');
+    resyncOverlayEl.className = 'phone-overlay';
+    resyncOverlayEl.hidden = true;
+    resyncOverlayEl.innerHTML = resyncOverlayHtml();
+    frame.appendChild(resyncOverlayEl);
+
+    toastEl = document.createElement('div');
+    toastEl.className = 'phone-toast';
+    toastEl.setAttribute('aria-live', 'polite');
+    toastEl.hidden = true;
+    frame.appendChild(toastEl);
+
+    window.VisitPersona.mountPersonaSwitcher(document.getElementById('persona-switcher-mount'));
+
+    bottomTabs.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('[data-nav]') : null;
+      if (!btn) return;
+      window.VisitProto.navigate(btn.getAttribute('data-nav'));
+    });
+
+    dispatch = window.VisitProto.initRouter({
+      '/whoami': function () { setRoute('whoami'); renderWhoami(); },
+      '/events': function () { setRoute('events'); renderEvents(); },
+      '/cases': function () { setRoute('cases'); renderCases(); },
+      '/case/:id': function (params) { setRoute('cases'); renderCaseDetail(params.id); },
+      '/case/:id/photo': function (params) { setRoute('cases'); renderCasePhoto(params.id); },
+      '/map': function () { setRoute('map'); renderMap(); }
+    });
+
+    setInterval(function () {
+      syncPhase = 1 - syncPhase;
+      updateGlobalSyncBar();
+    }, 3000);
+
+    window.VisitPersona.onPersonaChange(handlePersonaChange);
+    updateHeaderPersonaNote();
+
+    if (window.VisitPersona.getPersona().revoked) {
+      revokedOverlayEl.hidden = false;
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
