@@ -53,6 +53,7 @@
     color: var(--text);
     font-weight: 800;
     font-size: var(--fs-h3);
+    text-decoration: none;
   }
   .top-bar a span {
     color: var(--text-dim);
@@ -105,21 +106,28 @@
   }
   .whoami-card__value { font-size: var(--fs-body); font-weight: 600; }
 
-  .signal-table { width: 100%; border-collapse: collapse; }
-  .signal-table th, .signal-table td {
-    text-align: left;
-    padding: var(--sp-2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 14px;
-    vertical-align: top;
+  /* four-signal grid: label uses the same uppercase-tracked-dim treatment
+     as .whoami-card__label above it (design-system reuse, not a new
+     pattern), values are badges/chips rather than a stacked column of
+     mono dim text so the four rows don't read as one uniform block. */
+  .signal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--sp-4) var(--sp-5);
   }
-  .signal-table th {
-    color: var(--text-dim);
-    font-weight: 600;
-    width: 42%;
+  .signal-item { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .signal-item__label {
+    /* These are literal API field names (isAdmin, eventAdminSlugs, ...),
+       not prose labels — uppercasing camelCase mangles word boundaries
+       (eventAdminSlugs -> EVENTADMINSLUGS reads as one unbroken word), so
+       this keeps mono + original casing rather than the uppercase-tracked
+       treatment used for prose labels elsewhere on this screen. */
     font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
   }
-  .signal-table tr:last-child th, .signal-table tr:last-child td { border-bottom: none; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 
   /* ---- events ---- */
   button.card { appearance: none; -webkit-appearance: none; border: none; font: inherit; color: inherit; cursor: pointer; }
@@ -336,8 +344,14 @@
 
   function routeLower(r) { return String(r).toLowerCase(); }
 
-  function arrOrDash(arr) {
-    return arr && arr.length ? esc(arr.join('、')) : '<span class="dim">—</span>';
+  // Renders an admin-signal array as a row of badge chips instead of a
+  // comma-joined mono string, so the four-signal grid has texture instead
+  // of four stacked rows of uniform small gray text.
+  function arrChips(arr, kind) {
+    if (!arr || !arr.length) return '<span class="dim">—</span>';
+    return '<div class="chip-row">' + arr.map(function (v) {
+      return '<span class="badge badge--' + kind + ' mono">' + esc(v) + '</span>';
+    }).join('') + '</div>';
   }
 
   function rejectReasonLabel(reason) {
@@ -522,12 +536,12 @@
       '</div>' +
       '<div class="card">' +
         '<h3 class="card-heading">四維 Admin 訊號矩陣</h3>' +
-        '<table class="signal-table"><tbody>' +
-          '<tr><th scope="row">isAdmin</th><td>' + (sig.isAdmin ? '<span class="badge badge--info">是</span>' : '<span class="badge badge--muted">否</span>') + '</td></tr>' +
-          '<tr><th scope="row">eventAdminSlugs</th><td>' + arrOrDash(sig.eventAdminSlugs) + '</td></tr>' +
-          '<tr><th scope="row">hexinAdminOf</th><td>' + arrOrDash(sig.hexinAdminOf) + '</td></tr>' +
-          '<tr><th scope="row">deptAdminOf</th><td>' + arrOrDash(sig.deptAdminOf) + '</td></tr>' +
-        '</tbody></table>' +
+        '<div class="signal-grid">' +
+          '<div class="signal-item"><span class="signal-item__label">isAdmin</span>' + (sig.isAdmin ? '<span class="badge badge--info">是</span>' : '<span class="badge badge--muted">否</span>') + '</div>' +
+          '<div class="signal-item"><span class="signal-item__label">eventAdminSlugs</span>' + arrChips(sig.eventAdminSlugs, 'info') + '</div>' +
+          '<div class="signal-item"><span class="signal-item__label">hexinAdminOf</span>' + arrChips(sig.hexinAdminOf, 'muted') + '</div>' +
+          '<div class="signal-item"><span class="signal-item__label">deptAdminOf</span>' + arrChips(sig.deptAdminOf, 'muted') + '</div>' +
+        '</div>' +
       '</div>' +
       (showAdminEntry ?
         '<div class="card">' +

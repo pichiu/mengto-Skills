@@ -45,6 +45,7 @@
   }
   .admin-page-title h1 {
     font-size: var(--fs-h2);
+    font-weight: 800;
     margin: 0;
   }
   .admin-page-title .persona-hint {
@@ -98,6 +99,19 @@
   }
   .admin-panel {
     outline: none;
+    /* A fresh .admin-panel element is created on every render() (see
+       buildShell()), so this replays automatically on each tab switch —
+       no JS class-toggling needed, and the content is present in the DOM
+       throughout (only opacity/position animate), so it still renders
+       correctly with reduced motion, in headless screenshots, or if the
+       animation is skipped entirely. Gives admin.html the same "state
+       change gets a transition" motion language mobile.html already has
+       (.screen-transition-in), instead of tab content just snapping in. */
+    animation: admin-panel-in var(--dur) var(--ease);
+  }
+  @keyframes admin-panel-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .stack { display: flex; flex-direction: column; gap: var(--sp-5); }

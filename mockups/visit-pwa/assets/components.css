@@ -35,6 +35,35 @@
   pointer-events: none;
 }
 
+/* ---- interactive card affordance -----------------------------------------
+   Any <a> or <button> using .card as its base (event-card, case-card,
+   entry-card, ...) gets a hover/focus lift so clickable cards never sit
+   there looking static — filling in the "hover" state the polish pass
+   flagged as missing on mobile's event/case cards and admin's event
+   cards. Page-local rules with matching-or-higher specificity (e.g.
+   index.html's .entry-card:hover) still win, so existing tuned
+   interactions are unaffected; this is only a floor. */
+a.card,
+button.card {
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+a.card:hover,
+a.card:focus-visible,
+button.card:hover,
+button.card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+a.card:active,
+button.card:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
 /* ---- .btn / .btn-primary / .btn.ghost / :disabled ------------------------
    Touch-height by default (var(--control-h) >= 48px), AA-safe text.
 --------------------------------------------------------------------------- */
@@ -353,7 +382,14 @@
    top of the browser-frame content instead of position:fixed, so it never
    overlaps interactive controls (dept card action buttons, planning-desk
    right-column checkboxes). mobile.html keeps the default fixed/floating
-   behaviour untouched. */
+   behaviour untouched.
+
+   Deliberately styled as a slim, flat "prototype harness" strip rather
+   than a glass card: the floating variant on mobile is chrome sitting on
+   top of the phone screen, but docked sits inline, directly above the
+   real admin sidebar/panel. Without this, the picker (a testing tool, not
+   part of the product) reads as equal or greater visual weight than the
+   actual admin UI beneath it. Flat + compact restores that hierarchy. */
 .persona-switcher.is-docked {
   position: static;
   right: auto;
@@ -364,11 +400,35 @@
   width: 100%;
   min-width: 0;
   z-index: auto;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-4);
+  background: var(--surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: var(--r-md);
+  box-shadow: none;
+}
+
+.persona-switcher.is-docked .persona-switcher__current {
+  flex: 0 0 auto;
+  padding: 0 var(--sp-3) 0 0;
+  border-bottom: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .persona-switcher.is-docked .persona-switcher__list {
+  flex: 1 1 auto;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.persona-switcher.is-docked .persona-switcher__item {
+  width: auto;
+  height: 30px;
+  padding: 0 var(--sp-3);
 }
 
 .persona-switcher__item {

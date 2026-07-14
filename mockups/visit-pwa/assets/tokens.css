@@ -104,12 +104,31 @@
 }
 
 /* ---- Base document styles ----------------------------------------------*/
+/* Subtle depth wash instead of a flat single-color fill. Alpha is low
+   enough (≤0.05) that it shifts effective background luminance by only a
+   few units out of 255 — text contrast ratios computed against --bg in
+   tokens above hold with margin to spare. Anchored to the viewport
+   (background-attachment: fixed) so it reads as one ambient light source
+   behind the whole page, not a blob that only shows near the top of a
+   tall document. Echoes the same blue/green radial-gradient language
+   already used for the fake-map/geocode-preview canvases, tying the
+   chrome to the same visual system as the "product" surfaces. */
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(1100px 640px at 12% -8%, rgba(76, 154, 255, 0.055), transparent 60%),
+    radial-gradient(900px 520px at 100% 0%, rgba(74, 222, 128, 0.035), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: var(--fs-base);
   line-height: var(--lh);
+}
+
+/* Short headings read better with balanced line lengths instead of a
+   ragged last line; harmless on already-single-line headings. */
+h1, h2, h3 {
+  text-wrap: balance;
 }
 
 @media (prefers-reduced-motion: reduce) {

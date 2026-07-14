@@ -317,6 +317,13 @@
     font-size: 15px;
   }
 
+  .route-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-top: var(--sp-4);
+  }
+
   .site-footer {
     padding: var(--sp-6) 0 var(--sp-8);
     color: var(--text-dim);
@@ -537,6 +544,13 @@
       <div class="card">
         <h3>路線色票系統</h3>
         <p>每條路線一個高對比色票(route-a 到 route-e),在列表、地圖、規劃桌間保持一致辨識度。</p>
+        <div class="route-legend" aria-hidden="true">
+          <span class="route-chip" data-route="a">A</span>
+          <span class="route-chip" data-route="b">B</span>
+          <span class="route-chip" data-route="c">C</span>
+          <span class="route-chip" data-route="d">D</span>
+          <span class="route-chip" data-route="e">E</span>
+        </div>
       </div>
     </div>
   </section>
