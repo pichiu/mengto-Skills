@@ -1019,5 +1019,1439 @@
   render();
 })();
 </script>
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------
+  // 規劃桌(路線規劃)tab — 掛載到 VisitProto.registerTab('planning', fn)
+  //
+  // 純前端示意:三欄工作區(區域階層樹 / 門牌點地圖 / 指派面板)。
+  // 所有「套用 / 授權 / 建案 / 手動釘選」皆只做 UI 回饋(toast),不寫入
+  // 任何 window.VisitMock 資料,避免與事件管理 / 成員名冊等其他 tab 的
+  // mock 狀態互相污染。
+  // ------------------------------------------------------------------
+
+  if (!window.VisitMock || !window.VisitProto) return;
+
+  var EVENT_SLUG = 'flood-2026';
+  var EVENT_CFG = window.VisitMock.EVENT_CONFIG[EVENT_SLUG] || {};
+  var BASE_ROUTES = EVENT_CFG.routes || [];
+  var ALL_POINTS = window.VisitMock.ADDR_POINTS || [];
+  var ADDR_REGIONS = (window.VisitMock.ADDR_REGIONS && window.VisitMock.ADDR_REGIONS['花蓮縣']) || {};
+  var MEMBERS = window.VisitMock.MEMBERS || [];
+
+  var TEAM_LABELS = {};
+  (EVENT_CFG.teams || []).forEach(function (t) { TEAM_LABELS[t.id] = t.label; });
+
+  // ---- 地圖座標正規化(固定參考框,篩選時標記不跳動)-------------------
+
+  var lats = ALL_POINTS.map(function (p) { return p.lat; });
+  var lngs = ALL_POINTS.map(function (p) { return p.lng; });
+  var minLat = lats.length ? Math.min.apply(null, lats) : 0;
+  var maxLat = lats.length ? Math.max.apply(null, lats) : 1;
+  var minLng = lngs.length ? Math.min.apply(null, lngs) : 0;
+  var maxLng = lngs.length ? Math.max.apply(null, lngs) : 1;
+  var latRange = (maxLat - minLat) || 1;
+  var lngRange = (maxLng - minLng) || 1;
+
+  function pointPct(p) {
+    return {
+      x: ((p.lng - minLng) / lngRange) * 84 + 8,
+      y: (1 - (p.lat - minLat) / latRange) * 76 + 10
+    };
+  }
+
+  // ---- 狀態(存於記憶體,跨此 tab 的重新繪製而保留;整頁重新整理即重置)---
+
+  var pdState = {
+    expanded: {},             // path -> bool,樹節點展開狀態
+    selectedNeighborhood: null, // { district, village, neighborhood } | null
+    selection: {},            // addrKey -> true
+    chosenRouteId: null,      // 批次改路線目前選取的路線
+    extraRoutes: [],          // 本次 session 新增的路線 [{id,label,color}]
+    memberGrants: {},         // email -> { routeId: bool }
+    memberGrantsInit: false
+  };
+
+  // 預設展開 光復鄉 › 大平村,因 mock ADDR_POINTS 僅涵蓋此村里。
+  if (ADDR_REGIONS['光復鄉']) {
+    pdState.expanded['光復鄉'] = true;
+    pdState.expanded['光復鄉/大平村'] = true;
+  }
+
+  // ---- 小工具 ----------------------------------------------------------
+
+  function esc(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function toArray(list) {
+    return Array.prototype.slice.call(list);
+  }
+
+  function toast(message, kind) {
+    var stack = document.getElementById('toast-stack');
+    if (!stack) return;
+    var t = document.createElement('div');
+    t.className = 'toast' + (kind ? ' toast--' + kind : '');
+    t.textContent = message;
+    stack.appendChild(t);
+    setTimeout(function () { t.remove(); }, 3200);
+  }
+
+  function getAllRoutes() {
+    return BASE_ROUTES.concat(pdState.extraRoutes);
+  }
+
+  // route-e(第 5 條)沿用預先定義好的 token;第 6 條起依 tokens.css 註解的
+  // 循環規則計算新 hue:hsl(210 + (index-5)*47, 75%, 60%)。
+  function nextRouteMeta(index) {
+    var letter = String.fromCharCode(64 + index);
+    if (index <= 5) {
+      return { id: letter, color: 'var(--route-' + letter.toLowerCase() + ')' };
+    }
+    var hue = (210 + (index - 5) * 47) % 360;
+    return { id: letter, color: 'hsl(' + hue + ' 75% 60%)' };
+  }
+
+  function ensureMemberGrants() {
+    if (pdState.memberGrantsInit) return;
+    MEMBERS.forEach(function (m) {
+      var g = {};
+      (m.availableRoutes || []).forEach(function (r) { g[r] = true; });
+      pdState.memberGrants[m.email] = g;
+    });
+    pdState.memberGrantsInit = true;
+  }
+
+  // ---- 一次性樣式注入(scoped，pd- 前綴，不動 tokens.css / components.css)---
+
+  function ensureStyles() {
+    if (document.getElementById('pd-planning-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'pd-planning-styles';
+    style.textContent =
+      '.pd-workspace{display:flex;gap:var(--sp-4);height:640px;min-width:0;}' +
+      '.pd-col{display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--surface);border-radius:var(--r-lg);border:1px solid rgba(255,255,255,0.08);}' +
+      '.pd-col-left{flex:0 0 320px;width:320px;}' +
+      '.pd-col-center{flex:1 1 auto;}' +
+      '.pd-col-right{flex:0 0 360px;width:360px;}' +
+      '.pd-col-head{flex:0 0 auto;padding:var(--sp-3) var(--sp-4);border-bottom:1px solid rgba(255,255,255,0.08);}' +
+      '.pd-col-head h2{margin:0;font-size:var(--fs-h3);}' +
+      '.pd-col-head p{margin:4px 0 0;}' +
+      '.pd-col-body{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:var(--sp-3);}' +
+      '.pd-col-right .pd-col-body{display:flex;flex-direction:column;gap:var(--sp-3);padding-bottom:400px;}' +
+      '.pd-tree-node{min-width:0;}' +
+      '.pd-tree-btn{display:flex;align-items:center;gap:6px;width:100%;text-align:left;background:transparent;border:none;color:var(--text);padding:6px 8px;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-family:inherit;}' +
+      '.pd-tree-btn:hover{background:rgba(255,255,255,0.06);}' +
+      '.pd-tree-btn.is-active{background:var(--accent);color:#06070B;font-weight:700;}' +
+      '.pd-caret{display:inline-block;width:12px;flex:0 0 auto;color:var(--text-dim);font-size:10px;}' +
+      '.pd-depth-1 .pd-tree-btn{padding-left:22px;}' +
+      '.pd-depth-2 .pd-tree-btn{padding-left:36px;font-size:12px;}' +
+      '.pd-map{position:relative;height:240px;border-radius:var(--r-md);overflow:hidden;cursor:crosshair;user-select:none;flex:0 0 auto;margin-bottom:var(--sp-3);background-color:var(--bg);background-image:radial-gradient(circle at 26% 20%, rgba(76,154,255,0.22), transparent 55%),radial-gradient(circle at 78% 74%, rgba(74,222,128,0.14), transparent 50%),repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 26px),repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 26px);}' +
+      '.pd-point{position:absolute;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:var(--muted);border:2px solid rgba(6,7,11,0.65);padding:0;cursor:pointer;}' +
+      '.pd-point:hover{filter:brightness(1.3);}' +
+      '.pd-point.is-selected{background:var(--accent);width:14px;height:14px;box-shadow:0 0 0 3px rgba(76,154,255,0.35);}' +
+      '.pd-marquee{position:absolute;border:1px solid var(--accent);background:rgba(76,154,255,0.18);pointer-events:none;z-index:5;}' +
+      '.pd-actionbar{display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap;padding:var(--sp-2) var(--sp-3);background:var(--surface-raised);border-radius:var(--r-md);margin-bottom:var(--sp-3);font-size:13px;}' +
+      '.pd-actionbar .btn{height:30px;padding:0 var(--sp-3);font-size:12px;}' +
+      '.pd-detail{padding:var(--sp-3);border-radius:var(--r-md);background:var(--surface-raised);margin-bottom:var(--sp-3);font-size:13px;display:flex;flex-direction:column;gap:6px;}' +
+      '.pd-detail .btn{align-self:flex-start;font-size:12px;height:30px;padding:0 var(--sp-3);}' +
+      '.pd-list{display:flex;flex-direction:column;gap:2px;}' +
+      '.pd-list-row{display:flex;align-items:center;gap:var(--sp-2);padding:4px 6px;border-radius:var(--r-sm);font-size:12px;min-width:0;}' +
+      '.pd-list-row:hover{background:rgba(255,255,255,0.04);}' +
+      '.pd-list-row label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}' +
+      '.pd-list-badge{font-size:10px;color:var(--text-dim);flex:0 0 auto;}' +
+      '.pd-card{padding:var(--sp-4);border-radius:var(--r-md);background:var(--surface-raised);}' +
+      '.pd-card h3{margin:0 0 6px;font-size:15px;}' +
+      '.pd-card .hint{margin:0 0 var(--sp-2);}' +
+      '.pd-route-pick{display:flex;flex-wrap:wrap;gap:6px;margin:var(--sp-2) 0;}' +
+      '.pd-route-pick button{border:2px solid transparent;cursor:pointer;font:inherit;}' +
+      '.pd-route-pick button[aria-pressed="true"]{border-color:var(--text);box-shadow:0 0 0 2px rgba(255,255,255,0.18);}' +
+      '.pd-member-row{display:flex;flex-direction:column;gap:4px;padding:var(--sp-2) 0;border-bottom:1px solid rgba(255,255,255,0.06);}' +
+      '.pd-member-row:last-child{border-bottom:none;}' +
+      '.pd-member-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);font-size:13px;}' +
+      '.pd-member-routes{display:flex;flex-wrap:wrap;gap:6px;}' +
+      '.pd-member-routes label{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--text-dim);cursor:pointer;}' +
+      '.pd-member-routes .route-chip{font-size:10px;padding:1px 6px;}' +
+      '.pd-newroute-row{display:flex;gap:var(--sp-2);align-items:flex-end;}' +
+      '.pd-newroute-row .field{flex:1 1 auto;min-width:0;margin:0;}' +
+      '@media (max-width: 1180px){.pd-workspace{flex-wrap:wrap;height:auto;}.pd-col-left,.pd-col-right{width:100%;flex:1 1 100%;}.pd-col-center{flex:1 1 100%;}}';
+    document.head.appendChild(style);
+  }
+
+  // ---- 左欄:區域階層樹 --------------------------------------------------
+
+  function buildTreeHtml() {
+    var html = '';
+    Object.keys(ADDR_REGIONS).forEach(function (district) {
+      var distExpanded = !!pdState.expanded[district];
+      html += '<div class="pd-tree-node">' +
+        '<button type="button" class="pd-tree-btn" data-kind="toggle" data-path="' + esc(district) + '" aria-expanded="' + distExpanded + '">' +
+        '<span class="pd-caret">' + (distExpanded ? '▾' : '▸') + '</span>' + esc(district) + '</button></div>';
+      if (!distExpanded) return;
+      var villages = ADDR_REGIONS[district];
+      Object.keys(villages).forEach(function (village) {
+        var vPath = district + '/' + village;
+        var vExpanded = !!pdState.expanded[vPath];
+        html += '<div class="pd-tree-node pd-depth-1">' +
+          '<button type="button" class="pd-tree-btn" data-kind="toggle" data-path="' + esc(vPath) + '" aria-expanded="' + vExpanded + '">' +
+          '<span class="pd-caret">' + (vExpanded ? '▾' : '▸') + '</span>' + esc(village) + '</button></div>';
+        if (!vExpanded) return;
+        (villages[village] || []).forEach(function (nb) {
+          var sel = pdState.selectedNeighborhood;
+          var isSel = !!(sel && sel.district === district && sel.village === village && sel.neighborhood === nb);
+          html += '<div class="pd-tree-node pd-depth-2">' +
+            '<button type="button" class="pd-tree-btn' + (isSel ? ' is-active' : '') + '" data-kind="leaf" ' +
+            'data-district="' + esc(district) + '" data-village="' + esc(village) + '" data-neighborhood="' + esc(nb) + '" ' +
+            'aria-pressed="' + isSel + '">' + esc(nb) + '</button></div>';
+        });
+      });
+    });
+    return html || '<p class="hint">無區域資料。</p>';
+  }
+
+  function buildLeftCol(container) {
+    var col = document.createElement('div');
+    col.className = 'pd-col pd-col-left';
+
+    var head = document.createElement('div');
+    head.className = 'pd-col-head';
+    head.innerHTML = '<h2>區域階層樹</h2><p class="hint">行政區 › 村里 › 鄰。點選「鄰」篩選中欄門牌點。</p>';
+    col.appendChild(head);
+
+    var body = document.createElement('div');
+    body.className = 'pd-col-body';
+    body.setAttribute('role', 'tree');
+    body.innerHTML = buildTreeHtml();
+    col.appendChild(body);
+
+    toArray(body.querySelectorAll('[data-kind="toggle"]')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var path = btn.getAttribute('data-path');
+        pdState.expanded[path] = !pdState.expanded[path];
+        draw(container);
+      });
+    });
+    toArray(body.querySelectorAll('[data-kind="leaf"]')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var d = btn.getAttribute('data-district');
+        var v = btn.getAttribute('data-village');
+        var nb = btn.getAttribute('data-neighborhood');
+        var cur = pdState.selectedNeighborhood;
+        if (cur && cur.district === d && cur.village === v && cur.neighborhood === nb) {
+          pdState.selectedNeighborhood = null;
+        } else {
+          pdState.selectedNeighborhood = { district: d, village: v, neighborhood: nb };
+        }
+        draw(container);
+      });
+    });
+
+    return col;
+  }
+
+  // ---- 中欄:門牌點地圖(框選 + 清單)-------------------------------------
+
+  function currentFilteredPoints() {
+    if (!pdState.selectedNeighborhood) return ALL_POINTS.slice();
+    var sel = pdState.selectedNeighborhood;
+    return ALL_POINTS.filter(function (p) {
+      return p.district === sel.district && p.village === sel.village && p.neighborhood === sel.neighborhood;
+    });
+  }
+
+  function currentSelectionKeys() {
+    return Object.keys(pdState.selection).filter(function (k) { return pdState.selection[k]; });
+  }
+
+  function wireMarquee(mapEl, points, container) {
+    var dragState = null;
+    var marqueeEl = null;
+
+    mapEl.addEventListener('mousedown', function (e) {
+      if (e.button !== 0) return;
+      var rect = mapEl.getBoundingClientRect();
+      dragState = { startX: e.clientX - rect.left, startY: e.clientY - rect.top, rect: rect, w: 0, h: 0, left: 0, top: 0 };
+      marqueeEl = document.createElement('div');
+      marqueeEl.className = 'pd-marquee';
+      marqueeEl.style.left = dragState.startX + 'px';
+      marqueeEl.style.top = dragState.startY + 'px';
+      marqueeEl.style.width = '0px';
+      marqueeEl.style.height = '0px';
+      mapEl.appendChild(marqueeEl);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+      e.preventDefault();
+    });
+
+    function onMove(e) {
+      if (!dragState) return;
+      var x = e.clientX - dragState.rect.left;
+      var y = e.clientY - dragState.rect.top;
+      x = Math.max(0, Math.min(dragState.rect.width, x));
+      y = Math.max(0, Math.min(dragState.rect.height, y));
+      var left = Math.min(x, dragState.startX);
+      var top = Math.min(y, dragState.startY);
+      var w = Math.abs(x - dragState.startX);
+      var h = Math.abs(y - dragState.startY);
+      marqueeEl.style.left = left + 'px';
+      marqueeEl.style.top = top + 'px';
+      marqueeEl.style.width = w + 'px';
+      marqueeEl.style.height = h + 'px';
+      dragState.w = w;
+      dragState.h = h;
+      dragState.left = left;
+      dragState.top = top;
+    }
+
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (!dragState) return;
+      var w = dragState.w, h = dragState.h;
+      if (w < 4 && h < 4) {
+        pdState.selection = {};
+        dragState = null;
+        draw(container);
+        return;
+      }
+      var rectW = dragState.rect.width, rectH = dragState.rect.height;
+      var newSelection = {};
+      points.forEach(function (p) {
+        var pos = pointPct(p);
+        var px = (pos.x / 100) * rectW;
+        var py = (pos.y / 100) * rectH;
+        if (px >= dragState.left && px <= dragState.left + w && py >= dragState.top && py <= dragState.top + h) {
+          newSelection[p.addrKey] = true;
+        }
+      });
+      pdState.selection = newSelection;
+      dragState = null;
+      draw(container);
+    }
+  }
+
+  function buildCenterCol(container) {
+    var col = document.createElement('div');
+    col.className = 'pd-col pd-col-center';
+
+    var filtered = currentFilteredPoints();
+    var filterLabel = pdState.selectedNeighborhood
+      ? (pdState.selectedNeighborhood.village + ' ' + pdState.selectedNeighborhood.neighborhood)
+      : '全部門牌點';
+
+    var head = document.createElement('div');
+    head.className = 'pd-col-head';
+    head.innerHTML = '<h2>門牌點地圖</h2><p class="hint">篩選:' + esc(filterLabel) + '(' + filtered.length + ' 點)・拖曳框選批次挑選,單擊選單點,Shift+單擊可加選。</p>';
+    col.appendChild(head);
+
+    var body = document.createElement('div');
+    body.className = 'pd-col-body';
+    col.appendChild(body);
+
+    var selectedKeys = currentSelectionKeys();
+    var n = selectedKeys.length;
+
+    if (n > 0) {
+      var over = n > 50;
+      var actionbar = document.createElement('div');
+      actionbar.className = 'pd-actionbar';
+      var infoSpan = document.createElement('span');
+      infoSpan.innerHTML = '已選 <strong>' + n + '</strong> 點';
+      actionbar.appendChild(infoSpan);
+      var noteSpan = document.createElement('span');
+      noteSpan.className = 'hint';
+      noteSpan.textContent = '單批最多 50 筆(D11)' + (over ? ' — 已超過上限,無法批次建案' : '');
+      actionbar.appendChild(noteSpan);
+      var batchBtn = document.createElement('button');
+      batchBtn.type = 'button';
+      batchBtn.className = 'btn btn-primary';
+      batchBtn.textContent = '批次建案(import-from-addr)';
+      batchBtn.disabled = over;
+      batchBtn.addEventListener('click', function () {
+        toast('已示意批次建案:' + n + ' 筆(import-from-addr,未真的寫入)', 'success');
+        pdState.selection = {};
+        draw(container);
+      });
+      actionbar.appendChild(batchBtn);
+      var clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'btn ghost';
+      clearBtn.textContent = '清除選取';
+      clearBtn.addEventListener('click', function () {
+        pdState.selection = {};
+        draw(container);
+      });
+      actionbar.appendChild(clearBtn);
+      body.appendChild(actionbar);
+    }
+
+    var map = document.createElement('div');
+    map.className = 'pd-map';
+    body.appendChild(map);
+
+    if (!filtered.length) {
+      var emptyNote = document.createElement('p');
+      emptyNote.className = 'hint';
+      emptyNote.textContent = '此鄰目前無門牌點資料(mock 資料僅涵蓋大平村 1–3 鄰,共 18 筆)。';
+      body.appendChild(emptyNote);
+    }
+
+    filtered.forEach(function (p) {
+      var pos = pointPct(p);
+      var isSelected = !!pdState.selection[p.addrKey];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pd-point' + (isSelected ? ' is-selected' : '');
+      btn.style.left = pos.x.toFixed(1) + '%';
+      btn.style.top = pos.y.toFixed(1) + '%';
+      btn.title = p.displayAddress;
+      btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+      btn.setAttribute('aria-label', p.displayAddress);
+      btn.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (e.shiftKey) {
+          if (pdState.selection[p.addrKey]) delete pdState.selection[p.addrKey];
+          else pdState.selection[p.addrKey] = true;
+        } else {
+          pdState.selection = {};
+          pdState.selection[p.addrKey] = true;
+        }
+        draw(container);
+      });
+      map.appendChild(btn);
+    });
+
+    wireMarquee(map, filtered, container);
+
+    if (n === 1) {
+      var pt = ALL_POINTS.filter(function (p) { return p.addrKey === selectedKeys[0]; })[0];
+      if (pt) {
+        var detail = document.createElement('div');
+        detail.className = 'pd-detail';
+        var infoDiv = document.createElement('div');
+        infoDiv.innerHTML = '<strong>' + esc(pt.displayAddress) + '</strong>' +
+          '<div class="hint mono">' + esc(pt.district) + ' · ' + esc(pt.village) + ' · ' + esc(pt.neighborhood) + '</div>' +
+          '<div class="hint mono">lat ' + pt.lat + ', lng ' + pt.lng + '</div>';
+        detail.appendChild(infoDiv);
+        var pinBtn = document.createElement('button');
+        pinBtn.type = 'button';
+        pinBtn.className = 'btn ghost';
+        pinBtn.textContent = '手動釘選座標(PATCH coords, geocode_source=manual)';
+        pinBtn.addEventListener('click', function () {
+          toast('已示意手動釘選「' + pt.displayAddress + '」座標,geocode_source → manual(未真的寫入)', 'success');
+        });
+        detail.appendChild(pinBtn);
+        body.appendChild(detail);
+      }
+    }
+
+    var listTitle = document.createElement('p');
+    listTitle.className = 'hint';
+    listTitle.style.margin = '0 0 4px';
+    listTitle.textContent = '門牌清單(可勾選複選,鍵盤可操作)';
+    body.appendChild(listTitle);
+
+    var list = document.createElement('div');
+    list.className = 'pd-list';
+    if (!filtered.length) {
+      list.innerHTML = '<p class="hint">無資料。</p>';
+    }
+    filtered.forEach(function (p) {
+      var row = document.createElement('div');
+      row.className = 'pd-list-row';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.id = 'pd-chk-' + p.addrKey;
+      cb.checked = !!pdState.selection[p.addrKey];
+      cb.addEventListener('change', function () {
+        if (cb.checked) pdState.selection[p.addrKey] = true;
+        else delete pdState.selection[p.addrKey];
+        draw(container);
+      });
+      row.appendChild(cb);
+      var label = document.createElement('label');
+      label.setAttribute('for', cb.id);
+      label.textContent = p.displayAddress;
+      row.appendChild(label);
+      var badge = document.createElement('span');
+      badge.className = 'pd-list-badge';
+      badge.textContent = p.neighborhood;
+      row.appendChild(badge);
+      list.appendChild(row);
+    });
+    body.appendChild(list);
+
+    return col;
+  }
+
+  // ---- 右欄:指派面板 ----------------------------------------------------
+
+  function buildAssignRouteCard(container) {
+    var card = document.createElement('div');
+    card.className = 'pd-card';
+    var n = currentSelectionKeys().length;
+    card.innerHTML = '<h3>批次改路線</h3><p class="hint">已選取 <strong>' + n + '</strong> 點/案件。</p>';
+
+    var pick = document.createElement('div');
+    pick.className = 'pd-route-pick';
+    getAllRoutes().forEach(function (r) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'route-chip';
+      b.style.background = r.color;
+      b.textContent = r.id + ' ' + r.label;
+      b.setAttribute('aria-pressed', pdState.chosenRouteId === r.id ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        pdState.chosenRouteId = (pdState.chosenRouteId === r.id) ? null : r.id;
+        draw(container);
+      });
+      pick.appendChild(b);
+    });
+    card.appendChild(pick);
+
+    var applyBtn = document.createElement('button');
+    applyBtn.type = 'button';
+    applyBtn.className = 'btn btn-primary';
+    applyBtn.textContent = '套用改路線(示意)';
+    applyBtn.addEventListener('click', function () {
+      if (!n) { toast('請先在中欄選取至少一個點/案件', 'danger'); return; }
+      if (!pdState.chosenRouteId) { toast('請先選擇要指派的路線', 'danger'); return; }
+      toast('已示意將 ' + n + ' 點/案件改為路線 ' + pdState.chosenRouteId + '(routes/assign,未真的寫入)', 'success');
+      pdState.selection = {};
+      pdState.chosenRouteId = null;
+      draw(container);
+    });
+    card.appendChild(applyBtn);
+
+    return card;
+  }
+
+  function buildMemberGrantCard(container) {
+    ensureMemberGrants();
+    var card = document.createElement('div');
+    card.className = 'pd-card';
+    var headP = document.createElement('div');
+    headP.innerHTML = '<h3>成員路線授權</h3><p class="hint">勾選要授權的路線後按「授權」(memberRouteGrants,示意)。僅列出前 6 位成員(demo)。</p>';
+    card.appendChild(headP);
+
+    MEMBERS.slice(0, 6).forEach(function (m) {
+      var row = document.createElement('div');
+      row.className = 'pd-member-row';
+
+      var headRow = document.createElement('div');
+      headRow.className = 'pd-member-head';
+      var nameSpan = document.createElement('span');
+      nameSpan.innerHTML = esc(m.name) + ' <span class="hint mono">' + esc(TEAM_LABELS[m.team] || m.team) + '</span>';
+      headRow.appendChild(nameSpan);
+      var grantBtn = document.createElement('button');
+      grantBtn.type = 'button';
+      grantBtn.className = 'btn ghost';
+      grantBtn.textContent = '授權';
+      headRow.appendChild(grantBtn);
+      row.appendChild(headRow);
+
+      var routesWrap = document.createElement('div');
+      routesWrap.className = 'pd-member-routes';
+      getAllRoutes().forEach(function (r) {
+        var lab = document.createElement('label');
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!pdState.memberGrants[m.email][r.id];
+        cb.addEventListener('change', function () {
+          pdState.memberGrants[m.email][r.id] = cb.checked;
+        });
+        lab.appendChild(cb);
+        var chip = document.createElement('span');
+        chip.className = 'route-chip';
+        chip.style.background = r.color;
+        chip.textContent = r.id;
+        lab.appendChild(chip);
+        routesWrap.appendChild(lab);
+      });
+      row.appendChild(routesWrap);
+
+      grantBtn.addEventListener('click', function () {
+        var granted = Object.keys(pdState.memberGrants[m.email]).filter(function (k) { return pdState.memberGrants[m.email][k]; });
+        toast('已示意更新 ' + m.name + ' 的可用路線為 ' + (granted.length ? granted.join(',') : '(無)') + '(未真的寫入)', 'success');
+      });
+
+      card.appendChild(row);
+    });
+
+    return card;
+  }
+
+  function buildNewRouteCard(container) {
+    var card = document.createElement('div');
+    card.className = 'pd-card';
+    var headP = document.createElement('div');
+    headP.innerHTML = '<h3>新增路線</h3><p class="hint">目前 ' + getAllRoutes().length + ' 條路線,色票依 tokens 循環規則自動指派(第 5 條沿用 --route-e,第 6 條起以 hsl 計算新 hue)。</p>';
+    card.appendChild(headP);
+
+    var row = document.createElement('div');
+    row.className = 'pd-newroute-row';
+    var field = document.createElement('div');
+    field.className = 'field';
+    field.innerHTML = '<label for="pd-new-route-label">路線名稱</label>';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'pd-new-route-label';
+    input.placeholder = '例:大安里';
+    field.appendChild(input);
+    row.appendChild(field);
+
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn btn-primary';
+    addBtn.textContent = '新增';
+    addBtn.addEventListener('click', function () {
+      var label = input.value.trim();
+      if (!label) { toast('請輸入路線名稱', 'danger'); return; }
+      var nextIndex = getAllRoutes().length + 1;
+      var meta = nextRouteMeta(nextIndex);
+      pdState.extraRoutes.push({ id: meta.id, label: label, color: meta.color });
+      toast('已新增路線 ' + meta.id + ' · ' + label + '(newRoutes,示意)', 'success');
+      draw(container);
+    });
+    row.appendChild(addBtn);
+    card.appendChild(row);
+
+    return card;
+  }
+
+  function buildRightCol(container) {
+    var col = document.createElement('div');
+    col.className = 'pd-col pd-col-right';
+
+    var head = document.createElement('div');
+    head.className = 'pd-col-head';
+    head.innerHTML = '<h2>指派面板</h2><p class="hint">批次改路線 / 成員路線授權 / 新增路線 — 以下皆為 UI 示意。</p>';
+    col.appendChild(head);
+
+    var body = document.createElement('div');
+    body.className = 'pd-col-body';
+    col.appendChild(body);
+
+    body.appendChild(buildAssignRouteCard(container));
+    body.appendChild(buildMemberGrantCard(container));
+    body.appendChild(buildNewRouteCard(container));
+
+    return col;
+  }
+
+  // ---- 主繪製 ------------------------------------------------------------
+
+  function draw(container) {
+    ensureStyles();
+    container.innerHTML = '';
+
+    var head = document.createElement('div');
+    head.innerHTML = '<h2 class="section-title" style="margin-bottom:2px;">規劃桌 — 路線規劃</h2>' +
+      '<p class="hint" style="margin:0 0 var(--sp-3);">' + esc(EVENT_SLUG) + ' · 左欄篩選鄰別、中欄框選門牌點、右欄批次指派。以下操作皆為 UI 示意,不會真的寫入後端。</p>';
+    container.appendChild(head);
+
+    var workspace = document.createElement('div');
+    workspace.className = 'pd-workspace';
+    container.appendChild(workspace);
+
+    workspace.appendChild(buildLeftCol(container));
+    workspace.appendChild(buildCenterCol(container));
+    workspace.appendChild(buildRightCol(container));
+  }
+
+  window.VisitProto.registerTab('planning', draw);
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------
+  // 組織 tab(sysAdmin 專屬,gating 依 VisitPersona.adminScope(persona).org)
+  // — 掛載到 VisitProto.registerTab('org', fn)
+  //
+  // 純前端示意:合心/和氣兩層樹 + 處室字典(CRUD 示意,含 409「使用中保護」
+  // /「同名衝突」)、合心/處室管理員任免、系統管理員切換(toggle-admin)。
+  // 所有操作只做 UI 回饋(toast),CRUD 只改本檔內的 orgTree 深拷貝,
+  // 不寫入 window.VisitMock,避免污染其他 tab 的 mock 狀態。
+  // ------------------------------------------------------------------
+
+  if (!window.VisitMock || !window.VisitProto || !window.VisitPersona) return;
+
+  // ---- 本地複本(深拷貝,CRUD 只改這份，不動 window.VisitMock.ORG_TREE)----
+
+  function deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  var orgTree = deepClone(window.VisitMock.ORG_TREE || { hexin: [], depts: [] });
+  var nextHeqiId = 900;
+  var nextDeptId = 900;
+
+  // ---- 「使用中」判定 --------------------------------------------------
+  // 比對 DIRECTORY 單位字串是否引用該節點名稱、以及 PERSONAS 真值表裡
+  // 的 hexinAdminOf / deptAdminOf 是否指向該節點 id — 示意「有人隸屬 /
+  // 已被任命管理」則不可停用。純示意用的簡化規則，非真實後端邏輯。
+  // ------------------------------------------------------------------
+
+  function computeInUse() {
+    var units = [];
+    var dir = window.VisitMock.DIRECTORY || {};
+    Object.keys(dir).forEach(function (g) {
+      (dir[g] || []).forEach(function (person) {
+        if (person.orgUnit) units.push(person.orgUnit);
+      });
+    });
+
+    var hexinAdminIds = {};
+    var deptAdminIds = {};
+    (window.VisitPersona.PERSONAS || []).forEach(function (p) {
+      var sig = p.adminSignal || {};
+      (sig.hexinAdminOf || []).forEach(function (id) { hexinAdminIds[id] = true; });
+      (sig.deptAdminOf || []).forEach(function (id) { deptAdminIds[id] = true; });
+    });
+
+    function nameReferenced(name) {
+      return units.some(function (u) { return u.indexOf(name) !== -1; });
+    }
+
+    orgTree.hexin.forEach(function (h) {
+      if (h.active === undefined) h.active = true;
+      h.inUse = nameReferenced(h.name) || !!hexinAdminIds[h.id];
+      (h.heqi || []).forEach(function (q) {
+        if (q.active === undefined) q.active = true;
+        q.inUse = nameReferenced(q.name);
+      });
+    });
+    (orgTree.depts || []).forEach(function (d) {
+      if (d.active === undefined) d.active = true;
+      d.inUse = nameReferenced(d.name) || !!deptAdminIds[d.id];
+    });
+  }
+
+  computeInUse();
+
+  // ---- UI 狀態(存於記憶體，重新整理即重置)------------------------------
+
+  var uiState = {
+    expandedHexin: {},   // hexinId -> bool
+    addingHeqiFor: null,  // hexinId | null
+    addingDept: false,
+    renameTarget: null    // { kind: 'hexin'|'heqi'|'dept', id, hexinId }
+  };
+  orgTree.hexin.forEach(function (h) { uiState.expandedHexin[h.id] = true; });
+
+  var appointState = { personEmail: '', targetKey: '' };
+
+  // ---- 系統管理員切換狀態 ------------------------------------------------
+  // 「自己」沿用與事件管理 tab 相同的示意慣例：名冊中第一位事件管理員。
+
+  var SELF_EMAIL = (window.VisitMock.MEMBERS.filter(function (m) { return m.isEventAdmin; })[0] || {}).email;
+  var isAdminState = {};
+  window.VisitMock.MEMBERS.forEach(function (m) {
+    isAdminState[m.email] = m.email === SELF_EMAIL || m.email === 'chen.admin@charity.org.tw';
+  });
+
+  // ---- 小工具 ------------------------------------------------------------
+
+  function esc(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function toast(message, kind) {
+    var stack = document.getElementById('toast-stack');
+    if (!stack) return;
+    var t = document.createElement('div');
+    t.className = 'toast' + (kind ? ' toast--' + kind : '');
+    t.textContent = message;
+    stack.appendChild(t);
+    setTimeout(function () { t.remove(); }, 3200);
+  }
+
+  function findHexin(id) {
+    return orgTree.hexin.filter(function (h) { return String(h.id) === String(id); })[0] || null;
+  }
+  function findHeqi(hexinId, id) {
+    var h = findHexin(hexinId);
+    if (!h) return null;
+    return (h.heqi || []).filter(function (q) { return String(q.id) === String(id); })[0] || null;
+  }
+  function findDept(id) {
+    return orgTree.depts.filter(function (d) { return String(d.id) === String(id); })[0] || null;
+  }
+
+  function siblingNames(list, excludeId) {
+    return list
+      .filter(function (n) { return excludeId == null || String(n.id) !== String(excludeId); })
+      .map(function (n) { return n.name.trim().toLowerCase(); });
+  }
+
+  // ---- 一次性樣式注入(scoped，org- 前綴，不動 tokens.css / components.css)---
+
+  function ensureStyles() {
+    if (document.getElementById('org-tab-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'org-tab-styles';
+    style.textContent =
+      '.org-node{min-width:0;}' +
+      '.org-row{display:flex;align-items:center;gap:var(--sp-2);padding:7px 8px;border-radius:var(--r-sm);flex-wrap:wrap;}' +
+      '.org-row:hover{background:rgba(255,255,255,0.04);}' +
+      '.org-caret{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;width:16px;flex:0 0 auto;padding:0;}' +
+      '.org-caret:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}' +
+      '.org-name{font-weight:600;flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}' +
+      '.org-row-actions{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}' +
+      '.org-row-actions .btn{height:28px;padding:0 var(--sp-3);font-size:12px;}' +
+      '.org-depth-1{padding-left:26px;}' +
+      '.org-inline-form{display:flex;gap:8px;align-items:center;padding:8px 8px 8px 26px;flex-wrap:wrap;}' +
+      '.org-inline-form .hint{margin:0;}' +
+      '.org-inline-form input{height:32px;padding:0 var(--sp-3);border-radius:var(--r-sm);border:1px solid rgba(255,255,255,0.14);background:var(--surface);color:var(--text);font-size:13px;min-width:200px;font-family:var(--font-sans);}' +
+      '.org-inline-form input:focus-visible{outline:none;border-color:var(--accent);background:var(--surface-raised);}' +
+      '.org-inline-form .btn{height:32px;padding:0 var(--sp-3);font-size:12px;}' +
+      '.org-dict-row{display:flex;align-items:center;gap:var(--sp-2);padding:7px 4px;flex-wrap:wrap;}' +
+      '.org-dict-row.container-line{padding-bottom:11px;margin-bottom:4px;}' +
+      '.org-appoint-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto auto;gap:var(--sp-3);align-items:end;}' +
+      '@media (max-width: 900px){.org-appoint-grid{grid-template-columns:1fr;}.org-appoint-grid .btn{width:100%;}}' +
+      '.org-admin-row{display:flex;align-items:center;gap:var(--sp-3);padding:8px 4px;flex-wrap:wrap;}' +
+      '.org-admin-row.container-line{padding-bottom:11px;margin-bottom:4px;}' +
+      '.org-admin-email{font-family:var(--font-mono);font-size:13px;min-width:220px;}' +
+      '.org-admin-name{min-width:72px;color:var(--text-dim);font-size:13px;}' +
+      '.org-admin-actions{margin-left:auto;display:flex;align-items:center;gap:var(--sp-3);}';
+    document.head.appendChild(style);
+  }
+
+  // ---- 權限保護擋卡(雙保險 — 殼理論上已 gate)------------------------------
+
+  function buildBlockedCard(persona) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">僅系統管理員可用</h2>' +
+      '<p class="hint">目前身分「' + esc(persona.label) + '」沒有組織管理權限，無法檢視合心/和氣樹、' +
+      '處室字典、管理員任免與系統管理員切換。</p>' +
+      '<p class="hint">此頁需 <code class="mono">VisitPersona.adminScope(persona).org === true</code>。' +
+      '請使用右下角 persona 切換器切換身分。</p>';
+    return card;
+  }
+
+  // ---- 內用表單元件 --------------------------------------------------------
+
+  function buildInlineForm(opts) {
+    // opts: { label, value, submitLabel, onSubmit(name), onCancel() }
+    var row = document.createElement('div');
+    row.className = 'org-inline-form';
+
+    if (opts.label) {
+      var labelSpan = document.createElement('span');
+      labelSpan.className = 'hint';
+      labelSpan.textContent = opts.label;
+      row.appendChild(labelSpan);
+    }
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = '輸入名稱';
+    input.value = opts.value || '';
+    row.appendChild(input);
+
+    var okBtn = document.createElement('button');
+    okBtn.type = 'button';
+    okBtn.className = 'btn btn-primary';
+    okBtn.textContent = opts.submitLabel || '確認';
+    okBtn.addEventListener('click', function () { opts.onSubmit(input.value); });
+    row.appendChild(okBtn);
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn ghost';
+    cancelBtn.textContent = '取消';
+    cancelBtn.addEventListener('click', opts.onCancel);
+    row.appendChild(cancelBtn);
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); opts.onSubmit(input.value); }
+      if (e.key === 'Escape') { e.preventDefault(); opts.onCancel(); }
+    });
+
+    setTimeout(function () { input.focus(); input.select(); }, 0);
+
+    return row;
+  }
+
+  // ---- 組織樹(合心 / 和氣)-------------------------------------------------
+
+  function statusBadgeHtml(node) {
+    if (!node.active) return '<span class="badge badge--muted">已停用</span>';
+    if (node.inUse) return '<span class="badge badge--warning">使用中</span>';
+    return '<span class="badge">可停用</span>';
+  }
+
+  function deactivateNode(node, label, container) {
+    if (!node.active) return;
+    if (node.inUse) {
+      toast('409 — 「' + label + '」仍有成員隸屬，無法停用', 'danger');
+      return;
+    }
+    node.active = false;
+    toast('已示意停用「' + label + '」(未寫回)', 'success');
+    draw(container);
+  }
+
+  function renameNode(kind, id, hexinId, rawName, container) {
+    var name = String(rawName || '').trim();
+    if (!name) { toast('請輸入名稱', 'danger'); return; }
+
+    var node, siblings;
+    if (kind === 'hexin') {
+      node = findHexin(id);
+      siblings = siblingNames(orgTree.hexin, id);
+    } else if (kind === 'heqi') {
+      var h = findHexin(hexinId);
+      node = h ? findHeqi(hexinId, id) : null;
+      siblings = h ? siblingNames(h.heqi || [], id) : [];
+    } else {
+      node = findDept(id);
+      siblings = siblingNames(orgTree.depts, id);
+    }
+    if (!node) { toast('找不到節點', 'danger'); return; }
+
+    if (siblings.indexOf(name.toLowerCase()) !== -1) {
+      toast('409 duplicate_name — 「' + name + '」與同層級名稱重複', 'danger');
+      return;
+    }
+
+    var oldName = node.name;
+    node.name = name;
+    computeInUse();
+    uiState.renameTarget = null;
+    toast('已示意將「' + oldName + '」改名為「' + name + '」(未寫回)', 'success');
+    draw(container);
+  }
+
+  function addHeqi(h, rawName, container) {
+    var name = String(rawName || '').trim();
+    if (!name) { toast('請輸入和氣名稱', 'danger'); return; }
+    if (siblingNames(h.heqi || [], null).indexOf(name.toLowerCase()) !== -1) {
+      toast('409 duplicate_name — 「' + name + '」與現有和氣同名', 'danger');
+      return;
+    }
+    nextHeqiId += 1;
+    h.heqi = h.heqi || [];
+    h.heqi.push({ id: nextHeqiId, name: name, active: true, inUse: false });
+    uiState.addingHeqiFor = null;
+    uiState.expandedHexin[h.id] = true;
+    toast('已示意新增和氣「' + name + '」於「' + h.name + '」下(未寫回)', 'success');
+    draw(container);
+  }
+
+  function buildHeqiNode(h, q, container) {
+    var wrap = document.createElement('div');
+    wrap.className = 'org-node org-depth-1';
+
+    var rt = uiState.renameTarget;
+    if (rt && rt.kind === 'heqi' && String(rt.id) === String(q.id) && String(rt.hexinId) === String(h.id)) {
+      wrap.appendChild(buildInlineForm({
+        value: q.name,
+        submitLabel: '儲存',
+        onSubmit: function (name) { renameNode('heqi', q.id, h.id, name, container); },
+        onCancel: function () { uiState.renameTarget = null; draw(container); }
+      }));
+      return wrap;
+    }
+
+    var row = document.createElement('div');
+    row.className = 'org-row';
+
+    var name = document.createElement('span');
+    name.className = 'org-name';
+    name.innerHTML = esc(q.name) + statusBadgeHtml(q);
+    row.appendChild(name);
+
+    var actions = document.createElement('div');
+    actions.className = 'org-row-actions';
+
+    var renameBtn = document.createElement('button');
+    renameBtn.type = 'button';
+    renameBtn.className = 'btn ghost';
+    renameBtn.textContent = '改名';
+    renameBtn.setAttribute('aria-label', '改名 · ' + q.name);
+    renameBtn.addEventListener('click', function () {
+      uiState.renameTarget = { kind: 'heqi', id: q.id, hexinId: h.id };
+      uiState.addingHeqiFor = null;
+      draw(container);
+    });
+    actions.appendChild(renameBtn);
+
+    var deactivateBtn = document.createElement('button');
+    deactivateBtn.type = 'button';
+    deactivateBtn.className = 'btn ghost';
+    deactivateBtn.textContent = q.active ? '停用' : '已停用';
+    deactivateBtn.disabled = !q.active;
+    deactivateBtn.setAttribute('aria-label', (q.active ? '停用' : '已停用') + ' · ' + q.name);
+    if (q.active && q.inUse) deactivateBtn.title = '仍有成員隸屬，停用會回傳 409';
+    deactivateBtn.addEventListener('click', function () {
+      deactivateNode(q, q.name, container);
+    });
+    actions.appendChild(deactivateBtn);
+
+    row.appendChild(actions);
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function buildHexinNode(h, container) {
+    var wrap = document.createElement('div');
+    wrap.className = 'org-node';
+
+    var rt = uiState.renameTarget;
+    if (rt && rt.kind === 'hexin' && String(rt.id) === String(h.id)) {
+      wrap.appendChild(buildInlineForm({
+        value: h.name,
+        submitLabel: '儲存',
+        onSubmit: function (name) { renameNode('hexin', h.id, null, name, container); },
+        onCancel: function () { uiState.renameTarget = null; draw(container); }
+      }));
+    } else {
+      var row = document.createElement('div');
+      row.className = 'org-row';
+
+      var expanded = !!uiState.expandedHexin[h.id];
+      var caret = document.createElement('button');
+      caret.type = 'button';
+      caret.className = 'org-caret';
+      caret.setAttribute('aria-expanded', String(expanded));
+      caret.setAttribute('aria-label', (expanded ? '收合' : '展開') + ' ' + h.name);
+      caret.textContent = expanded ? '▾' : '▸';
+      caret.addEventListener('click', function () {
+        uiState.expandedHexin[h.id] = !expanded;
+        draw(container);
+      });
+      row.appendChild(caret);
+
+      var name = document.createElement('span');
+      name.className = 'org-name';
+      name.innerHTML = esc(h.name) + statusBadgeHtml(h);
+      row.appendChild(name);
+
+      var actions = document.createElement('div');
+      actions.className = 'org-row-actions';
+
+      var addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'btn ghost';
+      addBtn.textContent = '新增和氣';
+      addBtn.disabled = !h.active;
+      addBtn.setAttribute('aria-label', '新增和氣 · 上層 ' + h.name);
+      addBtn.addEventListener('click', function () {
+        uiState.addingHeqiFor = h.id;
+        uiState.renameTarget = null;
+        uiState.expandedHexin[h.id] = true;
+        draw(container);
+      });
+      actions.appendChild(addBtn);
+
+      var renameBtn = document.createElement('button');
+      renameBtn.type = 'button';
+      renameBtn.className = 'btn ghost';
+      renameBtn.textContent = '改名';
+      renameBtn.setAttribute('aria-label', '改名 · ' + h.name);
+      renameBtn.addEventListener('click', function () {
+        uiState.renameTarget = { kind: 'hexin', id: h.id };
+        uiState.addingHeqiFor = null;
+        draw(container);
+      });
+      actions.appendChild(renameBtn);
+
+      var deactivateBtn = document.createElement('button');
+      deactivateBtn.type = 'button';
+      deactivateBtn.className = 'btn ghost';
+      deactivateBtn.textContent = h.active ? '停用' : '已停用';
+      deactivateBtn.disabled = !h.active;
+      deactivateBtn.setAttribute('aria-label', (h.active ? '停用' : '已停用') + ' · ' + h.name);
+      if (h.active && h.inUse) deactivateBtn.title = '仍有成員隸屬，停用會回傳 409';
+      deactivateBtn.addEventListener('click', function () {
+        deactivateNode(h, h.name, container);
+      });
+      actions.appendChild(deactivateBtn);
+
+      row.appendChild(actions);
+      wrap.appendChild(row);
+    }
+
+    if (uiState.addingHeqiFor === h.id) {
+      wrap.appendChild(buildInlineForm({
+        label: '新增和氣 · 上層 ' + h.name,
+        submitLabel: '新增',
+        onSubmit: function (name) { addHeqi(h, name, container); },
+        onCancel: function () { uiState.addingHeqiFor = null; draw(container); }
+      }));
+    }
+
+    if (uiState.expandedHexin[h.id]) {
+      (h.heqi || []).forEach(function (q) {
+        wrap.appendChild(buildHeqiNode(h, q, container));
+      });
+    }
+
+    return wrap;
+  }
+
+  function buildOrgTreeCard(container) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">組織樹 — 合心 / 和氣</h2>' +
+      '<p class="section-sub">CRUD 皆為 UI 示意(toast)，不會寫回資料。停用「使用中」節點或新增同名節點會出現 409 提示。</p>';
+
+    var list = document.createElement('div');
+    list.className = 'stack-sm';
+    list.style.marginTop = 'var(--sp-3)';
+
+    if (!orgTree.hexin.length) {
+      var empty = document.createElement('p');
+      empty.className = 'hint';
+      empty.textContent = '無合心資料。';
+      list.appendChild(empty);
+    } else {
+      orgTree.hexin.forEach(function (h) {
+        list.appendChild(buildHexinNode(h, container));
+      });
+    }
+
+    card.appendChild(list);
+    return card;
+  }
+
+  // ---- 處室字典 -------------------------------------------------------
+
+  function addDept(rawName, container) {
+    var name = String(rawName || '').trim();
+    if (!name) { toast('請輸入處室名稱', 'danger'); return; }
+    if (siblingNames(orgTree.depts, null).indexOf(name.toLowerCase()) !== -1) {
+      toast('409 duplicate_name — 「' + name + '」與現有處室同名', 'danger');
+      return;
+    }
+    nextDeptId += 1;
+    orgTree.depts.push({ id: nextDeptId, name: name, active: true, inUse: false });
+    uiState.addingDept = false;
+    toast('已示意新增處室「' + name + '」(未寫回)', 'success');
+    draw(container);
+  }
+
+  function buildDeptRow(d, container, isLast) {
+    var rt = uiState.renameTarget;
+    if (rt && rt.kind === 'dept' && String(rt.id) === String(d.id)) {
+      var formWrap = document.createElement('div');
+      formWrap.className = 'org-dict-row' + (isLast ? '' : ' container-line');
+      formWrap.appendChild(buildInlineForm({
+        value: d.name,
+        submitLabel: '儲存',
+        onSubmit: function (name) { renameNode('dept', d.id, null, name, container); },
+        onCancel: function () { uiState.renameTarget = null; draw(container); }
+      }));
+      return formWrap;
+    }
+
+    var row = document.createElement('div');
+    row.className = 'org-dict-row' + (isLast ? '' : ' container-line');
+
+    var name = document.createElement('span');
+    name.className = 'org-name';
+    name.innerHTML = esc(d.name) + statusBadgeHtml(d);
+    row.appendChild(name);
+
+    var actions = document.createElement('div');
+    actions.className = 'org-row-actions';
+
+    var renameBtn = document.createElement('button');
+    renameBtn.type = 'button';
+    renameBtn.className = 'btn ghost';
+    renameBtn.textContent = '改名';
+    renameBtn.setAttribute('aria-label', '改名 · ' + d.name);
+    renameBtn.addEventListener('click', function () {
+      uiState.renameTarget = { kind: 'dept', id: d.id };
+      uiState.addingDept = false;
+      draw(container);
+    });
+    actions.appendChild(renameBtn);
+
+    var deactivateBtn = document.createElement('button');
+    deactivateBtn.type = 'button';
+    deactivateBtn.className = 'btn ghost';
+    deactivateBtn.textContent = d.active ? '停用' : '已停用';
+    deactivateBtn.disabled = !d.active;
+    deactivateBtn.setAttribute('aria-label', (d.active ? '停用' : '已停用') + ' · ' + d.name);
+    if (d.active && d.inUse) deactivateBtn.title = '仍有成員隸屬，停用會回傳 409';
+    deactivateBtn.addEventListener('click', function () {
+      deactivateNode(d, d.name, container);
+    });
+    actions.appendChild(deactivateBtn);
+
+    row.appendChild(actions);
+    return row;
+  }
+
+  function buildDeptsCard(container) {
+    var card = document.createElement('div');
+    card.className = 'card';
+
+    var head = document.createElement('div');
+    head.className = 'row-between';
+    head.innerHTML =
+      '<div><h2 class="section-title" style="margin-bottom:2px;">處室字典</h2>' +
+      '<p class="section-sub" style="margin:0;">同名或停用「使用中」處室會出現 409 提示；示意用途，不寫回資料。</p></div>';
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn btn-primary';
+    addBtn.textContent = '新增處室';
+    addBtn.addEventListener('click', function () {
+      uiState.addingDept = true;
+      uiState.renameTarget = null;
+      draw(container);
+    });
+    head.appendChild(addBtn);
+    card.appendChild(head);
+
+    var list = document.createElement('div');
+    list.style.marginTop = 'var(--sp-3)';
+
+    if (uiState.addingDept) {
+      list.appendChild(buildInlineForm({
+        label: '新增處室',
+        submitLabel: '新增',
+        onSubmit: function (name) { addDept(name, container); },
+        onCancel: function () { uiState.addingDept = false; draw(container); }
+      }));
+    }
+
+    orgTree.depts.forEach(function (d, i) {
+      list.appendChild(buildDeptRow(d, container, i === orgTree.depts.length - 1));
+    });
+
+    card.appendChild(list);
+    return card;
+  }
+
+  // ---- 合心 / 處室管理員任免 ----------------------------------------------
+
+  function buildPeopleOptions() {
+    var people = [];
+    var dir = window.VisitMock.DIRECTORY || {};
+    var GROUP_LABEL = { volunteer: '志工', staff: '職工', advisor: '幹部/委員' };
+    Object.keys(dir).forEach(function (g) {
+      (dir[g] || []).forEach(function (p) {
+        people.push({ email: p.email, name: p.name, label: p.name + '(' + (GROUP_LABEL[g] || g) + ' · ' + p.orgUnit + ')' });
+      });
+    });
+    (window.VisitMock.MEMBERS || []).forEach(function (m) {
+      people.push({ email: m.email, name: m.name, label: m.name + '(成員 · ' + m.team + ')' });
+    });
+    return people;
+  }
+
+  function buildTargetOptions() {
+    var targets = [];
+    orgTree.hexin.forEach(function (h) {
+      targets.push({ key: 'hexin:' + h.id, label: '合心 · ' + h.name, kind: 'hexin', name: h.name });
+      (h.heqi || []).forEach(function (q) {
+        targets.push({ key: 'heqi:' + h.id + ':' + q.id, label: '和氣 · ' + q.name, kind: 'heqi', name: q.name });
+      });
+    });
+    orgTree.depts.forEach(function (d) {
+      targets.push({ key: 'dept:' + d.id, label: '處室 · ' + d.name, kind: 'dept', name: d.name });
+    });
+    return targets;
+  }
+
+  function doAppoint(isAppoint, people, targets) {
+    var person = people.filter(function (p) { return p.email === appointState.personEmail; })[0];
+    var target = targets.filter(function (t) { return t.key === appointState.targetKey; })[0];
+    if (!person || !target) {
+      toast('請先選擇人員與單位', 'danger');
+      return;
+    }
+    var fnName = target.kind === 'dept' ? 'set_dept_admin' : 'set_hexin_admin';
+    var verb = isAppoint ? '任命' : '解除';
+    toast(
+      '已示意' + verb + ' ' + person.name + ' 為「' + target.name + '」管理員(' +
+        fnName + '(' + (isAppoint ? 'true' : 'false') + ')，未寫回)',
+      'success'
+    );
+  }
+
+  function buildAppointCard(container) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">合心 / 處室管理員任免</h2>' +
+      '<p class="section-sub">選一人 + 一個合心 / 和氣 / 處室，示意 set_hexin_admin / set_dept_admin(未寫回)。</p>';
+
+    var grid = document.createElement('div');
+    grid.className = 'org-appoint-grid';
+    grid.style.marginTop = 'var(--sp-3)';
+
+    var people = buildPeopleOptions();
+    var targets = buildTargetOptions();
+
+    var peopleField = document.createElement('div');
+    peopleField.className = 'field';
+    peopleField.innerHTML = '<label for="org-appoint-person">人員</label>';
+    var peopleSelect = document.createElement('select');
+    peopleSelect.id = 'org-appoint-person';
+    peopleSelect.innerHTML =
+      '<option value="">— 選擇人員 —</option>' +
+      people.map(function (p) { return '<option value="' + esc(p.email) + '">' + esc(p.label) + '</option>'; }).join('');
+    peopleSelect.value = appointState.personEmail;
+    peopleSelect.addEventListener('change', function () { appointState.personEmail = peopleSelect.value; });
+    peopleField.appendChild(peopleSelect);
+    grid.appendChild(peopleField);
+
+    var targetField = document.createElement('div');
+    targetField.className = 'field';
+    targetField.innerHTML = '<label for="org-appoint-target">合心 / 和氣 / 處室</label>';
+    var targetSelect = document.createElement('select');
+    targetSelect.id = 'org-appoint-target';
+    targetSelect.innerHTML =
+      '<option value="">— 選擇單位 —</option>' +
+      targets.map(function (t) { return '<option value="' + esc(t.key) + '">' + esc(t.label) + '</option>'; }).join('');
+    targetSelect.value = appointState.targetKey;
+    targetSelect.addEventListener('change', function () { appointState.targetKey = targetSelect.value; });
+    targetField.appendChild(targetSelect);
+    grid.appendChild(targetField);
+
+    var appointBtn = document.createElement('button');
+    appointBtn.type = 'button';
+    appointBtn.className = 'btn btn-primary';
+    appointBtn.textContent = '任命';
+    appointBtn.addEventListener('click', function () { doAppoint(true, people, targets); });
+    grid.appendChild(appointBtn);
+
+    var revokeBtn = document.createElement('button');
+    revokeBtn.type = 'button';
+    revokeBtn.className = 'btn ghost';
+    revokeBtn.textContent = '解除';
+    revokeBtn.addEventListener('click', function () { doAppoint(false, people, targets); });
+    grid.appendChild(revokeBtn);
+
+    card.appendChild(grid);
+    return card;
+  }
+
+  // ---- 系統管理員切換(toggle-admin)---------------------------------------
+
+  function buildToggleAdminCard(container) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">系統管理員切換</h2>' +
+      '<p class="section-sub">toggle-admin 示意：無法解除自己；系統至少須保留 1 位系統管理員。</p>';
+
+    var trueCount = window.VisitMock.MEMBERS.filter(function (m) { return isAdminState[m.email]; }).length;
+
+    var list = document.createElement('div');
+    list.style.marginTop = 'var(--sp-3)';
+
+    window.VisitMock.MEMBERS.forEach(function (m, i) {
+      var row = document.createElement('div');
+      row.className = 'org-admin-row' + (i === window.VisitMock.MEMBERS.length - 1 ? '' : ' container-line');
+
+      var isSelf = m.email === SELF_EMAIL;
+      var isAdmin = !!isAdminState[m.email];
+      var isLastAdmin = isAdmin && trueCount <= 1;
+
+      var email = document.createElement('span');
+      email.className = 'org-admin-email';
+      email.textContent = m.email;
+      row.appendChild(email);
+
+      var name = document.createElement('span');
+      name.className = 'org-admin-name';
+      name.textContent = m.name;
+      row.appendChild(name);
+
+      if (isSelf) {
+        var youBadge = document.createElement('span');
+        youBadge.className = 'badge badge--info';
+        youBadge.textContent = '你';
+        row.appendChild(youBadge);
+      }
+
+      var statusB = document.createElement('span');
+      statusB.className = 'badge badge--' + (isAdmin ? 'success' : 'muted');
+      statusB.textContent = isAdmin ? '系統管理員' : '一般成員';
+      row.appendChild(statusB);
+
+      var actions = document.createElement('div');
+      actions.className = 'org-admin-actions';
+
+      var toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'btn ghost';
+      toggleBtn.textContent = isAdmin ? '解除系統管理員' : '設為系統管理員';
+      var blockSelf = isAdmin && isSelf;
+      var blockLast = isAdmin && isLastAdmin;
+      toggleBtn.disabled = blockSelf || blockLast;
+      toggleBtn.setAttribute('aria-label', (isAdmin ? '解除系統管理員' : '設為系統管理員') + ' · ' + m.name);
+      if (blockSelf) toggleBtn.title = '無法解除自己的系統管理員權限';
+      else if (blockLast) toggleBtn.title = '系統至少須保留 1 位系統管理員';
+      toggleBtn.addEventListener('click', function () {
+        if (blockSelf) { toast('無法解除自己的系統管理員權限', 'danger'); return; }
+        if (blockLast) { toast('系統至少須保留 1 位系統管理員，無法解除', 'danger'); return; }
+        isAdminState[m.email] = !isAdmin;
+        toast((isAdmin ? '已解除 ' : '已設為系統管理員 ') + m.name + '(toggle-admin，未寫回)', isAdmin ? 'danger' : 'success');
+        draw(container);
+      });
+      actions.appendChild(toggleBtn);
+
+      row.appendChild(actions);
+      list.appendChild(row);
+    });
+
+    card.appendChild(list);
+    return card;
+  }
+
+  // ---- 主繪製 --------------------------------------------------------
+
+  function draw(container) {
+    ensureStyles();
+    container.innerHTML = '';
+
+    var persona = window.VisitPersona.getPersona();
+    var scope = window.VisitPersona.adminScope(persona);
+
+    if (!scope.org) {
+      container.appendChild(buildBlockedCard(persona));
+      return;
+    }
+
+    computeInUse();
+
+    var head = document.createElement('div');
+    head.innerHTML =
+      '<h2 class="section-title" style="margin-bottom:2px;">組織</h2>' +
+      '<p class="hint" style="margin:0 0 var(--sp-4);">合心/和氣樹、處室字典、管理員任免、系統管理員切換 — 以下操作皆為 UI 示意，不會真的寫入後端。</p>';
+    container.appendChild(head);
+
+    var stack = document.createElement('div');
+    stack.className = 'stack';
+    stack.appendChild(buildOrgTreeCard(container));
+    stack.appendChild(buildDeptsCard(container));
+    stack.appendChild(buildAppointCard(container));
+    stack.appendChild(buildToggleAdminCard(container));
+    container.appendChild(stack);
+  }
+
+  window.VisitProto.registerTab('org', draw);
+})();
+</script>
+
 </body>
 </html>
