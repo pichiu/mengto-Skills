@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>家訪 PWA — 桌面管理後台(原型)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="家訪 PWA 桌面 admin 可點擊原型 — 事件管理 / 成員名冊 / 匯入匯出,依 persona 分層授權。">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* ---- page-local styles (admin.html only; do not touch tokens/components) ---- */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { min-height: 100vh; }
+
+  #app {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--sp-5);
+  }
+
+  .admin-page-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-4);
+  }
+  .admin-page-title h1 {
+    font-size: var(--fs-h2);
+    margin: 0;
+  }
+  .admin-page-title .persona-hint {
+    color: var(--text-dim);
+    font-size: 14px;
+    font-family: var(--font-mono);
+  }
+
+  /* ---- shell: sidebar + main ------------------------------------------ */
+  .admin-shell {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-5);
+    min-height: 620px;
+  }
+  .admin-sidebar {
+    flex: 0 0 208px;
+    width: 208px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-3);
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .admin-sidebar .admin-tab {
+    width: 100%;
+    justify-content: flex-start;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+  }
+  .admin-tab:disabled,
+  .admin-tab[aria-disabled="true"] {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .admin-tab .tab-note {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .admin-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .admin-panel {
+    outline: none;
+  }
+
+  .stack { display: flex; flex-direction: column; gap: var(--sp-5); }
+  .stack-sm { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+  .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+  .section-title { font-size: var(--fs-h3); margin: 0 0 var(--sp-2); }
+  .section-sub { color: var(--text-dim); font-size: 14px; margin: 0; }
+  .mono { font-family: var(--font-mono); }
+  .hint { color: var(--text-dim); font-size: 14px; }
+
+  /* ---- table ------------------------------------------------------------ */
+  .table-scroll { width: 100%; overflow-x: auto; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; }
+  .admin-table th {
+    text-align: left;
+    padding: var(--sp-2) var(--sp-3);
+    color: var(--text-dim);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    white-space: nowrap;
+  }
+  .admin-table td {
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+  }
+  .admin-table tbody tr:hover td { background: rgba(255, 255, 255, 0.03); }
+  .admin-table td.num, .admin-table th.num { font-family: var(--font-mono); text-align: right; }
+  .admin-table .btn { height: 28px; padding: 0 var(--sp-3); font-size: 12px; }
+
+  /* ---- event cards -------------------------------------------------------*/
+  .event-card { padding: var(--sp-4); cursor: pointer; }
+  .event-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+  .event-card__name { font-weight: 700; font-size: var(--fs-body-lg); }
+  .event-card__meta { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-top: var(--sp-2); }
+  .event-card__detail {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: none;
+  }
+  .event-card.is-open .event-card__detail { display: block; }
+  .event-card__status-controls { display: flex; gap: var(--sp-2); margin-top: var(--sp-3); flex-wrap: wrap; }
+  .kv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-3); margin: var(--sp-3) 0; }
+  .kv-grid dt { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+  .kv-grid dd { margin: 0; font-weight: 600; }
+
+  /* ---- forms --------------------------------------------------------------*/
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-4); }
+
+  /* ---- modal --------------------------------------------------------------*/
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(4, 7, 14, 0.65);
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--sp-5);
+  }
+  .modal {
+    width: 680px; max-width: 100%; max-height: 82vh;
+    overflow-y: auto;
+    padding: var(--sp-5);
+  }
+  .modal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-4); }
+  .modal__close { height: 32px; width: 32px; padding: 0; border-radius: var(--r-sm); }
+  .picker-tabs { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+  .picker-tabs button { height: 32px; padding: 0 var(--sp-3); font-size: 12px; }
+  .picker-list { display: flex; flex-direction: column; gap: var(--sp-1); max-height: 280px; overflow-y: auto; }
+  .picker-row { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-sm); }
+  .picker-row:hover { background: rgba(255, 255, 255, 0.04); }
+  .picker-row label { flex: 1; cursor: pointer; }
+  .picker-row .org-unit { color: var(--text-dim); font-size: 12px; }
+
+  /* ---- toast --------------------------------------------------------------*/
+  .toast-stack {
+    position: fixed; top: var(--sp-5); left: 50%; transform: translateX(-50%);
+    z-index: 300; display: flex; flex-direction: column; gap: var(--sp-2);
+    align-items: center;
+  }
+  .toast {
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--r-md);
+    background: var(--surface-raised);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: var(--shadow-md);
+    font-size: 14px;
+    animation: toast-in var(--dur) var(--ease);
+  }
+  .toast--success { border-color: rgba(74, 222, 128, 0.4); color: var(--success); }
+  .toast--danger { border-color: rgba(255, 107, 107, 0.4); color: var(--danger); }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- no access page -------------------------------------------------- */
+  .no-access {
+    max-width: 480px;
+    margin: var(--sp-8) auto;
+    text-align: center;
+    padding: var(--sp-6);
+  }
+  .no-access h2 { margin-top: 0; }
+
+  /* ---- upload zone -------------------------------------------------------*/
+  .upload-zone {
+    border: 1px dashed rgba(255, 255, 255, 0.24);
+    border-radius: var(--r-lg);
+    padding: var(--sp-6);
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 900px) {
+    .admin-shell { flex-direction: column; }
+    .admin-sidebar { flex-direction: row; flex-wrap: wrap; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app" data-density="dense"></div>
+<div id="persona-mount"></div>
+<div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+
+<script src="assets/mock-data.js"></script>
+<script src="assets/persona.js"></script>
+<script src="assets/prototype.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------
+  // 掛載外框 + persona 切換器
+  // ------------------------------------------------------------------
+
+  var appEl = document.getElementById('app');
+
+  var titleBar = document.createElement('div');
+  titleBar.className = 'admin-page-title';
+  titleBar.innerHTML =
+    '<h1>家訪 PWA — 管理後台</h1>' +
+    '<span class="persona-hint">flood-2026 · 花蓮光復堰塞湖溢流救災</span>';
+  appEl.appendChild(titleBar);
+
+  var frameHost = document.createElement('div');
+  appEl.appendChild(frameHost);
+
+  var content = VisitProto.mountBrowserFrame(frameHost);
+
+  VisitPersona.mountPersonaSwitcher(document.getElementById('persona-mount'));
+
+  // ------------------------------------------------------------------
+  // toast 小工具
+  // ------------------------------------------------------------------
+
+  function toast(message, kind) {
+    var stack = document.getElementById('toast-stack');
+    var t = document.createElement('div');
+    t.className = 'toast' + (kind ? ' toast--' + kind : '');
+    t.textContent = message;
+    stack.appendChild(t);
+    setTimeout(function () {
+      t.remove();
+    }, 3200);
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 狀態(僅存於記憶體,重新整理即重置 — 原型用途)
+  // ------------------------------------------------------------------
+
+  var state = {
+    activeTab: 'events',
+    expandedEventId: null,
+    memberRevoked: {},     // email -> bool
+    pickerOpen: false,
+    pickerTab: 'volunteer',
+    pickerSearch: '',
+    pickerSelected: {},    // email -> bool
+    importDryRunShown: false,
+    importHashInput: window.VisitMock.IMPORT_DRYRUN.fileHash
+  };
+
+  // mock「自己」是名冊中第一位事件管理員,用來示範自己那列不能停權自己。
+  var SELF_MEMBER_EMAIL = window.VisitMock.MEMBERS.filter(function (m) {
+    return m.isEventAdmin;
+  })[0].email;
+
+  // ------------------------------------------------------------------
+  // tab 定義
+  //   importExport 的 gating 選擇:manageEvents || manageMembers。
+  //   spec 只明列 orgAdmin(全擋)/eventAdmin(未提匯入匯出)兩種情境,
+  //   這裡取「跟案件資料相關的管理權限」作為交集,讓 eventAdmin/sysAdmin
+  //   可用、orgAdmin(僅建事件)不可用 — 屬設計取捨,已於回報中註記。
+  // ------------------------------------------------------------------
+
+  var TABS = [
+    {
+      id: 'events', label: '事件管理', kind: 'built',
+      enabled: function (scope) { return scope.manageEvents || scope.createEvent; }
+    },
+    {
+      id: 'members', label: '成員名冊', kind: 'built',
+      enabled: function (scope) { return scope.manageMembers; }
+    },
+    {
+      id: 'importExport', label: '匯入匯出', kind: 'built',
+      enabled: function (scope) { return scope.manageEvents || scope.manageMembers; }
+    },
+    {
+      id: 'planning', label: '規劃桌', kind: 'placeholder',
+      enabled: function (scope) { return scope.planningDesk; }
+    },
+    {
+      id: 'org', label: '組織', kind: 'placeholder',
+      enabled: function (scope) { return scope.org; }
+    }
+  ];
+
+  // ------------------------------------------------------------------
+  // 無管理權限擋頁
+  // ------------------------------------------------------------------
+
+  function buildNoAccessPage(persona) {
+    var wrap = document.createElement('div');
+    wrap.className = 'card no-access';
+    wrap.innerHTML =
+      '<h2>無管理權限</h2>' +
+      '<p class="hint">目前身分「' + escapeHtml(persona.label) + '」沒有任何後台管理權限,' +
+      '無法檢視事件管理 / 成員名冊 / 匯入匯出 / 規劃桌 / 組織。</p>' +
+      '<p class="hint">請使用右下角 persona 切換器切換為 orgAdmin / eventAdmin / sysAdmin 以檢視管理後台。</p>';
+    return wrap;
+  }
+
+  // ------------------------------------------------------------------
+  // 外殼(側邊 tab + 主內容)
+  // ------------------------------------------------------------------
+
+  function buildShell(scope) {
+    var shell = document.createElement('div');
+    shell.className = 'admin-shell';
+
+    var sidebar = document.createElement('div');
+    sidebar.className = 'admin-sidebar';
+    sidebar.setAttribute('role', 'tablist');
+    sidebar.setAttribute('aria-orientation', 'vertical');
+
+    TABS.forEach(function (tab) {
+      var isEnabled = tab.enabled(scope);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'admin-tab';
+      btn.id = 'tabbtn-' + tab.id;
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-controls', 'tabpanel-' + tab.id);
+      btn.setAttribute('aria-selected', tab.id === state.activeTab ? 'true' : 'false');
+      btn.textContent = tab.label;
+
+      if (!isEnabled) {
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+        var note = document.createElement('span');
+        note.className = 'tab-note';
+        note.textContent = '無權限';
+        btn.appendChild(note);
+      } else if (tab.id === state.activeTab) {
+        btn.classList.add('active');
+      }
+
+      btn.addEventListener('click', function () {
+        state.activeTab = tab.id;
+        render();
+      });
+
+      sidebar.appendChild(btn);
+    });
+
+    var main = document.createElement('div');
+    main.className = 'admin-main';
+
+    var panel = document.createElement('div');
+    panel.className = 'admin-panel';
+    panel.id = 'tabpanel-' + state.activeTab;
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('tabindex', '0');
+    panel.setAttribute('aria-labelledby', 'tabbtn-' + state.activeTab);
+    main.appendChild(panel);
+
+    shell.appendChild(sidebar);
+    shell.appendChild(main);
+
+    return { shell: shell, panel: panel };
+  }
+
+  function placeholderCard(name, label) {
+    var wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML =
+      '<h2 class="section-title">' + escapeHtml(label) + '</h2>' +
+      '<p class="hint">此區由「' + escapeHtml(label) + '」模組提供。</p>' +
+      '<p class="hint">尚未偵測到 <code class="mono">VisitProto.registerTab(\'' + name +
+      '\', fn)</code> 的註冊 — 後續模組註冊完成後,點此 tab 會自動改為呼叫該模組。</p>';
+    return wrap;
+  }
+
+  // ------------------------------------------------------------------
+  // 事件管理 tab
+  // ------------------------------------------------------------------
+
+  var STATUS_TRANSITIONS = { active: ['closing'], closing: ['closed', 'active'], closed: [] };
+  var STATUS_ORDER = ['active', 'closing', 'closed'];
+  var STATUS_BADGE = { active: 'success', closing: 'warning', closed: 'muted' };
+
+  function renderEventsTab(panel, scope, persona) {
+    panel.innerHTML = '';
+    var stack = document.createElement('div');
+    stack.className = 'stack';
+
+    if (scope.createEvent) {
+      stack.appendChild(buildCreateEventForm(scope));
+    }
+
+    if (scope.manageEvents) {
+      var events = window.VisitMock.EVENTS.slice();
+      var scopedSlugs = persona.adminSignal && persona.adminSignal.eventAdminSlugs;
+      if (scopedSlugs && scopedSlugs.length && !persona.adminSignal.isAdmin) {
+        events = events.filter(function (e) { return scopedSlugs.indexOf(e.slug) !== -1; });
+      }
+      stack.appendChild(buildEventsList(events, persona));
+    } else if (scope.createEvent) {
+      var note = document.createElement('p');
+      note.className = 'hint';
+      note.textContent = '你僅有「建立事件」權限,無法檢視或管理現有事件列表。';
+      stack.appendChild(note);
+    }
+
+    panel.appendChild(stack);
+  }
+
+  function buildCreateEventForm(scope) {
+    var card = document.createElement('div');
+    card.className = 'card';
+
+    var hexinOptions = (window.VisitMock.ORG_TREE.hexin || []).map(function (h) {
+      return '<option value="' + h.id + '">' + escapeHtml(h.name) + '</option>';
+    }).join('');
+
+    card.innerHTML =
+      '<h2 class="section-title">建立事件</h2>' +
+      '<p class="section-sub">示意表單 — 提交不會實際呼叫後端。</p>' +
+      '<form class="form-grid" id="create-event-form" style="margin-top: var(--sp-4);">' +
+      '  <div class="field"><label for="ce-name">事件名稱</label><input id="ce-name" type="text" placeholder="例:光復溢流救災(第三階段)" required></div>' +
+      '  <div class="field"><label for="ce-slug">Slug</label><input id="ce-slug" type="text" placeholder="flood-2026-c" required></div>' +
+      '  <div class="field"><label for="ce-county">縣市</label><input id="ce-county" type="text" placeholder="花蓮縣" required></div>' +
+      '  <div class="field"><label for="ce-owner">Owner 合心</label><select id="ce-owner">' + hexinOptions + '</select></div>' +
+      '</form>' +
+      '<div class="row" style="margin-top: var(--sp-4);"><button type="submit" form="create-event-form" class="btn btn-primary">建立(示意)</button></div>';
+
+    var form = card.querySelector('#create-event-form');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = card.querySelector('#ce-name').value.trim();
+      var slug = card.querySelector('#ce-slug').value.trim();
+      var county = card.querySelector('#ce-county').value.trim();
+      if (!name || !slug || !county) {
+        toast('請填寫事件名稱 / slug / 縣市', 'danger');
+        return;
+      }
+      window.VisitMock.EVENTS.unshift({
+        id: 'evt-' + slug,
+        slug: slug,
+        name: name,
+        status: 'active',
+        openSupport: false,
+        county: county,
+        driveConfigured: false
+      });
+      toast('已示意建立事件「' + name + '」(未真的呼叫後端)', 'success');
+      form.reset();
+      render();
+    });
+
+    return card;
+  }
+
+  function buildEventsList(events, persona) {
+    var wrap = document.createElement('div');
+    wrap.className = 'stack-sm';
+
+    var heading = document.createElement('h2');
+    heading.className = 'section-title';
+    heading.textContent = '事件清單(' + events.length + ')';
+    wrap.appendChild(heading);
+
+    if (events.length === 0) {
+      var empty = document.createElement('p');
+      empty.className = 'hint';
+      empty.textContent = '你目前沒有可管理的事件。';
+      wrap.appendChild(empty);
+      return wrap;
+    }
+
+    events.forEach(function (evt) {
+      wrap.appendChild(buildEventCard(evt, persona));
+    });
+
+    return wrap;
+  }
+
+  function buildEventCard(evt, persona) {
+    var card = document.createElement('div');
+    card.className = 'card event-card';
+    if (state.expandedEventId === evt.id) card.classList.add('is-open');
+
+    var head = document.createElement('div');
+    head.className = 'event-card__head';
+    head.innerHTML =
+      '<div><div class="event-card__name">' + escapeHtml(evt.name) + '</div>' +
+      '<div class="hint mono">' + escapeHtml(evt.slug) + '</div></div>' +
+      '<span class="badge badge--' + STATUS_BADGE[evt.status] + '">' + escapeHtml(evt.status) + '</span>';
+    card.appendChild(head);
+
+    var meta = document.createElement('div');
+    meta.className = 'event-card__meta';
+    meta.innerHTML =
+      '<span class="badge">' + escapeHtml(evt.county) + '</span>' +
+      '<span class="badge badge--' + (evt.openSupport ? 'info' : 'muted') + '">openSupport: ' + (evt.openSupport ? '開放' : '關閉') + '</span>' +
+      '<span class="badge badge--' + (evt.driveConfigured ? 'success' : 'warning') + '">driveConfigured: ' + (evt.driveConfigured ? '已設定' : '未設定') + '</span>';
+    card.appendChild(meta);
+
+    var detail = document.createElement('div');
+    detail.className = 'event-card__detail';
+
+    var config = window.VisitMock.EVENT_CONFIG[evt.slug];
+    if (config) {
+      var kv = document.createElement('dl');
+      kv.className = 'kv-grid';
+      kv.innerHTML =
+        '<div><dt>啟用欄位數</dt><dd class="mono">' + config.enabledFields.length + '</dd></div>' +
+        '<div><dt>路線</dt><dd>' + config.routes.map(function (r) { return r.id; }).join(', ') + '</dd></div>' +
+        '<div><dt>隊伍</dt><dd>' + config.teams.map(function (t) { return t.label; }).join('、') + '</dd></div>' +
+        '<div><dt>鄉鎮市區</dt><dd>' + config.districts.join('、') + '</dd></div>' +
+        '<div><dt>縣市</dt><dd>' + escapeHtml(config.county) + '</dd></div>';
+      detail.appendChild(kv);
+    } else {
+      var noCfg = document.createElement('p');
+      noCfg.className = 'hint';
+      noCfg.textContent = '此事件無詳細欄位設定(mock 資料未提供 EVENT_CONFIG)。';
+      detail.appendChild(noCfg);
+    }
+
+    if (persona.adminSignal && persona.adminSignal.isAdmin) {
+      var statusWrap = document.createElement('div');
+      statusWrap.innerHTML = '<div class="hint" style="margin-top: var(--sp-2);">狀態切換(僅系統管理員)</div>';
+      var controls = document.createElement('div');
+      controls.className = 'event-card__status-controls';
+      var allowed = STATUS_TRANSITIONS[evt.status] || [];
+
+      STATUS_ORDER.forEach(function (target) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn ghost';
+        var canGo = allowed.indexOf(target) !== -1;
+        btn.disabled = !canGo;
+        btn.textContent = '設為 ' + target;
+        btn.setAttribute('aria-label', evt.name + ' 設為 ' + target + (canGo ? '' : '(不允許此轉換)'));
+        btn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          evt.status = target;
+          toast('「' + evt.name + '」狀態已切換為 ' + target, 'success');
+          render();
+        });
+        controls.appendChild(btn);
+      });
+
+      statusWrap.appendChild(controls);
+      detail.appendChild(statusWrap);
+    }
+
+    card.appendChild(detail);
+
+    head.addEventListener('click', function () {
+      state.expandedEventId = state.expandedEventId === evt.id ? null : evt.id;
+      render();
+    });
+
+    return card;
+  }
+
+  // ------------------------------------------------------------------
+  // 成員名冊 tab
+  // ------------------------------------------------------------------
+
+  function renderMembersTab(panel, scope) {
+    panel.innerHTML = '';
+    var stack = document.createElement('div');
+    stack.className = 'stack';
+
+    var headRow = document.createElement('div');
+    headRow.className = 'row-between';
+    headRow.innerHTML = '<h2 class="section-title">成員名冊(' + window.VisitMock.MEMBERS.length + ')</h2>';
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn btn-primary';
+    addBtn.textContent = '批次新增';
+    addBtn.addEventListener('click', function () {
+      state.pickerOpen = true;
+      state.pickerTab = 'volunteer';
+      state.pickerSearch = '';
+      state.pickerSelected = {};
+      render();
+    });
+    headRow.appendChild(addBtn);
+    stack.appendChild(headRow);
+
+    var tableScroll = document.createElement('div');
+    tableScroll.className = 'table-scroll';
+    var table = document.createElement('table');
+    table.className = 'admin-table';
+    table.innerHTML =
+      '<thead><tr>' +
+      '<th>Email</th><th>姓名</th><th>隊伍</th><th>可用路線</th><th>角色</th><th>事件管理員</th><th>狀態</th><th></th>' +
+      '</tr></thead>';
+    var tbody = document.createElement('tbody');
+
+    window.VisitMock.MEMBERS.forEach(function (m) {
+      var revoked = !!state.memberRevoked[m.email];
+      var isSelf = m.email === SELF_MEMBER_EMAIL;
+
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="mono">' + escapeHtml(m.email) + (isSelf ? ' <span class="badge badge--info">你</span>' : '') + '</td>' +
+        '<td>' + escapeHtml(m.name) + '</td>' +
+        '<td>' + escapeHtml(m.team) + '</td>' +
+        '<td class="mono">' + m.availableRoutes.join(',') + '</td>' +
+        '<td>' + escapeHtml(m.role) + '</td>' +
+        '<td>' + (m.isEventAdmin ? '<span class="badge badge--success">是</span>' : '<span class="badge badge--muted">否</span>') + '</td>' +
+        '<td>' + (revoked ? '<span class="badge badge--danger">已停權</span>' : '<span class="badge badge--success">正常</span>') + '</td>';
+
+      var actionTd = document.createElement('td');
+      var actionBtn = document.createElement('button');
+      actionBtn.type = 'button';
+      actionBtn.className = 'btn ghost';
+      actionBtn.textContent = revoked ? '復權' : '停權';
+      actionBtn.disabled = isSelf;
+      if (isSelf) actionBtn.title = '無法對自己執行此操作';
+      actionBtn.addEventListener('click', function () {
+        state.memberRevoked[m.email] = !revoked;
+        toast((revoked ? '已復權 ' : '已停權 ') + m.name, revoked ? 'success' : 'danger');
+        render();
+      });
+      actionTd.appendChild(actionBtn);
+      tr.appendChild(actionTd);
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    tableScroll.appendChild(table);
+    stack.appendChild(tableScroll);
+    panel.appendChild(stack);
+
+    if (state.pickerOpen) {
+      panel.appendChild(buildPickerModal());
+    }
+  }
+
+  function buildPickerModal() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closePicker();
+    });
+
+    var modal = document.createElement('div');
+    modal.className = 'card glass modal';
+
+    var head = document.createElement('div');
+    head.className = 'modal__head';
+    head.innerHTML = '<h2 class="section-title" style="margin:0;">挑人器 — 批次新增</h2>';
+    var closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn ghost modal__close';
+    closeBtn.setAttribute('aria-label', '關閉');
+    closeBtn.textContent = '✕';
+    closeBtn.addEventListener('click', closePicker);
+    head.appendChild(closeBtn);
+    modal.appendChild(head);
+
+    var note = document.createElement('p');
+    note.className = 'hint';
+    note.textContent = '單批最多 50 筆。清單為靜態示意資料,可用姓名 / email / 單位搜尋。';
+    modal.appendChild(note);
+
+    var tabsWrap = document.createElement('div');
+    tabsWrap.className = 'picker-tabs';
+    var DIR_LABELS = { volunteer: '志工', staff: '職工', advisor: '幹部/委員' };
+    Object.keys(DIR_LABELS).forEach(function (key) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn ghost';
+      if (state.pickerTab === key) btn.classList.add('is-active');
+      btn.style.background = state.pickerTab === key ? 'var(--surface-raised)' : '';
+      btn.style.color = state.pickerTab === key ? 'var(--accent)' : '';
+      btn.textContent = DIR_LABELS[key] + ' (' + window.VisitMock.DIRECTORY[key].length + ')';
+      btn.addEventListener('click', function () {
+        state.pickerTab = key;
+        render();
+      });
+      tabsWrap.appendChild(btn);
+    });
+    modal.appendChild(tabsWrap);
+
+    var searchField = document.createElement('div');
+    searchField.className = 'field';
+    searchField.innerHTML = '<label for="picker-search">搜尋</label>';
+    var searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.id = 'picker-search';
+    searchInput.placeholder = '姓名 / email / 單位';
+    searchInput.value = state.pickerSearch;
+    searchInput.addEventListener('input', function () {
+      state.pickerSearch = searchInput.value;
+      renderPickerList();
+    });
+    searchField.appendChild(searchInput);
+    modal.appendChild(searchField);
+
+    var list = document.createElement('div');
+    list.className = 'picker-list';
+    list.id = 'picker-list';
+    modal.appendChild(list);
+
+    var footer = document.createElement('div');
+    footer.className = 'row-between';
+    footer.style.marginTop = 'var(--sp-4)';
+    var countLabel = document.createElement('span');
+    countLabel.className = 'hint';
+    countLabel.id = 'picker-count';
+    footer.appendChild(countLabel);
+    var addSelectedBtn = document.createElement('button');
+    addSelectedBtn.type = 'button';
+    addSelectedBtn.className = 'btn btn-primary';
+    addSelectedBtn.textContent = '加入所選(示意)';
+    addSelectedBtn.addEventListener('click', function () {
+      var n = Object.keys(state.pickerSelected).filter(function (k) { return state.pickerSelected[k]; }).length;
+      if (n === 0) {
+        toast('請至少選擇一人', 'danger');
+        return;
+      }
+      toast('已示意加入 ' + n + ' 人(未真的呼叫後端)', 'success');
+      closePicker();
+    });
+    footer.appendChild(addSelectedBtn);
+    modal.appendChild(footer);
+
+    overlay.appendChild(modal);
+
+    function renderPickerList() {
+      var listEl = modal.querySelector('#picker-list');
+      var countEl = modal.querySelector('#picker-count');
+      listEl.innerHTML = '';
+      var people = window.VisitMock.DIRECTORY[state.pickerTab] || [];
+      var q = state.pickerSearch.trim().toLowerCase();
+      var filtered = people.filter(function (p) {
+        if (!q) return true;
+        return (p.name + p.email + p.orgUnit).toLowerCase().indexOf(q) !== -1;
+      });
+
+      if (filtered.length === 0) {
+        var empty = document.createElement('p');
+        empty.className = 'hint';
+        empty.textContent = '沒有符合搜尋條件的人員。';
+        listEl.appendChild(empty);
+      }
+
+      filtered.forEach(function (p) {
+        var row = document.createElement('div');
+        row.className = 'picker-row';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = 'pk-' + p.email;
+        cb.checked = !!state.pickerSelected[p.email];
+        cb.addEventListener('change', function () {
+          state.pickerSelected[p.email] = cb.checked;
+          updateCount();
+        });
+        var label = document.createElement('label');
+        label.setAttribute('for', 'pk-' + p.email);
+        label.innerHTML = escapeHtml(p.name) + ' <span class="mono hint">' + escapeHtml(p.email) + '</span>';
+        var unit = document.createElement('span');
+        unit.className = 'org-unit';
+        unit.textContent = p.orgUnit;
+        row.appendChild(cb);
+        row.appendChild(label);
+        row.appendChild(unit);
+        listEl.appendChild(row);
+      });
+
+      updateCount();
+
+      function updateCount() {
+        var n = Object.keys(state.pickerSelected).filter(function (k) { return state.pickerSelected[k]; }).length;
+        countEl.textContent = '已選 ' + n + ' 人(單批最多 50 筆)';
+      }
+    }
+
+    // deferred so elements exist in DOM
+    setTimeout(renderPickerList, 0);
+
+    document.addEventListener('keydown', escHandler);
+    function escHandler(e) {
+      if (e.key === 'Escape') closePicker();
+    }
+    function closePicker() {
+      document.removeEventListener('keydown', escHandler);
+      state.pickerOpen = false;
+      render();
+    }
+
+    return overlay;
+  }
+
+  // ------------------------------------------------------------------
+  // 匯入匯出 tab
+  // ------------------------------------------------------------------
+
+  function renderImportExportTab(panel, scope, persona) {
+    panel.innerHTML = '';
+    var stack = document.createElement('div');
+    stack.className = 'stack';
+
+    // 上傳區
+    var uploadCard = document.createElement('div');
+    uploadCard.className = 'card';
+    uploadCard.innerHTML =
+      '<h2 class="section-title">匯入</h2>' +
+      '<div class="upload-zone">' +
+      '  <p>拖放 CSV 檔案到這裡,或點擊選擇檔案(示意 — 不會真的讀取檔案)</p>' +
+      '</div>' +
+      '<div class="row" style="margin-top: var(--sp-4);">' +
+      '  <button type="button" class="btn btn-primary" id="ie-run-dryrun">使用範例檔進行 Dry-run</button>' +
+      '  <button type="button" class="btn ghost" id="ie-download-template">下載 CSV 範本</button>' +
+      '</div>';
+    stack.appendChild(uploadCard);
+
+    uploadCard.querySelector('#ie-run-dryrun').addEventListener('click', function () {
+      state.importDryRunShown = true;
+      render();
+    });
+    uploadCard.querySelector('#ie-download-template').addEventListener('click', function () {
+      downloadCsvTemplate();
+      toast('已下載 CSV 範本', 'success');
+    });
+
+    if (state.importDryRunShown) {
+      stack.appendChild(buildDryRunPreview());
+    }
+
+    // 匯出區
+    var exportCard = document.createElement('div');
+    exportCard.className = 'card';
+    var canSeePII = window.VisitPersona.canSeePII(persona) && persona.bypass;
+    exportCard.innerHTML =
+      '<h2 class="section-title">匯出</h2>' +
+      '<p class="hint">PII 欄(身分證字號 / 受款人身分證字號 / 內部備註)僅 bypass 權限者可見;' +
+      '目前身分「' + escapeHtml(persona.label) + '」' + (canSeePII ? '可見 PII 欄。' : '匯出將自動遮蔽 PII 欄。') + '</p>' +
+      '<div class="row" style="margin-top: var(--sp-3);"><button type="button" class="btn ghost" id="ie-export-all">匯出全部(CSV)</button></div>';
+    exportCard.querySelector('#ie-export-all').addEventListener('click', function () {
+      exportAllCsv(persona);
+      toast('已匯出全部案件資料', 'success');
+    });
+    stack.appendChild(exportCard);
+
+    panel.appendChild(stack);
+  }
+
+  function buildDryRunPreview() {
+    var card = document.createElement('div');
+    card.className = 'card';
+    var dryRun = window.VisitMock.IMPORT_DRYRUN;
+
+    var ACTION_BADGE = { insert: 'success', update: 'info', error: 'danger' };
+    var ACTION_LABEL = { insert: '新增', update: '更新', error: '錯誤' };
+
+    var rowsHtml = dryRun.rows.map(function (row) {
+      var summary = Object.keys(row.data).map(function (k) {
+        return k + '=' + row.data[k];
+      }).join(', ');
+      return '<tr>' +
+        '<td><span class="badge badge--' + ACTION_BADGE[row.action] + '">' + ACTION_LABEL[row.action] + '</span></td>' +
+        '<td class="mono" style="max-width:520px; white-space:normal;">' + escapeHtml(summary) + '</td>' +
+        '<td>' + (row.error ? '<span class="badge badge--danger">' + escapeHtml(row.error) + '</span>' : '—') + '</td>' +
+        '</tr>';
+    }).join('');
+
+    var insertCount = dryRun.rows.filter(function (r) { return r.action === 'insert'; }).length;
+    var updateCount = dryRun.rows.filter(function (r) { return r.action === 'update'; }).length;
+    var errorCount = dryRun.rows.filter(function (r) { return r.action === 'error'; }).length;
+
+    card.innerHTML =
+      '<h2 class="section-title">Dry-run 預覽</h2>' +
+      '<p class="hint">fileHash: <span class="mono">' + escapeHtml(dryRun.fileHash) + '</span> · ' +
+      '新增 ' + insertCount + ' / 更新 ' + updateCount + ' / 錯誤 ' + errorCount + '</p>' +
+      '<div class="table-scroll"><table class="admin-table">' +
+      '<thead><tr><th>動作</th><th>資料摘要</th><th>錯誤訊息</th></tr></thead>' +
+      '<tbody>' + rowsHtml + '</tbody></table></div>' +
+      '<div class="field" style="max-width:260px; margin-top: var(--sp-4);">' +
+      '  <label for="ie-hash-confirm">確認 fileHash(提交前比對)</label>' +
+      '  <input type="text" id="ie-hash-confirm" class="mono" value="' + escapeHtml(state.importHashInput) + '">' +
+      '</div>' +
+      '<div class="row" style="margin-top: var(--sp-3);">' +
+      '  <button type="button" class="btn btn-primary" id="ie-commit">提交(commit)</button>' +
+      '  <span class="hint">提交時 fileHash 需與 dry-run 一致,否則回傳 409(檔案已變更,需重新 dry-run)。</span>' +
+      '</div>';
+
+    var hashInput = card.querySelector('#ie-hash-confirm');
+    hashInput.addEventListener('input', function () {
+      state.importHashInput = hashInput.value;
+    });
+
+    card.querySelector('#ie-commit').addEventListener('click', function () {
+      if (state.importHashInput === dryRun.fileHash) {
+        toast('提交成功(示意):新增 ' + insertCount + '、更新 ' + updateCount + ' 筆', 'success');
+      } else {
+        toast('409 Conflict — fileHash 與 dry-run 不一致,請重新執行 dry-run', 'danger');
+      }
+    });
+
+    return card;
+  }
+
+  function downloadCsvTemplate() {
+    var headers = window.VisitMock.FIELD_CATALOG.map(function (f) { return f.key; });
+    var csv = headers.join(',') + '\n';
+    triggerDownload(csv, 'visit-pwa-template.csv');
+  }
+
+  function exportAllCsv(persona) {
+    var canSeePII = window.VisitPersona.canSeePII(persona) && persona.bypass;
+    var fields = window.VisitMock.FIELD_CATALOG.filter(function (f) {
+      return canSeePII || !f.pii;
+    });
+    var headers = fields.map(function (f) { return f.key; });
+    var lines = [headers.join(',')];
+    window.VisitMock.CASES.forEach(function (c) {
+      var row = fields.map(function (f) {
+        var v = c[f.key];
+        if (v == null) return '';
+        var s = String(v).replace(/"/g, '""');
+        return /[,"\n]/.test(s) ? '"' + s + '"' : s;
+      });
+      lines.push(row.join(','));
+    });
+    triggerDownload(lines.join('\n'), 'visit-pwa-export.csv');
+  }
+
+  function triggerDownload(text, filename) {
+    var blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  // ------------------------------------------------------------------
+  // 主 render
+  // ------------------------------------------------------------------
+
+  function render() {
+    var persona = window.VisitPersona.getPersona();
+    var scope = window.VisitPersona.adminScope(persona);
+    var anyAccess = scope.manageEvents || scope.createEvent || scope.manageMembers || scope.planningDesk || scope.org;
+
+    content.innerHTML = '';
+
+    if (!anyAccess) {
+      content.appendChild(buildNoAccessPage(persona));
+      return;
+    }
+
+    var activeDef = TABS.filter(function (t) { return t.id === state.activeTab; })[0];
+    if (!activeDef || !activeDef.enabled(scope)) {
+      var firstEnabled = TABS.filter(function (t) { return t.enabled(scope); })[0];
+      state.activeTab = firstEnabled ? firstEnabled.id : TABS[0].id;
+    }
+
+    var built = buildShell(scope);
+    content.appendChild(built.shell);
+
+    switch (state.activeTab) {
+      case 'events':
+        renderEventsTab(built.panel, scope, persona);
+        break;
+      case 'members':
+        renderMembersTab(built.panel, scope);
+        break;
+      case 'importExport':
+        renderImportExportTab(built.panel, scope, persona);
+        break;
+      case 'planning':
+        renderPlaceholder(built.panel, 'planning', '規劃桌');
+        break;
+      case 'org':
+        renderPlaceholder(built.panel, 'org', '組織');
+        break;
+      default:
+        break;
+    }
+  }
+
+  function renderPlaceholder(panel, name, label) {
+    panel.innerHTML = '';
+    var fn = window.VisitProto.getTab(name);
+    if (typeof fn === 'function') {
+      fn(panel);
+    } else {
+      panel.appendChild(placeholderCard(name, label));
+    }
+  }
+
+  window.VisitPersona.onPersonaChange(render);
+  render();
+})();
+</script>
+</body>
+</html>
