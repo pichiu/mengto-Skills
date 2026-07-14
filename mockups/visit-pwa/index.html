@@ -1,0 +1,566 @@
+<title>家訪 PWA 原型</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="家訪 PWA 原型 — 暗色、大字、無障礙、離線優先的可點擊原型,展示三層授權模型。">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* ---- page-local styles (index.html only; do not touch tokens/components) ---- */
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+
+  .skip-link {
+    position: absolute;
+    left: var(--sp-3);
+    top: -60px;
+    z-index: 100;
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    border-radius: var(--r-md);
+    transition: top var(--dur) var(--ease);
+  }
+  .skip-link:focus {
+    top: var(--sp-3);
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: var(--sp-3) var(--sp-6);
+    background: rgba(11, 14, 20, 0.85);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .site-header__mark {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    color: var(--text);
+    font-weight: 800;
+    font-size: var(--fs-h3);
+    text-decoration: none;
+  }
+
+  .site-header__mark span {
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  #current-persona-note {
+    display: none;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 var(--sp-6);
+  }
+
+  section {
+    padding: var(--sp-8) 0;
+  }
+
+  section + section {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .hero {
+    padding-top: var(--sp-8);
+    padding-bottom: var(--sp-7);
+    text-align: left;
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-4);
+  }
+
+  .hero h1 {
+    margin: 0 0 var(--sp-4);
+    font-size: clamp(32px, 5vw, var(--fs-h1));
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    font-weight: 800;
+  }
+
+  .hero p {
+    max-width: 62ch;
+    margin: 0;
+    font-size: var(--fs-body-lg);
+    color: var(--text-dim);
+  }
+
+  h2 {
+    font-size: var(--fs-h2);
+    font-weight: 800;
+    margin: 0 0 var(--sp-2);
+    letter-spacing: -0.005em;
+  }
+
+  .section-lede {
+    max-width: 68ch;
+    color: var(--text-dim);
+    margin: 0 0 var(--sp-6);
+    font-size: var(--fs-body);
+  }
+
+  /* ---- entry cards ---- */
+  .entry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--sp-5);
+  }
+
+  .entry-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+
+  a.entry-card:hover,
+  a.entry-card:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .entry-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-md);
+    background: var(--info-bg);
+    color: var(--info);
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .entry-card h3 {
+    margin: 0;
+    font-size: var(--fs-h3);
+    font-weight: 700;
+  }
+
+  .entry-card p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: var(--fs-body);
+    flex: 1;
+  }
+
+  .entry-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* ---- persona list ---- */
+  .persona-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--sp-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .persona-list li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .persona-list li.is-flagged {
+    box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(251, 191, 36, 0.45);
+  }
+
+  .persona-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+  }
+
+  .persona-id {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .persona-name {
+    font-weight: 700;
+    font-size: var(--fs-body-lg);
+  }
+
+  .persona-list p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: var(--fs-body);
+  }
+
+  .gap-note {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: flex-start;
+    margin-top: var(--sp-6);
+  }
+
+  .gap-note strong {
+    color: var(--warning);
+  }
+
+  /* ---- three-plane diagram ---- */
+  .plane-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--sp-5);
+    align-items: stretch;
+  }
+
+  .plane-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+
+  .plane-card__title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .plane-card__title h3 {
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .plane-card__title span {
+    color: var(--text-dim);
+    font-size: 13px;
+    font-family: var(--font-mono);
+  }
+
+  .plane-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  .plane-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-3);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .plane-row strong {
+    font-size: var(--fs-body);
+  }
+
+  .plane-row span {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .plane-note {
+    margin-top: var(--sp-6);
+  }
+
+  /* ---- philosophy ---- */
+  .philosophy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+  }
+
+  .philosophy-grid .card h3 {
+    margin: 0 0 var(--sp-2);
+    font-size: 17px;
+  }
+
+  .philosophy-grid .card p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  .site-footer {
+    padding: var(--sp-6) 0 var(--sp-8);
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .site-header { padding: var(--sp-3) var(--sp-4); }
+    .container { padding: 0 var(--sp-4); }
+    section { padding: var(--sp-7) 0; }
+  }
+</style>
+
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<header class="site-header">
+  <a class="site-header__mark" href="index.html">
+    家訪 PWA 原型 <span>flood-2026 原型</span>
+  </a>
+  <div id="current-persona-note" aria-live="polite"></div>
+</header>
+
+<main id="main">
+  <section class="hero container">
+    <div class="hero__eyebrow">
+      <span class="badge badge--info">離線優先 PWA</span>
+      <span class="badge badge--muted">純前端 · 無 build · 假資料</span>
+    </div>
+    <h1>家訪 PWA 原型</h1>
+    <p>
+      暗色、大字、無障礙、離線優先的 PWA 原型 —— 展示一套三層授權模型:
+      資料平面(路線可見範圍)、Admin 平面(事件管理員 vs 系統管理員)、
+      組織平面(合心/處室管理員)。以花蓮光復堰塞湖溢流風災家訪為情境,
+      供設計與工程團隊點擊走查每個角色實際看到的畫面差異。
+    </p>
+  </section>
+
+  <section class="container" aria-labelledby="entries-heading">
+    <h2 id="entries-heading">從這裡開始</h2>
+    <p class="section-lede">三個入口,分別對應本頁說明、手機端原型與桌面 Admin 原型。</p>
+    <nav class="entry-grid" aria-label="原型入口">
+      <a class="entry-card card" href="index.html">
+        <span class="entry-card__icon" aria-hidden="true">i</span>
+        <h3>啟動頁(本頁)說明</h3>
+        <p>三層授權模型總覽、七個 persona 對照,以及與現行後端的差異註記。原型走查前先讀這頁。</p>
+        <span class="entry-card__cta">目前所在頁面 →</span>
+      </a>
+      <a class="entry-card card" href="mobile.html">
+        <span class="entry-card__icon" aria-hidden="true">M</span>
+        <h3>手機原型</h3>
+        <p>訪視志工 / 行政組實際使用的畫面:whoami、事件列表、個案列表、個案詳情、照片上傳、地圖規劃。</p>
+        <span class="entry-card__cta">開啟 mobile.html →</span>
+      </a>
+      <a class="entry-card card" href="admin.html">
+        <span class="entry-card__icon" aria-hidden="true">A</span>
+        <h3>桌面 Admin 原型</h3>
+        <p>事件管理、成員管理、匯入匯出、規劃桌、組織管理。桌面 only,建議在寬螢幕瀏覽器開啟。</p>
+        <span class="entry-card__cta">開啟 admin.html →</span>
+      </a>
+    </nav>
+  </section>
+
+  <section class="container" aria-labelledby="persona-heading">
+    <h2 id="persona-heading">Persona 機制說明</h2>
+    <p class="section-lede">
+      每個 persona 對應一種授權組合,可在 mobile.html / admin.html 右下角的
+      persona 切換器即時切換,觀察同一份假資料在不同身分下的顯示差異。
+    </p>
+    <ul class="persona-list">
+      <li class="card">
+        <div class="persona-row">
+          <span class="persona-name">行政組</span>
+          <span class="persona-id">office</span>
+          <span class="badge badge--info">bypass</span>
+        </div>
+        <p>bypass = true,略過路線限制,看整個活動的所有案件 —— 展示「行政角色略過路線範圍」的機制。</p>
+      </li>
+      <li class="card is-flagged">
+        <div class="persona-row">
+          <span class="persona-name">訪視志工</span>
+          <span class="persona-id">visitor</span>
+          <span class="badge badge--warning">⚠︎ 後端缺口</span>
+        </div>
+        <p>
+          只看自己路線 + 可見 PII —— <strong>這是與現行後端不同的預期行為,代表一個後端能力缺口</strong>:
+          現行後端只要不是 bypass 身分,一律拔除 PII 欄位;此原型刻意示範「路線受限但仍需看到完整個案資料」
+          的實際使用需求,尚無對應後端能力。
+        </p>
+      </li>
+      <li class="card">
+        <div class="persona-row">
+          <span class="persona-name">指導師父</span>
+          <span class="persona-id">advisor</span>
+          <span class="badge badge--muted">viewer</span>
+        </div>
+        <p>role = viewer,只看自己路線且 PII 被拔除 —— 展示現行後端「viewer 一律無 PII」的既有行為,與 visitor 對照。</p>
+      </li>
+      <li class="card">
+        <div class="persona-row">
+          <span class="persona-name">被停權</span>
+          <span class="persona-id">revoked</span>
+          <span class="badge badge--danger">revoked</span>
+        </div>
+        <p>revoked = true,登入後看不到任何案件、寫入功能全部關閉 —— 展示帳號停權後的資料平面歸零狀態。</p>
+      </li>
+      <li class="card">
+        <div class="persona-row">
+          <span class="persona-name">合心/處室管理員</span>
+          <span class="persona-id">orgAdmin</span>
+          <span class="badge badge--muted">org</span>
+        </div>
+        <p>非 bypass、非事件/系統管理員,但擁有 hexinAdminOf / deptAdminOf —— 展示組織平面獨立於資料平面與 Admin 平面的授權(可建立事件、管組織架構,但不能管既有事件內容)。</p>
+      </li>
+      <li class="card">
+        <div class="persona-row">
+          <span class="persona-name">事件管理員</span>
+          <span class="persona-id">eventAdmin</span>
+          <span class="badge badge--info">bypass</span>
+        </div>
+        <p>bypass = true 且 eventAdminSlugs 包含 flood-2026 —— 展示 D12 事件管理員:可管單一事件的成員、匯入匯出、規劃桌,但不觸及組織平面。</p>
+      </li>
+      <li class="card">
+        <div class="persona-row">
+          <span class="persona-name">系統管理員</span>
+          <span class="persona-id">sysAdmin</span>
+          <span class="badge badge--info">isAdmin</span>
+        </div>
+        <p>adminSignal.isAdmin = true —— 展示 D12 系統管理員:三層平面全部放行,可管所有事件與組織。</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="container" aria-labelledby="planes-heading">
+    <h2 id="planes-heading">三層授權平面</h2>
+    <p class="section-lede">
+      三層各自獨立判斷、可疊加,彼此不是上下屬關係 —— 一個帳號可能同時擁有多層權限的任意組合。
+    </p>
+    <div class="plane-grid">
+      <div class="plane-card card">
+        <div class="plane-card__title">
+          <h3>資料平面</h3>
+          <span>bypass / route / viewer</span>
+        </div>
+        <div class="plane-rows">
+          <div class="plane-row">
+            <strong>bypass</strong>
+            <span>略過路線限制,看整個活動</span>
+          </div>
+          <div class="plane-row">
+            <strong>route</strong>
+            <span>availableRoutes 決定只看被授權路線的案件</span>
+          </div>
+          <div class="plane-row">
+            <strong>viewer</strong>
+            <span>role = viewer 或 revoked 一律拔除 PII / 關閉寫入</span>
+          </div>
+        </div>
+      </div>
+      <div class="plane-card card">
+        <div class="plane-card__title">
+          <h3>Admin 平面</h3>
+          <span>D12 事件管理員 vs 系統管理員</span>
+        </div>
+        <div class="plane-rows">
+          <div class="plane-row">
+            <strong>事件管理員</strong>
+            <span>eventAdminSlugs 指定的單一事件:成員 / 匯入匯出 / 規劃桌</span>
+          </div>
+          <div class="plane-row">
+            <strong>系統管理員</strong>
+            <span>isAdmin = true:所有事件的建立、管理、規劃桌</span>
+          </div>
+        </div>
+      </div>
+      <div class="plane-card card">
+        <div class="plane-card__title">
+          <h3>組織平面</h3>
+          <span>D13 合心 / 處室管理員</span>
+        </div>
+        <div class="plane-rows">
+          <div class="plane-row">
+            <strong>合心管理員</strong>
+            <span>hexinAdminOf:管理指定合心下的互愛組織架構</span>
+          </div>
+          <div class="plane-row">
+            <strong>處室管理員</strong>
+            <span>deptAdminOf:管理指定處室,可建立新事件</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="banner plane-note">
+      <span>三層獨立、疊加、非上下屬 —— 例如 orgAdmin 可以同時是某條路線的 member,兩層權限互不覆蓋、互不推導。</span>
+    </div>
+  </section>
+
+  <section class="container" aria-labelledby="philosophy-heading">
+    <h2 id="philosophy-heading">設計理念</h2>
+    <p class="section-lede">
+      暗色、大字、無障礙 ≠ 樸素。這個原型刻意保留層次、字體節奏與有意義的動效,
+      證明「可及性」與「有設計感」不衝突。
+    </p>
+    <div class="philosophy-grid">
+      <div class="card">
+        <h3>層次</h3>
+        <p>surface / surface-raised 兩級底色搭配漸層描邊卡片與柔和陰影,建立深度而不靠死黑對比。</p>
+      </div>
+      <div class="card">
+        <h3>字體節奏</h3>
+        <p>18px 基準字級、1.6 行高,標題到內文有明確的比例級距,長篇個案資料也能舒適閱讀。</p>
+      </div>
+      <div class="card">
+        <h3>有意義動效</h3>
+        <p>轉場、同步脈動點只在傳達狀態變化時出現,並尊重 prefers-reduced-motion。</p>
+      </div>
+      <div class="card">
+        <h3>路線色票系統</h3>
+        <p>每條路線一個高對比色票(route-a 到 route-e),在列表、地圖、規劃桌間保持一致辨識度。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2>畫面清單</h2>
+    <p class="section-lede">完整畫面清單與 persona 對照表請見同目錄下的 <code>README.md</code>。</p>
+  </section>
+</main>
+
+<footer class="site-footer container">
+  <p>家訪 PWA 原型 · 純前端、無 build、無 CDN、假資料 · 依 backend API spec 製作的可點擊 mockup。</p>
+</footer>
+
+<script src="assets/persona.js"></script>
+<script>
+  (function () {
+    'use strict';
+    try {
+      if (window.VisitPersona && typeof window.VisitPersona.getPersona === 'function') {
+        var current = window.VisitPersona.getPersona();
+        var note = document.getElementById('current-persona-note');
+        if (note && current) {
+          note.style.display = 'inline-flex';
+          note.textContent = '目前身分:' + current.label + '(' + current.id + ')';
+        }
+      }
+    } catch (e) {
+      /* persona.js 不可用時不影響啟動頁瀏覽 */
+    }
+  })();
+</script>
