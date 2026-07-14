@@ -13,6 +13,22 @@
   html, body { margin: 0; }
   body { min-height: 100vh; }
 
+  .skip-link {
+    position: absolute;
+    left: var(--sp-3);
+    top: -60px;
+    z-index: 100;
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    border-radius: var(--r-md);
+    transition: top var(--dur) var(--ease);
+  }
+  .skip-link:focus {
+    top: var(--sp-3);
+  }
+
   #app {
     width: 100%;
     max-width: 1440px;
@@ -205,8 +221,11 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main">跳到主要內容</a>
+
+<main id="main">
 <div id="app" data-density="dense"></div>
-<div id="persona-mount"></div>
+</main>
 <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
 
 <script src="assets/mock-data.js"></script>
@@ -222,7 +241,7 @@
 
   var appEl = document.getElementById('app');
 
-  var titleBar = document.createElement('div');
+  var titleBar = document.createElement('header');
   titleBar.className = 'admin-page-title';
   titleBar.innerHTML =
     '<h1>家訪 PWA — 管理後台</h1>' +
@@ -232,9 +251,20 @@
   var frameHost = document.createElement('div');
   appEl.appendChild(frameHost);
 
-  var content = VisitProto.mountBrowserFrame(frameHost);
+  var frameBody = VisitProto.mountBrowserFrame(frameHost);
 
-  VisitPersona.mountPersonaSwitcher(document.getElementById('persona-mount'));
+  // persona-switcher 掛在 browser-frame 內容區最上方,自成一列(docked),
+  // 而非 position:fixed 右下角 —— 避免蓋住各 tab 右下角的可互動控制項
+  // (處室卡動作鈕、規劃桌右欄勾選框)。獨立於下方的 `content`,不受
+  // render() 每次 innerHTML = '' 影響。mobile.html 維持原本浮動行為不動。
+  var personaBarHost = document.createElement('div');
+  frameBody.appendChild(personaBarHost);
+  VisitPersona.mountPersonaSwitcher(personaBarHost);
+  var personaSwitcherEl = personaBarHost.querySelector('.persona-switcher');
+  if (personaSwitcherEl) personaSwitcherEl.classList.add('is-docked');
+
+  var content = document.createElement('div');
+  frameBody.appendChild(content);
 
   // ------------------------------------------------------------------
   // toast 小工具
@@ -1143,7 +1173,7 @@
       '.pd-col-head h2{margin:0;font-size:var(--fs-h3);}' +
       '.pd-col-head p{margin:4px 0 0;}' +
       '.pd-col-body{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:var(--sp-3);}' +
-      '.pd-col-right .pd-col-body{display:flex;flex-direction:column;gap:var(--sp-3);padding-bottom:400px;}' +
+      '.pd-col-right .pd-col-body{display:flex;flex-direction:column;gap:var(--sp-3);}' +
       '.pd-tree-node{min-width:0;}' +
       '.pd-tree-btn{display:flex;align-items:center;gap:6px;width:100%;text-align:left;background:transparent;border:none;color:var(--text);padding:6px 8px;border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-family:inherit;}' +
       '.pd-tree-btn:hover{background:rgba(255,255,255,0.06);}' +
@@ -1164,7 +1194,7 @@
       '.pd-list-row{display:flex;align-items:center;gap:var(--sp-2);padding:4px 6px;border-radius:var(--r-sm);font-size:12px;min-width:0;}' +
       '.pd-list-row:hover{background:rgba(255,255,255,0.04);}' +
       '.pd-list-row label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}' +
-      '.pd-list-badge{font-size:10px;color:var(--text-dim);flex:0 0 auto;}' +
+      '.pd-list-badge{font-size:12px;color:var(--text-dim);flex:0 0 auto;}' +
       '.pd-card{padding:var(--sp-4);border-radius:var(--r-md);background:var(--surface-raised);}' +
       '.pd-card h3{margin:0 0 6px;font-size:15px;}' +
       '.pd-card .hint{margin:0 0 var(--sp-2);}' +
@@ -1175,8 +1205,8 @@
       '.pd-member-row:last-child{border-bottom:none;}' +
       '.pd-member-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);font-size:13px;}' +
       '.pd-member-routes{display:flex;flex-wrap:wrap;gap:6px;}' +
-      '.pd-member-routes label{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--text-dim);cursor:pointer;}' +
-      '.pd-member-routes .route-chip{font-size:10px;padding:1px 6px;}' +
+      '.pd-member-routes label{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--text-dim);cursor:pointer;}' +
+      '.pd-member-routes .route-chip{font-size:12px;padding:1px 6px;}' +
       '.pd-newroute-row{display:flex;gap:var(--sp-2);align-items:flex-end;}' +
       '.pd-newroute-row .field{flex:1 1 auto;min-width:0;margin:0;}' +
       '@media (max-width: 1180px){.pd-workspace{flex-wrap:wrap;height:auto;}.pd-col-left,.pd-col-right{width:100%;flex:1 1 100%;}.pd-col-center{flex:1 1 100%;}}';
@@ -1673,12 +1703,16 @@
   'use strict';
 
   // ------------------------------------------------------------------
-  // 組織 tab(sysAdmin 專屬,gating 依 VisitPersona.adminScope(persona).org)
-  // — 掛載到 VisitProto.registerTab('org', fn)
+  // 組織 tab — 掛載到 VisitProto.registerTab('org', fn)
   //
-  // 純前端示意:合心/和氣兩層樹 + 處室字典(CRUD 示意,含 409「使用中保護」
-  // /「同名衝突」)、合心/處室管理員任免、系統管理員切換(toggle-admin)。
-  // 所有操作只做 UI 回饋(toast),CRUD 只改本檔內的 orgTree 深拷貝,
+  // Tab 本身依 VisitPersona.adminScope(persona).org gating(orgAdmin + sysAdmin
+  // 皆可見)。但組織樹結構 CRUD(合心/和氣兩層樹 + 處室字典,含 409「使用中
+  // 保護」/「同名衝突」)、合心/處室管理員任免、系統管理員切換(toggle-admin)
+  // 僅 adminScope(persona).orgStructure === true(sysAdmin)可用 —— 對應後端
+  // /api/admin/org、任免、toggle-admin 皆僅系統管理員專屬。orgAdmin 進得來,
+  // 但只看到唯讀組織脈絡 + 說明卡,不出現任何新增/改名/停用/任免/toggle 按鈕。
+  //
+  // 所有 CRUD 操作只做 UI 回饋(toast),只改本檔內的 orgTree 深拷貝,
   // 不寫入 window.VisitMock,避免污染其他 tab 的 mock 狀態。
   // ------------------------------------------------------------------
 
@@ -1833,11 +1867,96 @@
     var card = document.createElement('div');
     card.className = 'card';
     card.innerHTML =
-      '<h2 class="section-title">僅系統管理員可用</h2>' +
-      '<p class="hint">目前身分「' + esc(persona.label) + '」沒有組織管理權限，無法檢視合心/和氣樹、' +
-      '處室字典、管理員任免與系統管理員切換。</p>' +
-      '<p class="hint">此頁需 <code class="mono">VisitPersona.adminScope(persona).org === true</code>。' +
+      '<h2 class="section-title">無組織管理權限</h2>' +
+      '<p class="hint">目前身分「' + esc(persona.label) + '」沒有組織平面訊號，無法檢視組織脈絡、' +
+      '合心/和氣樹、處室字典、管理員任免或系統管理員切換。</p>' +
+      '<p class="hint">此頁需 <code class="mono">VisitPersona.adminScope(persona).org === true</code>' +
+      '(orgAdmin / sysAdmin);組織樹結構異動、任免、系統管理員切換另需' +
+      ' <code class="mono">adminScope(persona).orgStructure === true</code>(僅 sysAdmin)。' +
       '請使用右下角 persona 切換器切換身分。</p>';
+    return card;
+  }
+
+  // ---- orgAdmin 唯讀組織脈絡(無 CRUD/任免/toggle 按鈕)-----------------------
+
+  function buildOrgAdminInfoCard() {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">您是合心/處室管理員</h2>' +
+      '<p class="hint">可於「成員名冊」依組織範圍管理名冊、可建立事件；組織樹結構、' +
+      '管理員任免、系統管理員切換為系統管理員專屬。</p>';
+    return card;
+  }
+
+  function buildReadOnlyOrgTreeCard() {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">組織脈絡 — 合心 / 和氣（唯讀）</h2>' +
+      '<p class="section-sub">僅供檢視目前組織階層，新增/改名/停用為系統管理員專屬。</p>';
+
+    var list = document.createElement('div');
+    list.className = 'stack-sm';
+    list.style.marginTop = 'var(--sp-3)';
+
+    if (!orgTree.hexin.length) {
+      var empty = document.createElement('p');
+      empty.className = 'hint';
+      empty.textContent = '無合心資料。';
+      list.appendChild(empty);
+    } else {
+      orgTree.hexin.forEach(function (h) {
+        var hWrap = document.createElement('div');
+        hWrap.className = 'org-node';
+        var hRow = document.createElement('div');
+        hRow.className = 'org-row';
+        var hName = document.createElement('span');
+        hName.className = 'org-name';
+        hName.innerHTML = esc(h.name) + statusBadgeHtml(h);
+        hRow.appendChild(hName);
+        hWrap.appendChild(hRow);
+        (h.heqi || []).forEach(function (q) {
+          var qWrap = document.createElement('div');
+          qWrap.className = 'org-node org-depth-1';
+          var qRow = document.createElement('div');
+          qRow.className = 'org-row';
+          var qName = document.createElement('span');
+          qName.className = 'org-name';
+          qName.innerHTML = esc(q.name) + statusBadgeHtml(q);
+          qRow.appendChild(qName);
+          qWrap.appendChild(qRow);
+          hWrap.appendChild(qWrap);
+        });
+        list.appendChild(hWrap);
+      });
+    }
+
+    card.appendChild(list);
+    return card;
+  }
+
+  function buildReadOnlyDeptsCard() {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<h2 class="section-title">處室字典（唯讀）</h2>' +
+      '<p class="section-sub">新增/改名/停用處室為系統管理員專屬。</p>';
+
+    var list = document.createElement('div');
+    list.style.marginTop = 'var(--sp-3)';
+
+    orgTree.depts.forEach(function (d, i) {
+      var row = document.createElement('div');
+      row.className = 'org-dict-row' + (i === orgTree.depts.length - 1 ? '' : ' container-line');
+      var name = document.createElement('span');
+      name.className = 'org-name';
+      name.innerHTML = esc(d.name) + statusBadgeHtml(d);
+      row.appendChild(name);
+      list.appendChild(row);
+    });
+
+    card.appendChild(list);
     return card;
   }
 
@@ -2433,6 +2552,25 @@
     }
 
     computeInUse();
+
+    if (!scope.orgStructure) {
+      // orgAdmin：tab 進得來，但內容降級為唯讀組織脈絡 + 說明卡，
+      // 不渲染任何組織樹 CRUD / 處室 CRUD / 任免 / toggle-admin 按鈕。
+      var headRO = document.createElement('div');
+      headRO.innerHTML =
+        '<h2 class="section-title" style="margin-bottom:2px;">組織</h2>' +
+        '<p class="hint" style="margin:0 0 var(--sp-4);">合心/處室管理員可檢視組織脈絡（唯讀）；' +
+        '組織樹結構異動、管理員任免、系統管理員切換為系統管理員專屬。</p>';
+      container.appendChild(headRO);
+
+      var roStack = document.createElement('div');
+      roStack.className = 'stack';
+      roStack.appendChild(buildOrgAdminInfoCard());
+      roStack.appendChild(buildReadOnlyOrgTreeCard());
+      roStack.appendChild(buildReadOnlyDeptsCard());
+      container.appendChild(roStack);
+      return;
+    }
 
     var head = document.createElement('div');
     head.innerHTML =

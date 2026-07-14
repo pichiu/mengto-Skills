@@ -349,6 +349,28 @@
   box-shadow: var(--shadow-lg);
 }
 
+/* docked variant: used by admin.html to mount the switcher inline at the
+   top of the browser-frame content instead of position:fixed, so it never
+   overlaps interactive controls (dept card action buttons, planning-desk
+   right-column checkboxes). mobile.html keeps the default fixed/floating
+   behaviour untouched. */
+.persona-switcher.is-docked {
+  position: static;
+  right: auto;
+  bottom: auto;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  z-index: auto;
+}
+
+.persona-switcher.is-docked .persona-switcher__list {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 .persona-switcher__item {
   display: flex;
   align-items: center;

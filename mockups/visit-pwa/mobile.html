@@ -1,3 +1,6 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
 <title>家訪 PWA 原型 — 手機端</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -261,6 +264,8 @@
     .stage-wrap { padding: var(--sp-5) var(--sp-2); }
   }
 </style>
+</head>
+<body>
 
 <a class="skip-link" href="#phone-stage">跳到手機畫面</a>
 
@@ -339,6 +344,14 @@
     if (reason === 'permission') return 'permission(路線權限不符)';
     if (reason && reason.indexOf('restricted_field') === 0) return reason + '(欄位受限)';
     return reason;
+  }
+
+  // permission / restricted_field 類拒絕理論上只會發生在「非 bypass、有路線限制」
+  // 的一般成員身上;bypass(略過路線限制)或 viewer(唯讀,本來就無法 push)身分
+  // 不應該收到這類拒絕。示意資料只做出這兩種拒絕原因,尚無 validation 類案例,
+  // 故 bypass/viewer 的被拒佇列在此原型中會直接是 0 筆,而非顯示不合理的資料。
+  function isPermissionOrRestrictedFieldReason(reason) {
+    return reason === 'permission' || (reason && reason.indexOf('restricted_field') === 0);
   }
 
   // ---- toast --------------------------------------------------------------
@@ -480,8 +493,11 @@
     return (
       '<div class="card">' +
         '<h3 class="card-heading">逐欄 LWW 衝突示意</h3>' +
-        '<p class="screen-sub">案件 #' + c.caseNo + ':訪視員 A 於 10:32 修改「災損程度」,訪視員 B 於 10:35(離線佇列同步時)修改「聯絡電話」。' +
-        '兩筆變更命中不同欄位,依到達伺服器的順序逐欄覆蓋(field-level LWW),不是整筆記錄互相覆蓋 —— 最終結果同時保留兩人的修改。</p>' +
+        '<p class="screen-sub">案件 #' + c.caseNo + ':訪視員 A 於 10:32 將「災損程度」改為「中度」,' +
+        '訪視員 B 於 10:35(離線佇列同步時)將同一欄「災損程度」改為「嚴重」。' +
+        '兩筆變更命中同一欄位,依到達伺服器的時間戳記逐欄覆蓋(field-level LWW):後到達的 B(10:35)覆蓋先到達的 A(10:32),' +
+        '最終「災損程度」= 嚴重。</p>' +
+        '<p class="screen-sub dim">若兩人改的是不同欄位(例如 A 改「災損程度」、B 改「聯絡電話」),則各自保留、互不覆蓋,不是整列互相覆蓋。</p>' +
       '</div>'
     );
   }
@@ -589,7 +605,15 @@
     var vis = window.VisitPersona.visibleCases(p, window.VisitMock.CASES, EVENT_SLUG);
     var pending = vis.filter(function (c) { return c.syncState === 'pending'; });
     var synced = vis.filter(function (c) { return c.syncState === 'synced'; });
-    var rejected = vis.filter(function (c) { return c.syncState === 'rejected'; });
+    var rejected = vis.filter(function (c) {
+      if (c.syncState !== 'rejected') return false;
+      // bypass(略過路線限制)與 viewer(本來就無法 push)理論上不會收到
+      // permission / restricted_field 類拒絕,故從佇列中略過該筆。
+      if ((p.bypass || p.role === 'viewer') && isPermissionOrRestrictedFieldReason(c.rejectReason)) {
+        return false;
+      }
+      return true;
+    });
 
     var html =
       '<div class="screen-title"><h2>案件列表</h2><p class="screen-sub">' + esc(EVENT_NAME) + ' · 依 visibleCases(persona) 篩選,共 ' + vis.length + ' 筆。</p></div>' +
@@ -920,3 +944,5 @@
   }
 })();
 </script>
+</body>
+</html>

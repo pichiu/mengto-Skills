@@ -195,6 +195,12 @@
     });
   }
 
+  // org        — 有組織平面存在感(orgAdmin + sysAdmin):組織 tab 可見、可依組織
+  //              範圍管理名冊、可建立事件。
+  // orgStructure — 可異動組織樹結構本身(合心/和氣/處室 CRUD、管理員任免、
+  //              toggle-admin)。後端 /api/admin/org、任免、toggle-admin 皆僅
+  //              系統管理員可用,故僅 sysAdmin 為 true;orgAdmin 為 false
+  //              (進得去組織 tab,但內容降級為唯讀)。
   function adminScope(p) {
     switch (p.id) {
       case 'orgAdmin':
@@ -203,7 +209,8 @@
           createEvent: true,
           manageMembers: false,
           planningDesk: false,
-          org: true
+          org: true,
+          orgStructure: false
         };
       case 'eventAdmin':
         return {
@@ -211,7 +218,8 @@
           createEvent: false,
           manageMembers: true,
           planningDesk: true,
-          org: false
+          org: false,
+          orgStructure: false
         };
       case 'sysAdmin':
         return {
@@ -219,7 +227,8 @@
           createEvent: true,
           manageMembers: true,
           planningDesk: true,
-          org: true
+          org: true,
+          orgStructure: true
         };
       default:
         return {
@@ -227,7 +236,8 @@
           createEvent: false,
           manageMembers: false,
           planningDesk: false,
-          org: false
+          org: false,
+          orgStructure: false
         };
     }
   }

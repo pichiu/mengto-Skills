@@ -1,3 +1,6 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
 <title>家訪 PWA 原型</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -326,6 +329,8 @@
     section { padding: var(--sp-7) 0; }
   }
 </style>
+</head>
+<body>
 
 <a class="skip-link" href="#main">跳到主要內容</a>
 
@@ -425,7 +430,7 @@
           <span class="persona-id">orgAdmin</span>
           <span class="badge badge--muted">org</span>
         </div>
-        <p>非 bypass、非事件/系統管理員,但擁有 hexinAdminOf / deptAdminOf —— 展示組織平面獨立於資料平面與 Admin 平面的授權(可建立事件、管組織架構,但不能管既有事件內容)。</p>
+        <p>非 bypass、非事件/系統管理員,但擁有 hexinAdminOf / deptAdminOf —— 展示組織平面獨立於資料平面與 Admin 平面的授權:可依組織範圍管理名冊、建立事件;組織樹結構、管理員任免、系統管理員切換為系統管理員專屬。</p>
       </li>
       <li class="card">
         <div class="persona-row">
@@ -496,11 +501,11 @@
         <div class="plane-rows">
           <div class="plane-row">
             <strong>合心管理員</strong>
-            <span>hexinAdminOf:管理指定合心下的互愛組織架構</span>
+            <span>hexinAdminOf:於指定合心範圍管理名冊、可建立事件(組織樹結構為系統管理員專屬)</span>
           </div>
           <div class="plane-row">
             <strong>處室管理員</strong>
-            <span>deptAdminOf:管理指定處室,可建立新事件</span>
+            <span>deptAdminOf:於指定處室範圍管理名冊、可建立新事件(處室字典為系統管理員專屬)</span>
           </div>
         </div>
       </div>
@@ -564,3 +569,5 @@
     }
   })();
 </script>
+</body>
+</html>

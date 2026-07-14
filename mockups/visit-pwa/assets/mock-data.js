@@ -163,12 +163,15 @@
 
   var EVENT_CONFIG = {
     'flood-2026': {
+      // 3 個 PII 欄(idNumber / payeeIdNumber / internalNotes)皆列入,讓手機表單
+      // 能完整示範 PII 欄依 canSeePII(persona) 出現/消失,而非只演到 idNumber。
       enabledFields: [
         'route', 'caseNo', 'visitDate', 'visitor', 'visitStatus',
         'county', 'district', 'village', 'neighborhood', 'address', 'lat', 'lng',
         'name', 'gender', 'birthYear', 'phone', 'idNumber', 'householdSize',
         'damageType', 'damageLevel', 'houseType', 'damageDesc',
-        'reliefType', 'reliefAmount'
+        'reliefType', 'reliefAmount', 'payeeIdNumber',
+        'internalNotes'
       ],
       routes: [
         { id: 'A', label: '光復市區', color: 'var(--route-a)' },
