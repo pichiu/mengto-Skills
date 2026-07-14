@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="慈濟大巨蛋演繹管理系統">
+  <rect width="512" height="512" rx="112" fill="#132b42"/>
+  <rect width="512" height="512" rx="112" fill="#1c4d73"/>
+  <!-- dome base arc -->
+  <path d="M116 336 A140 140 0 0 1 396 336 Z" fill="#0e2438"/>
+  <!-- lotus petals, kept inside maskable-safe zone (center ~80%) -->
+  <g fill="#eaf2f8">
+    <path d="M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z"/>
+    <path d="M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z" transform="rotate(72 256 268)"/>
+    <path d="M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z" transform="rotate(144 256 268)"/>
+    <path d="M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z" transform="rotate(216 256 268)"/>
+    <path d="M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z" transform="rotate(288 256 268)"/>
+  </g>
+  <circle cx="256" cy="268" r="20" fill="#4f9fd6"/>
+  <path d="M104 344h304" stroke="#4f9fd6" stroke-width="10" stroke-linecap="round"/>
+</svg>
