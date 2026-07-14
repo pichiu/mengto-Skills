@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-14T00:00:00Z",
+  "title": "Design System: 慈濟大巨蛋演繹管理系統",
+  "extensions": {
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "慈濟藍 Tzu Chi Blue",
+        "canonical": "oklch(0.68 0.115 245)",
+        "tonalRamp": ["oklch(0.20 0.06 245)", "oklch(0.30 0.08 245)", "oklch(0.40 0.10 245)", "oklch(0.50 0.11 245)", "oklch(0.60 0.12 248)", "oklch(0.68 0.115 245)", "oklch(0.80 0.09 244)", "oklch(0.92 0.05 244)"]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Blue-Tinted Deck",
+        "canonical": "oklch(0.17 0.014 255)",
+        "tonalRamp": ["oklch(0.17 0.014 255)", "oklch(0.213 0.016 255)", "oklch(0.255 0.018 255)", "oklch(0.30 0.02 255)", "oklch(0.34 0.018 255)", "oklch(0.50 0.014 255)", "oklch(0.70 0.012 255)", "oklch(0.97 0.004 255)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(0.97 0.004 255)",
+        "tonalRamp": ["oklch(0.30 0.02 255)", "oklch(0.45 0.016 255)", "oklch(0.60 0.014 255)", "oklch(0.70 0.012 255)", "oklch(0.82 0.010 255)", "oklch(0.90 0.006 255)", "oklch(0.97 0.004 255)", "oklch(0.99 0.002 255)"]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "已到 Green",
+        "canonical": "oklch(0.74 0.15 155)",
+        "tonalRamp": ["oklch(0.28 0.06 155)", "oklch(0.38 0.09 155)", "oklch(0.48 0.11 155)", "oklch(0.58 0.13 155)", "oklch(0.66 0.14 155)", "oklch(0.74 0.15 155)", "oklch(0.85 0.11 155)", "oklch(0.94 0.06 155)"]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "待確認 · 請假 Amber",
+        "canonical": "oklch(0.82 0.13 82)",
+        "tonalRamp": ["oklch(0.34 0.06 82)", "oklch(0.46 0.09 82)", "oklch(0.56 0.11 82)", "oklch(0.66 0.12 82)", "oklch(0.74 0.13 82)", "oklch(0.82 0.13 82)", "oklch(0.90 0.09 82)", "oklch(0.96 0.05 82)"]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "未到 · 失敗 Red",
+        "canonical": "oklch(0.68 0.19 25)",
+        "tonalRamp": ["oklch(0.30 0.10 25)", "oklch(0.40 0.13 25)", "oklch(0.50 0.16 25)", "oklch(0.60 0.18 25)", "oklch(0.68 0.19 25)", "oklch(0.76 0.17 25)", "oklch(0.86 0.11 25)", "oklch(0.94 0.06 25)"]
+      },
+      "costume-blue": {
+        "role": "primary",
+        "displayName": "藍服裝",
+        "canonical": "oklch(0.66 0.12 245)",
+        "tonalRamp": ["oklch(0.30 0.07 245)", "oklch(0.40 0.09 245)", "oklch(0.50 0.11 245)", "oklch(0.58 0.115 245)", "oklch(0.66 0.12 245)", "oklch(0.76 0.10 245)", "oklch(0.86 0.07 245)", "oklch(0.94 0.04 245)"]
+      },
+      "costume-white": {
+        "role": "neutral",
+        "displayName": "白服裝",
+        "canonical": "oklch(0.90 0.01 255)",
+        "tonalRamp": ["oklch(0.40 0.012 255)", "oklch(0.52 0.012 255)", "oklch(0.64 0.011 255)", "oklch(0.74 0.011 255)", "oklch(0.82 0.010 255)", "oklch(0.90 0.01 255)", "oklch(0.95 0.006 255)", "oklch(0.99 0.003 255)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The one big screen title per view (總覽, 交通調度)." },
+      "headline": { "displayName": "Headline / Stat", "purpose": "Giant stat numbers on tiles (2,592 / 368 / 8 台)." },
+      "title": { "displayName": "Title", "purpose": "Card headings, person/bus names, section titles." },
+      "body": { "displayName": "Body", "purpose": "All reading text; 18px floor, line-height 1.6." },
+      "label": { "displayName": "Label", "purpose": "Chips, tile captions, axis codes. Never all-caps tracked." },
+      "mono": { "displayName": "Mono", "purpose": "Seat codes {列}-{排}, phones, plates, timestamps." }
+    },
+    "shadows": [
+      { "name": "resting", "value": "0 1px 2px oklch(0 0 0 / .35)", "purpose": "Cards and tiles: barely-there separation from the deck." },
+      { "name": "floating", "value": "0 8px 24px oklch(0 0 0 / .32)", "purpose": "Modals, toasts, popovers only — things above the page." }
+    ],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Default easing for every state transition." },
+      { "name": "dur-fast", "value": "150ms", "purpose": "Transforms (button press scale)." },
+      { "name": "dur", "value": "200ms", "purpose": "Color/background/border changes, persona fade." },
+      { "name": "dur-slow", "value": "250ms", "purpose": "Progress-bar fill, optimistic tap pulse, screen fade-in." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "480px" },
+      { "name": "md", "value": "720px" },
+      { "name": "lg", "value": "1024px" }
+    ],
+    "zIndex": [
+      { "name": "dropdown", "value": "10" },
+      { "name": "sticky", "value": "20" },
+      { "name": "backdrop", "value": "30" },
+      { "name": "modal", "value": "40" },
+      { "name": "toast", "value": "50" },
+      { "name": "tooltip", "value": "60" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single loud action per context — solid 慈濟藍, 56px tall for older thumbs.",
+      "html": "<button class=\"ds-btn-primary\">訂閱行事曆</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;padding:0 20px;border:1px solid oklch(0.68 0.115 245);border-radius:12px;background:oklch(0.68 0.115 245);color:oklch(0.16 0.02 255);font-family:'Noto Sans TC',system-ui,sans-serif;font-size:1.375rem;font-weight:700;cursor:pointer;transition:background .2s cubic-bezier(.16,1,.3,1),border-color .2s cubic-bezier(.16,1,.3,1),transform .15s cubic-bezier(.16,1,.3,1)}.ds-btn-primary:hover{background:oklch(0.60 0.12 248);border-color:oklch(0.60 0.12 248)}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:3px solid oklch(0.78 0.11 240);outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Default action: tonal Surface-2 fill with a hairline border, lifts on hover.",
+      "html": "<button class=\"ds-btn\">編輯</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 20px;border:1px solid oklch(0.34 0.018 255);border-radius:12px;background:oklch(0.255 0.018 255);color:oklch(0.97 0.004 255);font-family:'Noto Sans TC',system-ui,sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s cubic-bezier(.16,1,.3,1),transform .15s cubic-bezier(.16,1,.3,1)}.ds-btn:hover{background:oklch(0.30 0.02 255)}.ds-btn:active{transform:scale(.97)}.ds-btn:focus-visible{outline:3px solid oklch(0.78 0.11 240);outline-offset:2px}"
+    },
+    {
+      "name": "Type Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill tag; typed variants tint toward their status hue (彩排 blue shown).",
+      "html": "<span class=\"ds-chip\">彩排</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-family:'Noto Sans TC',system-ui,sans-serif;font-size:0.78rem;font-weight:700;color:oklch(0.68 0.115 245);border:1px solid color-mix(in oklch,oklch(0.68 0.115 245) 45%,oklch(0.34 0.018 255));background:oklch(0.68 0.115 245 / 0.14)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The resting plane on the deck; hairline edge, whisper shadow, never nested.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-title\">台南1號車</div><div class=\"ds-card-sub\">台南靜思堂 → 高雄大巨蛋 · KAA-5162</div></div>",
+      "css": ".ds-card{background:oklch(0.213 0.016 255);border:1px solid oklch(1 0 0 / 0.08);border-radius:16px;padding:20px;box-shadow:0 1px 2px oklch(0 0 0 / .35);font-family:'Noto Sans TC',system-ui,sans-serif}.ds-card-title{font-size:1.375rem;font-weight:700;color:oklch(0.97 0.004 255)}.ds-card-sub{margin-top:4px;font-size:1rem;color:oklch(0.82 0.010 255)}"
+    },
+    {
+      "name": "Select Field",
+      "kind": "input",
+      "refersTo": "select",
+      "description": "48px control, Surface fill, custom inline chevron, consistent focus ring.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">場次</span><select class=\"ds-select\"><option>11/13(五) 安平聯區＋大橋</option></select></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:4px;font-family:'Noto Sans TC',system-ui,sans-serif}.ds-field-label{font-size:0.78rem;color:oklch(0.70 0.012 255)}.ds-select{min-height:48px;min-width:220px;padding:0 40px 0 14px;border:1px solid oklch(0.34 0.018 255);border-radius:12px;background:oklch(0.213 0.016 255) url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23b8c2cf' stroke-width='2'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E\") no-repeat right 12px center;color:oklch(0.97 0.004 255);font-size:1rem;appearance:none;cursor:pointer}.ds-select:focus-visible{outline:3px solid oklch(0.78 0.11 240);outline-offset:2px}"
+    },
+    {
+      "name": "Attendance Segment",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Three-state exclusive point-name control; active states paint semantically (已到 shown).",
+      "html": "<div class=\"ds-seg3\"><button>未到</button><button class=\"is-active ok\">已到</button><button>請假</button></div>",
+      "css": ".ds-seg3{display:inline-flex;border:1px solid oklch(0.34 0.018 255);border-radius:12px;overflow:hidden;font-family:'Noto Sans TC',system-ui,sans-serif}.ds-seg3 button{min-height:48px;padding:0 16px;border:none;border-right:1px solid oklch(0.34 0.018 255);background:oklch(0.213 0.016 255);color:oklch(0.82 0.010 255);font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s cubic-bezier(.16,1,.3,1)}.ds-seg3 button:last-child{border-right:none}.ds-seg3 button:hover{background:oklch(0.30 0.02 255)}.ds-seg3 button.is-active.ok{background:oklch(0.74 0.15 155 / 0.15);color:oklch(0.74 0.15 155)}.ds-seg3 button:focus-visible{outline:3px solid oklch(0.78 0.11 240);outline-offset:-3px}"
+    },
+    {
+      "name": "Seat Cell",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "One stadium seat: mono code {列}-{排}, occupant + 和氣 on desktop, painted by costume (藍 shown).",
+      "html": "<div class=\"ds-seat\"><span class=\"ds-seat-code\">48-21</span><span class=\"ds-seat-name\">陳金龍</span><span class=\"ds-seat-heqi\">大橋</span></div>",
+      "css": ".ds-seat{display:flex;flex-direction:column;align-items:center;justify-content:center;width:84px;height:64px;border-radius:7px;border:1px solid oklch(0.34 0.018 255);background:oklch(0.66 0.12 245);color:oklch(0.16 0.02 255);font-family:'Noto Sans TC',system-ui,sans-serif;text-align:center;cursor:pointer}.ds-seat-code{font-family:ui-monospace,'SF Mono',monospace;font-size:0.7rem;opacity:.8}.ds-seat-name{font-size:0.86rem;font-weight:700}.ds-seat-heqi{font-size:0.7rem}.ds-seat:hover{filter:brightness(1.08)}.ds-seat:focus-visible{outline:3px solid oklch(0.78 0.11 240);outline-offset:2px}"
+    },
+    {
+      "name": "Bottom Nav Item",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Mobile bottom-nav target; active is 慈濟藍 (active shown).",
+      "html": "<nav class=\"ds-bottomnav\"><a class=\"ds-nav-item is-active\"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 10 12 4l8 6v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z'/></svg><span>總覽</span></a><a class=\"ds-nav-item\"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='5' width='18' height='16' rx='2'/><path d='M3 9h18M8 3v4M16 3v4'/></svg><span>活動</span></a></nav>",
+      "css": ".ds-bottomnav{display:inline-flex;gap:4px;background:oklch(0.17 0.014 255);border-top:1px solid oklch(1 0 0 / 0.08);padding:6px}.ds-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;padding:8px 4px;color:oklch(0.70 0.012 255);cursor:pointer;transition:color .2s cubic-bezier(.16,1,.3,1)}.ds-nav-item svg{width:26px;height:26px}.ds-nav-item span{font-family:'Noto Sans TC',system-ui,sans-serif;font-size:0.78rem;font-weight:600}.ds-nav-item:hover{color:oklch(0.82 0.010 255)}.ds-nav-item.is-active{color:oklch(0.68 0.115 245)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "莊嚴值勤台 — The Serene Operations Deck",
+    "overview": "A working tool for Tzu Chi volunteers coordinating a stadium-scale dharma performance — seating, attendance, and cross-city bus logistics for 2,500+ registrations. It never performs; it recedes so the task can lead. The operators skew elderly, so 深色+大字 is an accessibility mandate (18px floor, ≥48px targets, ≥4.5:1 contrast), not a style. The sole accent is 慈濟藍, used as a calm signal; depth comes from tonal layering on a blue-tinted near-black deck, not from shadow theatrics. A dignified, well-lit night desk: quiet, legible, instrument-grade.",
+    "keyCharacteristics": [
+      "Near-black, blue-tinted deck; hierarchy by tone, not borders or shadows.",
+      "慈濟藍 is the only accent — a signal for the current, active, and actionable.",
+      "Oversized high-contrast type; 18px base, line-height 1.6.",
+      "Large forgiving touch targets (≥48px; primary 56px).",
+      "One responsive shell: mobile bottom-nav ↔ desktop sidebar, same DOM.",
+      "Status carried by a three-stop set: 已到 green, 請假/待確認 amber, 未到/失敗 red."
+    ],
+    "rules": [
+      { "name": "The One Blue Rule", "body": "慈濟藍 marks only what is current, active, or actionable. If more than ~10% of a screen is blue, something non-signal was painted with the signal color — pull it back.", "section": "colors" },
+      { "name": "The Blue-Tint Rule", "body": "Every neutral carries a whisper of hue 255. No pure black, no pure gray. The deck is quietly, unmistakably Tzu Chi's own.", "section": "colors" },
+      { "name": "The 18px Floor", "body": "Body text never renders below 18px and body contrast never below 4.5:1. Legibility for the volunteers' eyes wins over elegance.", "section": "typography" },
+      { "name": "The No-Eyebrow Rule", "body": "No tiny uppercase tracked kicker above sections and no 01/02/03 markers. Hierarchy is size and weight.", "section": "typography" },
+      { "name": "The Tonal-Lift Rule", "body": "To raise an element, step it up the surface ramp (and lighten on hover) — do not reach for a shadow. Shadows mark floating above the page, not emphasis within it.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep body text ≥18px and ≥4.5:1 contrast; push toward Ink, not Ink-3, when close.",
+      "Do make every interactive target ≥48px (primary 56px) with full default/hover/focus-visible/active/disabled states.",
+      "Do convey depth by stepping the surface ramp, not by adding shadow.",
+      "Do reserve 慈濟藍 for the current/active/actionable — the One Blue Rule.",
+      "Do carry status in the three-stop set: 已到 green, 請假/待確認 amber, 未到/失敗 red.",
+      "Do let wide content scroll inside an overflow-x:auto container; the body stays put.",
+      "Do tint every neutral toward hue 255 — no pure black or gray."
+    ],
+    "donts": [
+      "Don't use neon/cyberpunk glow, terminal tech-green, or any accent other than 慈濟藍.",
+      "Don't use background-clip:text gradient text — solid color, emphasis by weight/size.",
+      "Don't use glassmorphism/backdrop-blur as decoration.",
+      "Don't build the SaaS hero-metric template or endless identical icon+heading+text card grids.",
+      "Don't add tiny uppercase tracked eyebrows or 01/02/03 section markers.",
+      "Don't use a colored border-left/right >1px as a side-stripe accent.",
+      "Don't let a heading overflow its container at any breakpoint.",
+      "Don't drop body text to a light gray 'for elegance' — the biggest legibility failure on this deck."
+    ]
+  }
+}

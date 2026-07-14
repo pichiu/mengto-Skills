@@ -1,8 +1,16 @@
 # 慈濟大巨蛋演繹管理系統 — Mockup
 
 高保真、可安裝的 PWA mockup,涵蓋慈濟大巨蛋演繹活動的營運工具:場次總覽、活動點名、
-交通調度、座位格與個人行程。依 `DESIGN.md` 設計規格製作,內嵌**假資料(seed data)**,
-不連接任何真實後端或資料庫。
+交通調度、座位格與個人行程。依 `PLAN-v1.md`~`PLAN-v3.md` 規劃規格製作,內嵌**假資料(seed data)**,
+不連接任何真實後端或資料庫。含角色/權限分流,可用頂部「以…身份檢視」切換 11 種身份。
+
+## 設計文件
+
+- **`DESIGN.md`** — 從本 mockup 逆向產出的設計系統文件(impeccable / DESIGN.md 格式:
+  YAML token frontmatter + 六段 Overview/Colors/Typography/Elevation/Components/Do's and Don'ts)。
+  新畫面依此保持一致。
+- **`.impeccable/design.json`** — 設計系統 sidecar(色階 ramp、陰影/動效/斷點、可注入的元件片段、敘事)。
+- **`PLAN-v1.md`~`PLAN-v3.md`** — 分階段的實作規劃規格(Opus 規劃、Sonnet 實作)。
 
 ## 如何執行
 
@@ -37,4 +45,4 @@ standalone PWA(離線可開)。
 
 - 所有人名、和氣分佈、車次、座位占用皆為**種子假資料**(部分以固定亂數生成,重新整理後資料一致)。
 - 點名 / 交通 / 座位互動皆為前端狀態模擬(存於記憶體,重新整理會重置),不寫入任何後端。
-- 座位格數學、19 和氣、8 台去程巴士等數字依 `DESIGN.md` 與 domain model 規格構造,力求真實但非正式資料來源。
+- 座位格數學、19 和氣、8 台去程巴士等數字依 `PLAN-*.md` 與 domain model 規格構造,力求真實但非正式資料來源。

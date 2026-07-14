@@ -1,126 +1,259 @@
-# 慈濟大巨蛋演繹管理系統 — Mockup 設計規格 (Opus 規劃)
+---
+name: 慈濟大巨蛋演繹管理系統
+description: 深色、大字、慈濟藍的值勤台——長者志工也讀得清楚的營運工具(手機+瀏覽器 PWA)
+colors:
+  brand: "oklch(0.68 0.115 245)"
+  brand-2: "oklch(0.60 0.12 248)"
+  brand-ink: "oklch(0.16 0.02 255)"
+  brand-soft: "oklch(0.68 0.115 245 / 0.14)"
+  focus: "oklch(0.78 0.11 240)"
+  bg: "oklch(0.17 0.014 255)"
+  surface: "oklch(0.213 0.016 255)"
+  surface-2: "oklch(0.255 0.018 255)"
+  surface-3: "oklch(0.30 0.02 255)"
+  line: "oklch(0.34 0.018 255)"
+  line-soft: "oklch(1 0 0 / 0.08)"
+  ink: "oklch(0.97 0.004 255)"
+  ink-2: "oklch(0.82 0.010 255)"
+  ink-3: "oklch(0.70 0.012 255)"
+  ok: "oklch(0.74 0.15 155)"
+  warn: "oklch(0.82 0.13 82)"
+  danger: "oklch(0.68 0.19 25)"
+  costume-white: "oklch(0.90 0.01 255)"
+  costume-blue: "oklch(0.66 0.12 245)"
+typography:
+  display:
+    fontFamily: "Noto Sans TC, PingFang TC, Microsoft JhengHei, system-ui, sans-serif"
+    fontSize: "2.75rem"
+    fontWeight: 700
+    lineHeight: 1.15
+    letterSpacing: "-0.01em"
+  headline:
+    fontFamily: "Noto Sans TC, PingFang TC, Microsoft JhengHei, system-ui, sans-serif"
+    fontSize: "2.25rem"
+    fontWeight: 800
+    lineHeight: 1.2
+  title:
+    fontFamily: "Noto Sans TC, PingFang TC, Microsoft JhengHei, system-ui, sans-serif"
+    fontSize: "1.375rem"
+    fontWeight: 700
+    lineHeight: 1.3
+  body:
+    fontFamily: "Noto Sans TC, PingFang TC, Microsoft JhengHei, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.6
+  label:
+    fontFamily: "Noto Sans TC, PingFang TC, Microsoft JhengHei, system-ui, sans-serif"
+    fontSize: "0.78rem"
+    fontWeight: 700
+    lineHeight: 1.3
+  mono:
+    fontFamily: "ui-monospace, SF Mono, monospace"
+    fontSize: "0.86rem"
+    fontWeight: 400
+rounded:
+  sm: "8px"
+  md: "12px"
+  lg: "16px"
+  xl: "20px"
+  pill: "999px"
+spacing:
+  "1": "4px"
+  "2": "8px"
+  "3": "12px"
+  "4": "16px"
+  "5": "20px"
+  "6": "24px"
+  "7": "32px"
+  "8": "40px"
+  "9": "48px"
+  "10": "64px"
+components:
+  button-primary:
+    backgroundColor: "{colors.brand}"
+    textColor: "{colors.brand-ink}"
+    rounded: "{rounded.md}"
+    height: "56px"
+    padding: "0 20px"
+    typography: "{typography.title}"
+  button-primary-hover:
+    backgroundColor: "{colors.brand-2}"
+    textColor: "{colors.brand-ink}"
+  button-secondary:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    height: "48px"
+    padding: "10px 20px"
+  button-secondary-hover:
+    backgroundColor: "{colors.surface-3}"
+    textColor: "{colors.ink}"
+  chip:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink-2}"
+    rounded: "{rounded.pill}"
+    padding: "5px 12px"
+    typography: "{typography.label}"
+  card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "20px"
+  select:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    height: "48px"
+    padding: "0 40px 0 14px"
+  stat-tile:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "16px"
+---
 
-> 依 `backend-guide-for-frontend.md` + `domain-model.md` 製作的高保真 mockup。
-> 一個**響應式 PWA**同時涵蓋手機與瀏覽器(手機優先,桌面漸進增強),不拆兩份。
+# Design System: 慈濟大巨蛋演繹管理系統
 
-## 產品定位 & 使用者
-- 幕僚/志工用的**營運工具**(product register,非 landing)。工具要「消失在任務裡」。
-- 使用者多為**年長志工(菩薩)**——年齡規則(男<60/女<50)透露族群偏長者。
-- 所以 **深色 + 大字 + 大點擊區** 不是風格,是無障礙需求。
+## 1. Overview
 
-## 品牌與色彩(慈濟藍 · 深色)
-用 OKLCH。**慈濟藍**是識別核心,不可換成通用科技綠/紫。
+**Creative North Star: "莊嚴值勤台 — The Serene Operations Deck"**
 
-```css
-:root{
-  /* 底層:近黑、極淡藍調 */
-  --bg:         oklch(0.17 0.014 255);
-  --surface:    oklch(0.213 0.016 255);   /* 面板/卡片 */
-  --surface-2:  oklch(0.255 0.018 255);   /* 抬升層/hover */
-  --line:       oklch(0.34 0.018 255);    /* 邊框(不透明) */
-  --line-soft:  oklch(1 0 0 / 0.08);      /* 分隔線 */
+This is a working tool for Tzu Chi volunteers coordinating a stadium-scale dharma performance — seating, attendance, and cross-city bus logistics for 2,500+ registrations. It is not a marketing surface and never performs; it recedes so the task can lead. The register is **product**: design serves the work.
 
-  /* 文字(高對比,長者可讀,body ≥4.5:1) */
-  --ink:   oklch(0.97 0.004 255);   /* 主文字 */
-  --ink-2: oklch(0.82 0.010 255);   /* 次要 */
-  --ink-3: oklch(0.70 0.012 255);   /* 弱化(仍須過 4.5:1 於 --bg) */
+Two constraints shape everything. First, the operators skew **elderly** (the eligibility rules — 男<60 / 女<50 — reveal the crowd), so "深色 + 大字" is not a style choice but an **accessibility mandate**: an 18px type floor, ≥48px touch targets, and body contrast never below 4.5:1. Second, this is **慈濟** — the sole accent is 慈濟藍 (Tzu Chi Blue), used as a calm signal, never as decoration. The surface is a near-black blue-tinted deck; depth comes from **tonal layering**, not shadow theatrics. The feeling to reach for is a dignified, well-lit night desk: quiet, legible, instrument-grade.
 
-  /* 慈濟藍 主訊號色 */
-  --brand:      oklch(0.68 0.115 245);
-  --brand-2:    oklch(0.60 0.12 248);
-  --brand-ink:  oklch(0.16 0.02 255);      /* 藍底上的字 */
-  --brand-soft: oklch(0.68 0.115 245 / 0.14);
-  --focus:      oklch(0.78 0.11 240);
+It explicitly rejects the dark-mode reflexes: no neon/cyberpunk glow, no terminal tech-green, no gradient text, no glassmorphism, no SaaS hero-metric template, no cramped data grids of tiny gray text. Calm and readable beats clever.
 
-  /* 語意色 */
-  --ok:    oklch(0.74 0.15 155);   /* 到場/已點名 */
-  --ok-soft: oklch(0.74 0.15 155 / 0.15);
-  --warn:  oklch(0.82 0.13 82);    /* 待確認/滿載警示 */
-  --warn-soft: oklch(0.82 0.13 82 / 0.15);
-  --danger:oklch(0.68 0.19 25);    /* 未到/失敗/超載 */
-  --danger-soft: oklch(0.68 0.19 25 / 0.15);
+**Key Characteristics:**
+- Near-black, blue-tinted deck; hierarchy by **tone**, not borders or shadows.
+- 慈濟藍 is the only accent — a signal for the current, the active, the actionable.
+- Oversized, high-contrast type; 18px base, generous line-height (1.6).
+- Large, forgiving touch targets (≥48px; primary actions 56px).
+- One responsive shell: mobile bottom-nav ↔ desktop sidebar, same DOM.
+- Status carried by a small semantic set: 已到/成功 green, 待確認/請假 amber, 未到/失敗 red.
 
-  /* 和氣/服裝標示 */
-  --costume-white: oklch(0.90 0.01 255);
-  --costume-blue:  oklch(0.66 0.12 245);
-}
-```
-- 對比:body 文字用 `--ink`/`--ink-2`;`--ink-3` 只給 metadata。務必自檢 ≥4.5:1。
-- 藍是**訊號色**——主要動作、目前選取、狀態。不拿藍做整片裝飾。Restrained/局部 Committed。
+## 2. Colors
 
-## 字體與級距(大字)
-- 家族:`"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif`(**不載外部字型**,CSP 安全)。等寬 metadata 用 `ui-monospace, "SF Mono", monospace`。
-- **base = 18px**(非 16)。固定 rem 級距,非流體。
-- 級距:12→ `0.78rem`(僅角標)、14→`0.86rem`、body `1rem`(18px)、`1.125rem`、`1.375rem`、`1.75rem`、`2.25rem`、`2.75rem`(頁面大標)。
-- 觸控目標 ≥ 48px;主要按鈕高 56px。行高舒適(body 1.6)。
-- `text-wrap: balance` 於標題。
+A restrained dark palette: a blue-tinted near-black ground, three tonal surface lifts, a single blue accent, and a three-stop semantic set for status.
 
-## 版面 / 導覽(單一響應式)
-- **手機 (<1024px)**:頂部 app bar(頁名 + 目前情境 chip)+ 內容 + **底部 5 分頁**(大圖示+字):`總覽 / 活動 / 交通 / 座位 / 我的`。底部列 safe-area padding。
-- **桌面 (≥1024px)**:**左側邊欄**導覽(logo + 5 項 + 使用者卡)+ 主內容加寬(表格/座位格展開)。底部分頁隱藏。
-- 用 CSS `@media (min-width:1024px)` 切換;內容同一份 DOM。
-- z-index 語意層級:dropdown < sticky < backdrop < modal < toast < tooltip。
+### Primary
+- **慈濟藍 Tzu Chi Blue** (`oklch(0.68 0.115 245)`): the one accent. Active nav, primary buttons, current selection, progress fills, focus, links, "my seat". Rare by design — its scarcity is what makes it read as *signal*.
+- **慈濟藍 Deep** (`oklch(0.60 0.12 248)`): primary-button hover/pressed only.
+- **Blue Ink** (`oklch(0.16 0.02 255)`): text/icon color *on* blue fills, for AA contrast against the accent.
+- **Blue Wash** (`oklch(0.68 0.115 245 / 0.14)`): translucent accent tint for selected chips, "報名"/"已到" pills, and subtle active zones.
+- **Focus Blue** (`oklch(0.78 0.11 240)`): the `:focus-visible` ring only — a hair lighter than the brand so it reads on both surface and accent.
 
-## 五個畫面
+### Neutral (the deck)
+- **Deck** (`oklch(0.17 0.014 255)`): page background. Near-black with a faint blue cast — never pure `#000`.
+- **Surface** (`oklch(0.213 0.016 255)`): cards, panels, the resting plane.
+- **Surface-2** (`oklch(0.255 0.018 255)`): secondary buttons, chips, app-bar chip, inset controls.
+- **Surface-3** (`oklch(0.30 0.02 255)`): hover lift, progress-track, the topmost tonal step.
+- **Line** (`oklch(0.34 0.018 255)`): opaque control borders (inputs, chips, buttons).
+- **Line Soft** (`oklch(1 0 0 / 0.08)`): hairline dividers and card edges.
+- **Ink** (`oklch(0.97 0.004 255)`): primary text — ~17:1 on Deck.
+- **Ink-2** (`oklch(0.82 0.010 255)`): secondary text, labels.
+- **Ink-3** (`oklch(0.70 0.012 255)`): metadata only (timestamps, sub-captions). The floor — never used for body copy.
 
-### 1) 總覽 Overview
-- 頂部:活動倒數/情境。
-- **四場次卡**(11/12 全區共同場、11/13 安平聯區+大橋、11/14 佳里聯區、11/15 仁德聯區),每卡:場次名、日期、**648 名額**、已配位進度環/條、缺額數。
-- 統計列:**總報名人次 2,592**(4×648)、**不重複人數 1,187**(一人可報 1–4 場)、**已配位 %**、19 和氣。
-- **19 和氣分佈**:水平長條/熱區,顯示各和氣報名量(用真實 19 個和氣名)。
-- **高雄彩排交通概況**:8 台去程 · 車上已點名 n · 280 人不參加彩排 · 最多同一上車點 2 台(上限 5)。
-- 近期活動清單(彩排/共修/驗收)入口。
+### Tertiary (status + domain)
+- **已到 Green** (`oklch(0.74 0.15 155)`): attendance present, success, 共修 events, capacity-healthy bars.
+- **待確認 Amber** (`oklch(0.82 0.13 82)`): 請假 / 待確認 / 驗收 events / at-capacity warnings.
+- **未到 Red** (`oklch(0.68 0.19 25)`): absent, failure, overload, 取消.
+- **白服裝** (`oklch(0.90 0.01 255)`) / **藍服裝** (`oklch(0.66 0.12 245)`): the two costume states painted directly onto seat cells.
 
-### 2) 活動 Events + 點名 Attendance
-- 活動清單:type chip(彩排/共修/驗收)、標題、地點、日期、名冊人數、點名進度條。
-- 進入某活動:名冊 + **點名**。點名列每人:姓名 + 和氣 chip,右側**大狀態切換**(未到 / 現場 / 車上)——大按鈕、色彩明確(到場=--ok)。頂部日期分頁(多日活動)。搜尋加名。
-- 空狀態要教學,不只「沒有資料」。
+### Named Rules
+**The One Blue Rule.** 慈濟藍 marks only what is *current, active, or actionable*. If more than roughly a tenth of a screen is blue, something non-signal has been painted with the signal color — pull it back to a neutral.
 
-### 3) 交通 Transport 調度(重點畫面)
-- 情境:**高雄彩排** event。去/回程 toggle。
-- 摘要列:去程 **8 台**(最大 9)· 座位 360/384 · **同上車點上限 5**(目前最多 2)· 280 人不參加。
-- **車次卡**(每台):車次名、`上車點 → 目的地`、車長(person)、`capacity` 填充條(48 席,已滿/建議性超載警示)、**車上點名**進度(boarded/total)、司機聯絡(權限 gate,mockup 標示可見/遮罩)。
-- 去程 8 台種子(不同上車點,無單點 >5):
-  - 台南靜思堂(48/48)、台南靜思堂(46/48)、安平共修處(45/48)、佳里聯絡處(44/48)、新營聯絡處(43/48)、善化聯絡處(40/48)、麻豆聯絡處(38/48)、學甲聯絡處(36/48)。
-  - 上車點分佈:台南靜思堂 2 台,其餘各 1 → 最多 2,遠低於上限 5(顯示這個安全指標)。
-- 回程:抵達地同理(可與去程不同,顯示「跟回台南 / 留高雄」邏輯)。
-- 小型「上車點分佈」視覺(bar),標紅線 = 上限 5。
+**The Blue-Tint Rule.** Every neutral carries a whisper of the brand hue (255). No pure black, no pure gray. The deck is quietly, unmistakably Tzu Chi's own.
 
-### 4) 座位格 SeatGrid(招牌功能)
-- 場次選擇器 + 組別(A/B/C;C 無格,顯示清單提示)。
-- **西一象限**座標:`row_no` 列 1–54(列1 最右)、`col_no` 排 16–22(排16 最上)。
-  **渲染:`gridColumn = 55 − 列`、`gridRow = 排 − 15`。**
-- Mockup 渲染 A 組一段(列 1–30 × 排 16–22)的座位格,以顏色標:服裝(白/藍)或狀態(已配/空)或和氣。點座位顯示占用者。圖例。
-- 手機:可橫向捲動(`overflow-x:auto` 容器),不讓 body 橫捲。桌面:完整展開。
+## 3. Typography
 
-### 5) 我的 Me(個人區)
-- 個人卡:姓名、和氣、聯區、category。
-- **我的場次/座位**:哪一場、座位編號(可視化小格高亮)、服裝。
-- **我的車次**:去/回程上車點、車長資訊(若本人是車長顯示乘客名單入口)。
-- **我的行程**:彩排/共修/驗收 時間軸。
-- **行事曆訂閱(ICS)**:大按鈕(說明個人憑證,不外洩)。
-- 跑位 note(session/block/seq)。
+**Display / Body Font:** Noto Sans TC (falls back to PingFang TC, Microsoft JhengHei, system-ui) — one humanist CJK family carrying the whole hierarchy through weight, not through pairing.
+**Label / Mono Font:** `ui-monospace, SF Mono` — for seat numbers (`{列}-{排}`), phone numbers, plates, timestamps, and system metadata only.
 
-## PWA
-- `manifest.webmanifest`:name「慈濟大巨蛋演繹」、short_name「大巨蛋」、`display:standalone`、`theme_color`(近黑)、`background_color`、直向、icons(192/512,maskable)。SVG 生成的藍底蓮花/巨蛋簡標,轉 PNG 或用 SVG icon + data-URI fallback。
-- `sw.js`:install 時 cache app shell(index.html+css+js),fetch cache-first,offline 可開。
-- `index.html` `<head>` 掛 manifest + theme-color meta + apple-touch 相關 meta + viewport(含 `viewport-fit=cover`)。
-- 頂部提供「加入主畫面」提示(beforeinstallprompt 監聽,mockup 顯示按鈕)。
+**Character:** One warm, highly-legible CJK sans across the board; contrast comes from **size and weight**, never from a second family. No external webfonts load — the stack resolves to the reader's own system CJK face, which keeps the PWA self-contained and fast. Mono appears only where a fixed, scannable code reads better than prose.
 
-## 互動/狀態(product 規則)
-- 每個互動元件備齊 default/hover/focus/active/disabled。焦點環用 `--focus`,`:focus-visible`。
-- 點名/配位/上車有唯一約束 → mockup 用假資料模擬,但 UI 呈現「已點名/座位已占用」友善訊息樣式。
-- Toast 元件(res.error 友善繁中)。
-- 動效 150–250ms,傳達狀態非裝飾;`prefers-reduced-motion` 提供即時替代。ease-out(quart/expo)。
-- 樂觀更新:切換點名即時反白 + 微動,再落定。
+### Hierarchy
+- **Display** (700, `2.75rem` / clamp ceiling ~96px, line-height 1.15, `-0.01em`): the one big screen title per view (總覽, 交通調度…).
+- **Headline** (800, `2.25rem`, line-height 1.2): the giant stat numbers on tiles (2,592 / 368 / 8 台).
+- **Title** (700, `1.375rem`, line-height 1.3): card headings, person/bus names, section titles.
+- **Body** (400, `1rem` = **18px**, line-height 1.6): all reading text. `text-wrap: balance` on headings.
+- **Label** (700, `0.78rem`, line-height 1.3): chips, tile captions, axis codes. Sentence/term case — **never** all-caps tracked eyebrows.
+- **Mono** (400, `0.86rem`): seat codes, phones, plates, timestamps.
 
-## 技術
-- **單一自足 `index.html`**(inline CSS + JS,無外部請求)以利 Artifact 預覽 + 好帶走;PWA 檔(manifest/sw/icons)另存,提供真正安裝。
-- 假資料 seed 內嵌 JS(4 場次、19 和氣、~1187 人抽樣、8 台車、座位格一段)。
-- 客戶端切畫面(hash route 或 tab state)。
-- 無框架,原生 JS + CSS。乾淨、可讀、無 build。
+### Named Rules
+**The 18px Floor.** Body text never renders below 18px and body contrast never below 4.5:1. This is for the volunteers' eyes, not the designer's taste. Elegance that costs legibility is a defect here.
 
-## 禁止(避免 AI slop)
-- 不用側邊色條 border、漸層文字、玻璃擬態當預設、hero-metric 樣板、千篇一律卡片牆、每段小寫追蹤 eyebrow、01/02/03 編號裝飾。
-- 不用通用科技綠/霓虹。藍是慈濟識別,克制使用。
-- 標題不溢出容器(各斷點測 heading)。
+**The No-Eyebrow Rule.** No tiny uppercase tracked kicker above sections, and no `01/02/03` numbered markers. Hierarchy is size and weight; sequence is used only when the content is genuinely ordered.
+
+## 4. Elevation
+
+**Flat, layered by tone — not by shadow.** Depth is read from the four-step tonal ramp (Deck → Surface → Surface-2 → Surface-3), reinforced by `line-soft` hairlines. Cards sit on the deck with only a whisper of shadow; the app-bar is a translucent Deck (`/.92`) with a hairline, **no backdrop blur**. Real shadow is reserved for things that float above the page.
+
+### Shadow Vocabulary
+- **Resting** (`box-shadow: 0 1px 2px oklch(0 0 0 / .35)`): cards and tiles — barely-there separation from the deck.
+- **Floating** (`box-shadow: 0 8px 24px oklch(0 0 0 / .32)`): modals, toasts, and popovers only.
+
+### Named Rules
+**The Tonal-Lift Rule.** To raise an element, step it up the surface ramp (and lighten on hover to Surface-3) — do not reach for a shadow. Shadows mark *floating above the page*, not *emphasis within it*.
+
+## 5. Components
+
+### Buttons
+- **Shape:** softly rounded (12px, `rounded.md`); pill only for toggles/chips.
+- **Primary:** solid 慈濟藍 (`brand`) with Blue Ink text, full-width, **56px** tall, title-weight. The single loud action per context. Hover → 慈濟藍 Deep (`brand-2`).
+- **Secondary (default):** Surface-2 fill, Ink text, `line` border, **48px** min. Hover lifts to Surface-3; `:active` scales to .97.
+- **Ghost:** transparent with a `line` border; hover fills to Surface-2. For low-emphasis inline actions.
+- **Icon button:** 48×48 square, Surface-2, `line` border — steppers, close, call.
+- All buttons transition background/border/color at 200ms and transform at 150ms on the `cubic-bezier(.16,1,.3,1)` ease. Disabled = 0.45 opacity, `not-allowed`.
+
+### Chips
+- **Style:** pill (`rounded.pill`), Surface-2 fill, Ink-2 text, `line` border, label typography (700 / 0.78rem).
+- **Typed variants:** event type chips tint toward their status hue via `color-mix` — 彩排 blue, 共修 green, 驗收 amber — border and text share the hue, fill is the matching `-soft` wash. Filter chips show selection with the Blue Wash fill + brand text.
+
+### Cards / Containers
+- **Corner:** 16px (`rounded.lg`); large surfaces 20px (`rounded.xl`).
+- **Background:** Surface, on the Deck.
+- **Shadow:** Resting only (see Elevation). **Never** nest a card inside a card.
+- **Border:** 1px `line-soft` hairline.
+- **Padding:** 20px (`spacing.5`) default; 16px on dense tiles.
+
+### Inputs / Fields
+- **Style:** Surface fill, `line` border, 12px radius, **48px** min height, 18px text; custom inline SVG chevron on selects (no native arrow).
+- **Focus:** the global `:focus-visible` ring — 3px Focus-Blue, 2px offset. Applied consistently to every focusable control; `:focus{outline:none}` alone is never left bare.
+- **Disabled / out-of-scope:** 0.45–0.5 opacity + `not-allowed`; scope-locked rows render read-only, tagged, and dimmed rather than hidden.
+
+### Navigation
+- **Mobile (<1024px):** fixed bottom bar, ~76px tall, 5 large icon+label targets; active item is 慈濟藍, `:active` scales to .94, safe-area padded.
+- **Desktop (≥1024px):** 272px left sidebar — logo, the same items as rows (active = Blue Wash fill + brand text + brand rail), and a persona/user card pinned to the bottom.
+- Same DOM drives both; nav items appear/disappear by capability, and the bar stays balanced as the count changes.
+
+### Attendance Segment (signature)
+A three-state exclusive control (`未到 / 已到 / 請假`) built as a bordered pill-group of ≥48px segments. Active states paint semantically: 未到 → Surface-3 (neutral), 已到 → Green on Green-wash, 請假 → Amber on Amber-wash. Optimistic taps get a brief `pulse` (250ms), then settle to the server value. The registration variant swaps in a `報名` state (Green-wash) for upcoming events.
+
+### Seat Grid (signature)
+The招牌 view: the West-One quadrant of the stadium (列 1–54 × 排 16–22) rendered as a CSS grid with `gridColumn = 55 − 列`, `gridRow = 排 − 15` (列1 rightmost, 排16 topmost). Cells carry a mono seat code `{列}-{排}`; on desktop they also show occupant name + 和氣 inline (no tap needed). Costume is painted per cell (白/藍); empty cells are outlined; "my seat" gets a double brand ring. Axis numbers run along the top (列) and left (排); an every-3-列 band labels {AB}·{藍白}·{男女}. The clipped corner (列51→排21, 52→20, 53→19, 54→18) is left unrendered so the count reads exactly **368**. The grid scrolls horizontally inside its own container (`overflow-x:auto`); the page body never scrolls sideways.
+
+### Persona Switcher (signature)
+A labeled "Demo · 以…身份檢視" select (grouped 個人 / 幕僚) in the app-bar (mobile) and sidebar card (desktop). Changing it swaps the viewer's scope + PII tier + capabilities + account type and re-renders every screen behind a 200ms fade, with a "檢視範圍" chip echoing the active identity.
+
+## 6. Do's and Don'ts
+
+### Do:
+- **Do** keep body text ≥18px and ≥4.5:1 contrast; push toward Ink, not Ink-3, whenever it's close.
+- **Do** make every interactive target ≥48px (primary buttons 56px), with full default/hover/`:focus-visible`/active/disabled states.
+- **Do** convey depth by stepping the surface ramp (Deck → Surface → Surface-2 → Surface-3), not by adding shadow.
+- **Do** reserve 慈濟藍 for the current/active/actionable — the One Blue Rule.
+- **Do** carry status in the three-stop set: 已到 green, 請假/待確認 amber, 未到/失敗 red.
+- **Do** let wide content (seat grid, tables) scroll inside an `overflow-x:auto` container; the body stays put.
+- **Do** tint every neutral toward hue 255 — no pure black or gray.
+
+### Don't:
+- **Don't** use neon/cyberpunk glow, terminal tech-green, or any accent other than 慈濟藍. The blue is the identity.
+- **Don't** use `background-clip:text` gradient text — solid color, emphasis by weight/size.
+- **Don't** use glassmorphism/backdrop-blur as decoration (the app-bar is a plain translucent Deck, no blur).
+- **Don't** build the SaaS hero-metric template or endless identical icon+heading+text card grids.
+- **Don't** add tiny uppercase tracked eyebrows or `01/02/03` section markers.
+- **Don't** use a colored `border-left`/`border-right` >1px as a side-stripe accent — use full hairlines, tonal fills, or leading chips instead.
+- **Don't** let a heading overflow its container at any breakpoint — reduce the clamp or rewrite the copy; the viewport is part of the design.
+- **Don't** drop body text to a light gray "for elegance" — on this deck that's the single biggest legibility failure, and these readers can least afford it.
