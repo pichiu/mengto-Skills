@@ -1,0 +1,3697 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>慈濟大巨蛋演繹管理系統</title>
+<meta name="description" content="慈濟大巨蛋演繹管理系統 — 場次總覽、活動點名、交通調度、座位格與個人行程">
+<meta name="theme-color" content="#f4f6f9">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231c4d73'/%3E%3Cpath d='M116 336 A140 140 0 0 1 396 336 Z' fill='%230e2438'/%3E%3Cg fill='%23eaf2f8'%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(72 256 268)'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(144 256 268)'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(216 256 268)'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(288 256 268)'/%3E%3C/g%3E%3Ccircle cx='256' cy='268' r='20' fill='%234f9fd6'/%3E%3Cpath d='M104 344h304' stroke='%234f9fd6' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231c4d73'/%3E%3Cpath d='M116 336 A140 140 0 0 1 396 336 Z' fill='%230e2438'/%3E%3Cg fill='%23eaf2f8'%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(72 256 268)'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(144 256 268)'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(216 256 268)'/%3E%3Cpath d='M256 176c18 26 30 54 30 82 0 22-13 40-30 40s-30-18-30-40c0-28 12-56 30-82z' transform='rotate(288 256 268)'/%3E%3C/g%3E%3Ccircle cx='256' cy='268' r='20' fill='%234f9fd6'/%3E%3Cpath d='M104 344h304' stroke='%234f9fd6' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* ============ Tokens ============ */
+:root{
+  /* ---- Light theme ---- */
+  --bg:         oklch(0.968 0.004 255);
+  --surface:    oklch(1 0 0);
+  --surface-2:  oklch(0.978 0.004 255);
+  --surface-3:  oklch(0.945 0.006 255);
+  --line:       oklch(0.90 0.006 255);
+  --line-soft:  oklch(0.28 0.02 255 / 0.10);
+
+  --ink:   oklch(0.24 0.020 255);
+  --ink-2: oklch(0.44 0.018 255);
+  --ink-3: oklch(0.56 0.016 255);
+
+  --brand:      oklch(0.55 0.145 245);
+  --brand-2:    oklch(0.48 0.15 248);
+  --brand-ink:  oklch(0.99 0.005 255);
+  --brand-soft: oklch(0.55 0.145 245 / 0.12);
+  --focus:      oklch(0.55 0.145 245);
+
+  --ok:    oklch(0.56 0.15 155);
+  --ok-soft: oklch(0.56 0.15 155 / 0.13);
+  --warn:  oklch(0.66 0.14 70);
+  --warn-soft: oklch(0.66 0.14 70 / 0.15);
+  --danger:oklch(0.57 0.20 25);
+  --danger-soft: oklch(0.57 0.20 25 / 0.12);
+
+  --costume-white: oklch(0.93 0.008 255);
+  --costume-blue:  oklch(0.62 0.13 245);
+
+  --fs-xs: 0.78rem;
+  --fs-sm: 0.86rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: 2.25rem;
+  --fs-3xl: 2.75rem;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px;
+  --sp-6: 24px; --sp-7: 32px; --sp-8: 40px; --sp-9: 48px; --sp-10: 64px;
+
+  --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --radius-xl: 20px; --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px oklch(0.45 0.03 255 / .10);
+  --shadow-2: 0 10px 28px oklch(0.45 0.04 255 / .12);
+
+  --z-dropdown: 10; --z-sticky: 20; --z-backdrop: 30; --z-modal: 40; --z-toast: 50; --z-tooltip: 60;
+
+  --dur-fast: 150ms; --dur: 200ms; --dur-slow: 250ms;
+  --ease: cubic-bezier(.16,1,.3,1);
+
+  --font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", monospace;
+
+  --sidebar-w: 272px;
+  --bottomnav-h: 76px;
+  --appbar-h: 60px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+html{ font-size: 18px; -webkit-text-size-adjust: 100%; }
+body{
+  margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+  font-family: var(--font); font-size: var(--fs-base); line-height:1.6;
+  -webkit-font-smoothing: antialiased; overflow-x:hidden;
+}
+h1,h2,h3,h4,p,figure{ margin:0; }
+h1,h2,h3,h4{ text-wrap: balance; font-weight:700; }
+img,svg{ display:block; max-width:100%; }
+button{ font-family:inherit; color:inherit; }
+input, select{ font-family:inherit; font-size:inherit; }
+a{ color: var(--brand); }
+ul{ margin:0; padding:0; list-style:none; }
+
+::selection{ background: var(--brand-soft); color:var(--ink); }
+
+:focus{ outline:none; }
+:focus-visible{
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* scrollbar for horizontal seat scroller */
+.hscroll{ scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.hscroll::-webkit-scrollbar{ height:10px; }
+.hscroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:999px; }
+
+/* ============ App shell layout ============ */
+.app{ min-height:100vh; display:flex; flex-direction:column; }
+
+.appbar{
+  position: sticky; top:0; z-index: var(--z-sticky);
+  height: var(--appbar-h);
+  display:flex; align-items:center; gap:var(--sp-3);
+  padding: 0 var(--sp-4);
+  background: oklch(0.968 0.004 255 / .92);
+  backdrop-filter: none;
+  border-bottom:1px solid var(--line-soft);
+}
+.appbar .appbar-title{ font-size: var(--fs-md); font-weight:700; }
+.appbar .appbar-chip{
+  margin-left:auto; display:inline-flex; align-items:center; gap:6px;
+  background: var(--surface-2); border:1px solid var(--line);
+  color: var(--ink-2); font-size: var(--fs-xs);
+  padding: 6px 12px; border-radius: var(--radius-pill); white-space:nowrap;
+  max-width: 46vw; overflow:hidden; text-overflow:ellipsis;
+}
+
+.content{ flex:1; min-width:0; padding: var(--sp-5) var(--sp-4) calc(var(--bottomnav-h) + var(--safe-b) + var(--sp-6)); max-width:1180px; width:100%; margin:0 auto; }
+
+.screen{ display:none; }
+.screen.active{ display:block; animation: fadein var(--dur-slow) var(--ease); }
+@keyframes fadein{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
+
+/* bottom nav (mobile) */
+.bottomnav{
+  position: fixed; left:0; right:0; bottom:0; z-index: var(--z-sticky);
+  display:flex; background: var(--surface); border-top:1px solid var(--line-soft);
+  padding-bottom: var(--safe-b);
+  box-shadow: var(--shadow-2);
+}
+.bottomnav .nav-item{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  min-height:64px; padding:8px 4px;
+  background:none; border:none; cursor:pointer;
+  color: var(--ink-3); transition: color var(--dur) var(--ease);
+}
+.bottomnav .nav-item svg{ width:26px; height:26px; }
+.bottomnav .nav-item span{ font-size: var(--fs-xs); font-weight:600; }
+.bottomnav .nav-item:hover{ color: var(--ink-2); }
+.bottomnav .nav-item.active{ color: var(--brand); }
+.bottomnav .nav-item:active{ transform: scale(.94); }
+
+/* desktop sidebar */
+.sidebar{ display:none; }
+
+@media (min-width: 1024px){
+  .app{ flex-direction:row; }
+  .appbar{ display:none; }
+  .bottomnav{ display:none; }
+  .sidebar{
+    display:flex; flex-direction:column; position:sticky; top:0; height:100vh;
+    width: var(--sidebar-w); flex-shrink:0; background: var(--surface);
+    border-right:1px solid var(--line-soft); padding: var(--sp-6) var(--sp-5);
+    gap: var(--sp-6);
+  }
+  .sidebar .brand{ display:flex; align-items:center; gap:var(--sp-3); }
+  .sidebar .brand img{ width:40px; height:40px; border-radius:10px; }
+  .sidebar .brand .name{ font-size: var(--fs-md); font-weight:700; line-height:1.3; }
+  .sidebar .brand .sub{ font-size: var(--fs-xs); color: var(--ink-3); }
+  .sidebar nav{ display:flex; flex-direction:column; gap:4px; flex:1; }
+  .sidebar .nav-item{
+    display:flex; align-items:center; gap:var(--sp-3);
+    padding: 12px 14px; border-radius: var(--radius);
+    background:none; border:none; cursor:pointer; text-align:left;
+    color: var(--ink-2); font-size: var(--fs-md); min-height:48px;
+    transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .sidebar .nav-item svg{ width:24px; height:24px; flex-shrink:0; }
+  .sidebar .nav-item:hover{ background: var(--surface-2); color: var(--ink); }
+  .sidebar .nav-item.active{ background: var(--brand-soft); color: var(--brand); font-weight:700; }
+  .sidebar .user-card{
+    display:flex; align-items:center; gap:var(--sp-3);
+    padding: var(--sp-3); border-radius: var(--radius); background: var(--surface-2);
+    border:1px solid var(--line-soft);
+  }
+  .sidebar .user-card .avatar{
+    width:42px; height:42px; border-radius:50%; background: var(--brand-soft); color:var(--brand);
+    display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
+  }
+  .sidebar .user-card .who{ min-width:0; }
+  .sidebar .user-card .who .n{ font-size:var(--fs-sm); font-weight:700; }
+  .sidebar .user-card .who .r{ font-size:var(--fs-xs); color:var(--ink-3); }
+
+  .content{ padding: var(--sp-8) var(--sp-8) var(--sp-10); max-width:1240px; }
+}
+
+/* ============ Typography helpers ============ */
+.page-title{ font-size: var(--fs-3xl); line-height:1.2; letter-spacing:-.01em; }
+.page-sub{ color: var(--ink-2); font-size: var(--fs-md); margin-top:6px; }
+.section-title{ font-size: var(--fs-xl); margin-bottom: var(--sp-4); }
+.text-3{ color: var(--ink-3); }
+.text-2{ color: var(--ink-2); }
+.mono{ font-family: var(--font-mono); }
+
+/* ============ Buttons ============ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:48px; padding: 10px 20px; border-radius: var(--radius);
+  border:1px solid transparent; cursor:pointer; font-size: var(--fs-base); font-weight:600;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease), color var(--dur) var(--ease);
+  background: var(--surface-2); color: var(--ink); border-color: var(--line);
+}
+.btn:hover{ background: var(--surface-3); }
+.btn:active{ transform: scale(.97); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn-primary{ background: var(--brand); color: var(--brand-ink); border-color: var(--brand); height:56px; font-size: var(--fs-md); font-weight:700; width:100%; }
+.btn-primary:hover{ background: var(--brand-2); border-color: var(--brand-2); }
+.btn-ghost{ background:none; border-color: var(--line); }
+.btn-ghost:hover{ background: var(--surface-2); }
+.btn-sm{ min-height:40px; padding:6px 14px; font-size: var(--fs-sm); }
+.btn-block{ width:100%; }
+.icon-btn{
+  width:48px; height:48px; display:inline-flex; align-items:center; justify-content:center;
+  border-radius: var(--radius); border:1px solid var(--line); background: var(--surface-2); cursor:pointer;
+  transition: background var(--dur) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.icon-btn:hover{ background: var(--surface-3); }
+.icon-btn:active{ transform: scale(.94); }
+.icon-btn svg{ width:22px; height:22px; }
+
+/* ============ Cards ============ */
+.card{
+  background: var(--surface); border:1px solid var(--line-soft); border-radius: var(--radius-lg);
+  padding: var(--sp-5); box-shadow: var(--shadow-1);
+}
+.grid{ display:grid; gap: var(--sp-4); }
+.grid-2{ grid-template-columns: 1fr; }
+.grid-3{ grid-template-columns: 1fr; }
+@media (min-width:720px){ .grid-2{ grid-template-columns: 1fr 1fr; } .grid-3{ grid-template-columns: repeat(3,1fr); } }
+@media (min-width:1024px){ .grid-3{ grid-template-columns: repeat(3,1fr); } }
+
+/* ============ Chips ============ */
+.chip{
+  display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius: var(--radius-pill);
+  font-size: var(--fs-xs); font-weight:700; border:1px solid var(--line); color: var(--ink-2); background: var(--surface-2);
+  white-space:nowrap;
+}
+.chip-type-彩排{ color: var(--brand); border-color: color-mix(in oklch, var(--brand) 45%, var(--line)); background: var(--brand-soft); }
+.chip-type-共修{ color: var(--ok); border-color: color-mix(in oklch, var(--ok) 45%, var(--line)); background: var(--ok-soft); }
+.chip-type-驗收{ color: var(--warn); border-color: color-mix(in oklch, var(--warn) 45%, var(--line)); background: var(--warn-soft); }
+.chip-heqi{ color:var(--ink-2); }
+
+/* ============ Progress ============ */
+.bar{ height:10px; border-radius:999px; background: var(--surface-3); overflow:hidden; }
+.bar > i{ display:block; height:100%; width:100%; background: var(--brand); border-radius:999px; transform: scaleX(var(--w, 1)); transform-origin:left; transition: transform var(--dur-slow) var(--ease); }
+.bar.ok > i{ background: var(--ok); }
+.bar.warn > i{ background: var(--warn); }
+
+.ring{ --p:0; width:76px; height:76px; border-radius:50%;
+  background: conic-gradient(var(--brand) calc(var(--p)*1%), var(--surface-3) 0);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.ring .hole{ width:58px; height:58px; border-radius:50%; background: var(--surface); display:flex; align-items:center; justify-content:center; font-size:var(--fs-sm); font-weight:800; }
+
+/* ============ Overview screen ============ */
+.hero-row{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.install-banner{
+  display:flex; align-items:center; gap:var(--sp-3); background: var(--surface); border:1px solid var(--line);
+  border-radius: var(--radius-lg); padding: var(--sp-4); margin-bottom: var(--sp-5);
+}
+.install-banner p{ flex:1; font-size: var(--fs-sm); color: var(--ink-2); }
+.install-banner.hidden{ display:none; }
+
+.session-card{ display:flex; flex-direction:column; gap: var(--sp-4); }
+.session-card .top{ display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3); }
+.session-card h3{ font-size: var(--fs-lg); }
+.session-card .date{ font-size: var(--fs-sm); color: var(--ink-3); margin-top:2px; }
+.session-card .stats{ display:flex; align-items:center; gap: var(--sp-4); }
+.session-card .stats .nums{ flex:1; }
+.session-card .nums .big{ font-size: var(--fs-xl); font-weight:800; }
+.session-card .nums .lbl{ font-size: var(--fs-xs); color: var(--ink-3); }
+.session-card .gap-note{ font-size: var(--fs-sm); color: var(--ink-2); }
+
+.stat-row{ display:grid; grid-template-columns: repeat(2,1fr); gap: var(--sp-3); margin: var(--sp-6) 0; }
+@media (min-width:720px){ .stat-row{ grid-template-columns: repeat(4,1fr); } }
+.stat-tile{ background: var(--surface); border:1px solid var(--line-soft); border-radius: var(--radius-lg); padding: var(--sp-4); }
+.stat-tile .v{ font-size: var(--fs-2xl); font-weight:800; }
+.stat-tile .l{ font-size: var(--fs-sm); color: var(--ink-2); margin-top:4px; }
+
+.dist-row{ display:flex; align-items:center; gap: var(--sp-3); padding: 7px 0; }
+.dist-row .name{ width:64px; flex-shrink:0; font-size: var(--fs-sm); color: var(--ink-2); }
+.dist-row .track{ flex:1; height:14px; border-radius:999px; background: var(--surface-3); overflow:hidden; }
+.dist-row .track > i{ display:block; height:100%; background: var(--brand); border-radius:999px; }
+.dist-row .val{ width:44px; text-align:right; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.dist-row.dim{ opacity:.4; }
+.dist-row.dim .track > i{ background: var(--ink-3); }
+.dist-row.in-scope .name{ color: var(--ink); font-weight:700; }
+
+.transport-mini{ display:flex; flex-wrap:wrap; gap: var(--sp-5); align-items:center; }
+.transport-mini .m{ display:flex; flex-direction:column; }
+.transport-mini .m .v{ font-size: var(--fs-xl); font-weight:800; }
+.transport-mini .m .l{ font-size: var(--fs-xs); color: var(--ink-3); }
+
+.event-row{
+  display:flex; align-items:center; gap: var(--sp-4); padding: var(--sp-4) 0; border-top:1px solid var(--line-soft);
+  cursor:pointer; border-radius: var(--radius-sm); transition: background var(--dur) var(--ease);
+}
+.event-row:first-child{ border-top:none; }
+.event-row:hover{ background: var(--surface-2); }
+.event-row .info{ flex:1; min-width:0; }
+.event-row .info h4{ font-size: var(--fs-md); }
+.event-row .info .meta{ font-size: var(--fs-sm); color: var(--ink-3); margin-top:2px; }
+.event-row .chevron{ color: var(--ink-3); flex-shrink:0; }
+
+/* ============ Events screen ============ */
+.filter-row{ display:flex; gap: var(--sp-2); flex-wrap:wrap; margin-bottom: var(--sp-5); }
+.filter-chip{
+  padding: 9px 16px; border-radius: var(--radius-pill); border:1px solid var(--line); background: var(--surface);
+  color: var(--ink-2); font-size: var(--fs-sm); font-weight:600; cursor:pointer; min-height:40px;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.filter-chip:hover{ background: var(--surface-2); }
+.filter-chip.active{ background: var(--brand-soft); color: var(--brand); border-color: color-mix(in oklch, var(--brand) 45%, var(--line)); }
+
+.event-card{ display:flex; flex-direction:column; gap: var(--sp-3); cursor:pointer; }
+.event-card .head{ display:flex; align-items:flex-start; justify-content:space-between; gap: var(--sp-3); }
+.event-card h3{ font-size: var(--fs-md); }
+.event-card .meta{ font-size: var(--fs-sm); color: var(--ink-3); margin-top:4px; }
+.event-card .foot{ display:flex; align-items:center; gap: var(--sp-3); }
+.event-card .foot .bar{ flex:1; }
+.event-card .foot .n{ font-size: var(--fs-sm); color: var(--ink-2); white-space:nowrap; }
+.event-card.live{ border-color: color-mix(in oklch, var(--brand) 55%, var(--line)); background: color-mix(in oklch, var(--brand) 7%, var(--surface)); }
+.event-card.cancelled{ opacity:.55; }
+
+/* ---------- Events: temporal groups (Phase 1 — §階段1-2) ---------- */
+.event-group{ margin-bottom: var(--sp-7); }
+.event-group:last-child{ margin-bottom:0; }
+.event-group-head{
+  display:flex; align-items:center; gap:10px; width:100%; min-height:48px;
+  background:none; border:none; padding:0; margin-bottom: var(--sp-4); color:inherit; text-align:left;
+}
+button.event-group-head{ cursor:pointer; }
+button.event-group-head:hover .section-title{ color: var(--brand); }
+.event-group-head .chev{ width:20px; height:20px; color: var(--ink-3); transition: transform var(--dur) var(--ease); flex-shrink:0; }
+.event-group-head .chev.open{ transform: rotate(180deg); }
+.event-group.live .section-title{ color: var(--brand); }
+.demo-clock-hint{ display:inline-flex; align-items:center; gap:6px; font-size: var(--fs-sm); color: var(--ink-3); margin-bottom: var(--sp-5); }
+
+.back-row{ display:flex; align-items:center; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.back-row button{ display:flex; align-items:center; gap:6px; background:none; border:none; color: var(--brand); font-size: var(--fs-md); font-weight:600; cursor:pointer; min-height:48px; padding:0 4px; }
+
+.date-tabs{ display:flex; gap: var(--sp-2); overflow-x:auto; padding-bottom:2px; margin-bottom: var(--sp-5); }
+.date-tab{
+  flex-shrink:0; padding: 10px 18px; border-radius: var(--radius); border:1px solid var(--line); background: var(--surface);
+  color: var(--ink-2); font-size: var(--fs-sm); font-weight:700; cursor:pointer; min-height:44px;
+}
+.date-tab.active{ background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+
+.attendance-summary{ display:flex; gap: var(--sp-4); margin-bottom: var(--sp-5); flex-wrap:wrap; }
+.attendance-summary .pill{ display:flex; align-items:center; gap:8px; font-size: var(--fs-sm); color: var(--ink-2); }
+.attendance-summary .dot{ width:12px; height:12px; border-radius:50%; }
+
+.search-input{
+  display:flex; align-items:center; gap: var(--sp-2); background: var(--surface); border:1px solid var(--line);
+  border-radius: var(--radius); padding: 0 var(--sp-3); height:52px; margin-bottom: var(--sp-4);
+}
+.search-input svg{ flex-shrink:0; color: var(--ink-3); width:20px; height:20px; }
+.search-input input{ flex:1; background:none; border:none; color: var(--ink); font-size: var(--fs-base); height:100%; }
+.search-input input:focus{ outline:none; }
+.search-input input::placeholder{ color: var(--ink-3); }
+
+.roster-row{ display:flex; align-items:center; gap: var(--sp-3); padding: var(--sp-3) 0; border-top:1px solid var(--line-soft); flex-wrap:wrap; }
+.roster-row:first-child{ border-top:none; }
+.roster-row .who{ flex:1; min-width:150px; display:flex; align-items:center; gap: var(--sp-3); }
+.roster-row .who .name{ font-size: var(--fs-md); font-weight:700; overflow-wrap:anywhere; }
+.roster-row .who .sub{ font-size: var(--fs-xs); color: var(--ink-3); }
+
+.seg3{ display:flex; border:1px solid var(--line); border-radius: var(--radius); overflow:hidden; flex-shrink:0; }
+.seg3 button{
+  min-height:48px; min-width:76px; padding:0 14px; border:none; background: var(--surface-2); color: var(--ink-2);
+  font-size: var(--fs-sm); font-weight:700; cursor:pointer; border-right:1px solid var(--line);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.seg3 button:last-child{ border-right:none; }
+.seg3 button:hover{ background: var(--surface-3); }
+.seg3 button.state-未到.is-active{ background: var(--surface-3); color: var(--ink); }
+.seg3 button.state-已到.is-active{ background: var(--ok-soft); color: var(--ok); }
+.seg3 button.state-請假.is-active{ background: var(--warn-soft); color: var(--warn); }
+.seg3 button.pulse{ animation: pulse var(--dur-slow) var(--ease); }
+@keyframes pulse{ 0%{ transform:scale(1);} 40%{ transform:scale(1.06);} 100%{ transform:scale(1);} }
+
+.add-roster-row{ display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3); padding: var(--sp-3) 0; border-top:1px solid var(--line-soft); }
+
+.empty-state{ text-align:center; padding: var(--sp-9) var(--sp-4); color: var(--ink-2); }
+.empty-state svg{ width:56px; height:56px; margin:0 auto var(--sp-4); color: var(--ink-3); }
+.empty-state h4{ font-size: var(--fs-lg); margin-bottom:6px; color: var(--ink); }
+.empty-state p{ font-size: var(--fs-sm); max-width:36ch; margin:0 auto; }
+
+/* ============ Transport screen ============ */
+.toggle2{ display:inline-flex; border:1px solid var(--line); border-radius: var(--radius-pill); overflow:hidden; }
+.toggle2 button{
+  min-height:48px; padding: 0 22px; border:none; background: var(--surface); color: var(--ink-2);
+  font-size: var(--fs-base); font-weight:700; cursor:pointer;
+}
+.toggle2 button.active{ background: var(--brand); color: var(--brand-ink); }
+
+.switch{ position:relative; width:52px; height:30px; border-radius:999px; background: var(--surface-3); border:1px solid var(--line); cursor:pointer; flex-shrink:0; }
+.switch i{ position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:50%; background: var(--ink-2); transition: transform var(--dur) var(--ease), background var(--dur) var(--ease); }
+.switch.on{ background: var(--brand-soft); border-color: color-mix(in oklch, var(--brand) 45%, var(--line)); }
+.switch.on i{ transform: translateX(22px); background: var(--brand); }
+.switch:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.switch:disabled{ opacity:.45; cursor:not-allowed; }
+
+/* ============ Transport dispatch tiers (Phase 2 — §C-3) ============ */
+.dispatch-row{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap: var(--sp-4); padding: var(--sp-4) 0; border-top:1px solid var(--line-soft); }
+.dispatch-row:first-child{ border-top:none; }
+.dispatch-row .dr-head{ display:flex; align-items:center; gap:10px; min-width:150px; }
+.dispatch-row .dr-name{ font-size: var(--fs-md); font-weight:700; }
+.dispatch-row .dr-stats{ display:flex; gap: var(--sp-5); flex-wrap:wrap; }
+.dispatch-row .dr-stats .lbl{ font-size: var(--fs-xs); color: var(--ink-3); }
+.dispatch-row .dr-stats .dr-num{ font-size: var(--fs-lg); font-weight:800; font-variant-numeric:tabular-nums; }
+.dispatch-row .dr-controls{ display:flex; align-items:center; gap: var(--sp-3); flex-wrap:wrap; }
+.stepper{ display:inline-flex; align-items:center; gap:8px; }
+.stepper button{
+  width:48px; height:48px; border-radius: var(--radius-sm); border:1px solid var(--line); background: var(--surface-2);
+  color: var(--ink); font-weight:700; font-size: var(--fs-lg); cursor:pointer; line-height:1;
+  transition: background var(--dur) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.stepper button:hover{ background: var(--surface-3); }
+.stepper button:active{ transform: scale(.94); }
+.stepper button:disabled{ opacity:.4; cursor:not-allowed; }
+.stepper button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.stepper .val{ min-width:28px; text-align:center; font-variant-numeric:tabular-nums; font-weight:800; font-size: var(--fs-md); }
+.earmark-select{
+  min-height:48px; padding: 0 34px 0 12px; border-radius: var(--radius-sm); border:1px solid var(--line);
+  background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23b8c2cf' stroke-width='2'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 10px center;
+  color: var(--ink); font-size: var(--fs-sm); appearance:none; cursor:pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.earmark-select:hover{ background-color: var(--surface-3); }
+.earmark-select:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.breakdown-row{ display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3); padding:7px 0; font-size: var(--fs-sm); color: var(--ink-2); }
+.num-input{
+  width:76px; min-height:48px; padding:0 8px; border-radius: var(--radius-sm); border:1px solid var(--line);
+  background: var(--surface-2); color: var(--ink); text-align:center; font-variant-numeric:tabular-nums; font-size: var(--fs-base);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.num-input:hover{ background: var(--surface-3); }
+.num-input:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.roster-row.out-of-scope{ opacity:.45; }
+.seg3 button:disabled{ opacity:.5; cursor:not-allowed; }
+.seg3 button.state-報名.is-active{ background: var(--ok-soft); color: var(--ok); }
+
+.transport-summary{ display:grid; grid-template-columns: repeat(2,1fr); gap: var(--sp-3); margin: var(--sp-5) 0; }
+@media (min-width:720px){ .transport-summary{ grid-template-columns: repeat(4,1fr); } }
+
+.bus-card{ display:flex; flex-direction:column; gap: var(--sp-3); }
+.bus-card .head{ display:flex; align-items:flex-start; justify-content:space-between; gap: var(--sp-3); }
+.bus-card h3{ font-size: var(--fs-md); }
+.bus-card .route{ font-size: var(--fs-sm); color: var(--ink-2); margin-top:4px; }
+.bus-card .row{ display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3); font-size: var(--fs-sm); }
+.bus-card .row .l{ color: var(--ink-3); }
+.bus-card .cap-wrap{ display:flex; align-items:center; gap: var(--sp-3); }
+.bus-card .cap-wrap .bar{ flex:1; }
+.bus-card .cap-wrap .n{ font-size: var(--fs-sm); font-variant-numeric: tabular-nums; color: var(--ink-2); white-space:nowrap; }
+.bus-card .driver{ display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3); padding-top: var(--sp-2); border-top:1px solid var(--line-soft); font-size: var(--fs-sm); flex-wrap:wrap; }
+.driver .phone-group{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+.driver .phone{ font-family: var(--font-mono); color: var(--ink-2); }
+.driver .phone.masked{ color: var(--ink-3); letter-spacing:1px; }
+.driver .lock{ display:inline-flex; align-items:center; gap:4px; color: var(--ink-3); font-size: var(--fs-xs); white-space:nowrap; }
+
+.bp-dist{ display:flex; flex-direction:column; gap: var(--sp-2); }
+.bp-dist .bp-row{ display:grid; grid-template-columns: 140px 1fr 28px; align-items:center; gap: var(--sp-3); }
+.bp-dist .bp-row .name{ font-size: var(--fs-sm); color: var(--ink-2); }
+.bp-dist .track{ position:relative; height:16px; border-radius:999px; background: var(--surface-3); }
+.bp-dist .track > i{ position:absolute; left:0; top:0; height:100%; background: var(--brand); border-radius:999px; }
+.bp-dist .limit-line{ position:absolute; top:-4px; bottom:-4px; width:2px; background: var(--danger); }
+.bp-dist .val{ font-size: var(--fs-sm); color: var(--ink-3); text-align:right; }
+
+/* ============ Seats screen ============ */
+.seat-controls{ display:flex; flex-wrap:wrap; gap: var(--sp-3); align-items:center; margin-bottom: var(--sp-5); }
+.select-field{
+  display:flex; flex-direction:column; gap:4px;
+}
+.select-field label{ font-size: var(--fs-xs); color: var(--ink-3); }
+.select-field select{
+  min-height:48px; padding: 0 40px 0 14px; border-radius: var(--radius); border:1px solid var(--line);
+  background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23b8c2cf' stroke-width='2'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: var(--ink); font-size: var(--fs-base); appearance:none; cursor:pointer; min-width:180px;
+  max-width: 78vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+@media (min-width:480px){ .select-field select{ min-width:260px; max-width:320px; } }
+
+.seat-legend{ display:flex; flex-wrap:wrap; gap: var(--sp-4); margin: var(--sp-4) 0; font-size: var(--fs-sm); color: var(--ink-2); }
+.seat-legend .li{ display:flex; align-items:center; gap:8px; }
+.seat-legend .sw{ width:22px; height:22px; border-radius:6px; border:1px solid var(--line); }
+
+.seat-scroll{ overflow-x:auto; overflow-y:hidden; padding-bottom: var(--sp-3); }
+.seat-grid{ display:grid; gap:4px; width:max-content; }
+.seat-cell{
+  width:100%; height:100%; border-radius:7px; border:1px solid var(--line);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  font-size:10px; cursor:pointer; padding:2px; overflow:hidden; text-align:center;
+  background: var(--surface-2); color: var(--ink-3); transition: transform var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease), outline var(--dur-fast) var(--ease), opacity var(--dur) var(--ease);
+}
+.seat-cell:hover{ transform: translateY(-2px); filter: brightness(1.15); }
+.seat-cell.occupied.costume-白{ background: var(--costume-white); color:#1c2430; border-color: var(--costume-white); }
+.seat-cell.occupied.costume-藍{ background: var(--costume-blue); color:#0d1b28; border-color: var(--costume-blue); }
+.seat-cell.selected{ outline:3px solid var(--focus); outline-offset:1px; }
+.seat-cell.empty{ background: var(--surface); border-style:dashed; cursor:default; }
+.seat-cell.empty:hover{ transform:none; filter:none; }
+.seat-cell.me{ box-shadow: 0 0 0 3px var(--brand) inset; }
+.seat-cell.foreign-scope{ opacity:.45; }
+.seat-cell .nm, .seat-cell .hq{ display:none; }
+.seat-cell .seatnum{ font-family: var(--font-mono); font-size:8px; font-weight:700; line-height:1; letter-spacing:-.02em; }
+@media (min-width:1024px){
+  .seat-cell .seatnum{ font-size:10px; }
+  .seat-cell .nm{ display:block; font-size:12px; font-weight:800; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .seat-cell .hq{ display:block; font-size:10px; font-weight:600; opacity:.85; white-space:nowrap; }
+}
+
+/* ---------- 座位軸標 + 每3列標籤帶(區塊/服裝/性別) — DESIGN-v3 §階段2-12 ---------- */
+.seat-axis-col, .seat-axis-row{
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-mono); font-size:9px; color: var(--ink-2); font-weight:700;
+}
+.seat-corner{ background:transparent; }
+.seat-band{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
+  border-radius:5px; border:1px solid var(--line-soft); background: var(--surface-2);
+  font-size:8px; line-height:1.25; color: var(--ink-2); overflow:hidden; padding:1px;
+}
+.seat-band.block-A{ background: color-mix(in oklch, var(--brand) 14%, var(--surface-2)); }
+.seat-band.block-B{ background: color-mix(in oklch, var(--ok) 14%, var(--surface-2)); }
+.seat-band b{ font-weight:800; color: var(--ink); }
+@media (min-width:1024px){ .seat-band{ font-size:10px; } .seat-axis-col, .seat-axis-row{ font-size:11px; } }
+
+.seat-detail{ margin-top: var(--sp-5); min-height:96px; }
+.seat-detail .empty-hint{ color: var(--ink-3); font-size: var(--fs-sm); }
+.seat-detail .occ{ display:flex; align-items:center; gap: var(--sp-4); flex-wrap:wrap; }
+.seat-detail .occ .name{ font-size: var(--fs-lg); font-weight:800; }
+
+.c-note{ display:flex; gap: var(--sp-4); align-items:flex-start; }
+.c-note svg{ width:32px; height:32px; color: var(--brand); flex-shrink:0; }
+
+/* ============ Me screen ============ */
+.me-card{ display:flex; align-items:center; gap: var(--sp-5); }
+.me-card .avatar{
+  width:76px; height:76px; border-radius:50%; background: var(--brand-soft); color: var(--brand);
+  display:flex; align-items:center; justify-content:center; font-size: var(--fs-xl); font-weight:800; flex-shrink:0;
+}
+.me-card h2{ font-size: var(--fs-xl); }
+.me-card .tags{ display:flex; gap: var(--sp-2); flex-wrap:wrap; margin-top:8px; }
+
+.mini-grid-wrap{ display:flex; gap: var(--sp-5); flex-wrap:wrap; align-items:center; }
+.mini-grid{ display:grid; gap:4px; }
+.mini-cell{ width:28px; height:28px; border-radius:6px; border:1px solid var(--line); background: var(--surface-2); }
+.mini-cell.costume-白{ background: var(--costume-white); }
+.mini-cell.costume-藍{ background: var(--costume-blue); }
+.mini-cell.me{ box-shadow: 0 0 0 2px oklch(0.15 0.02 255) inset, 0 0 0 4px var(--brand) inset; }
+
+.timeline{ position:relative; padding-left: 28px; }
+.timeline::before{ content:""; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background: var(--line); }
+.timeline-item{ position:relative; padding-bottom: var(--sp-6); }
+.timeline-item:last-child{ padding-bottom:0; }
+.timeline-item::before{ content:""; position:absolute; left:-28px; top:4px; width:14px; height:14px; border-radius:50%; background: var(--brand); border:3px solid var(--surface); box-shadow: 0 0 0 2px var(--brand); }
+.timeline-item h4{ font-size: var(--fs-md); }
+.timeline-item .meta{ font-size: var(--fs-sm); color: var(--ink-3); margin-top:2px; }
+
+.ics-box{ display:flex; flex-direction:column; gap: var(--sp-3); }
+.ics-box .url-row{ display:flex; gap: var(--sp-2); align-items:center; background: var(--surface-2); border:1px solid var(--line); border-radius: var(--radius); padding: var(--sp-3); }
+.ics-box .url-row code{ flex:1; font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ics-box.revealed .url-row{ display:flex; }
+.ics-box .url-row{ display:none; }
+.ics-box p.hint{ font-size: var(--fs-sm); color: var(--ink-3); }
+
+/* ============ Persona switcher (Demo) ============ */
+.persona-bar{
+  position: sticky; top: var(--appbar-h); z-index: var(--z-sticky);
+  display:flex; align-items:center; gap: var(--sp-3); flex-wrap:wrap;
+  padding: 10px var(--sp-4); background: var(--surface); border-bottom:1px solid var(--line-soft);
+}
+.persona-bar-label{ font-size: var(--fs-xs); font-weight:700; color: var(--ink-3); white-space:nowrap; }
+.persona-select{
+  min-height:44px; padding: 0 38px 0 12px; border-radius: var(--radius); border:1px solid var(--line);
+  background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23b8c2cf' stroke-width='2'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 10px center;
+  color: var(--ink); font-size: var(--fs-sm); appearance:none; cursor:pointer; flex:1; min-width:180px; max-width:100%;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.persona-select:hover{ background-color: var(--surface-3); }
+.persona-select:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.chip.scope-chip{ background: var(--brand-soft); color: var(--brand); border-color: color-mix(in oklch, var(--brand) 45%, var(--line)); font-weight:700; }
+@media (min-width:1024px){ .persona-bar{ display:none; } }
+
+.persona-switch-desktop{ display:flex; flex-direction:column; gap:8px; }
+
+/* ============ People / List table ============ */
+.list-table-wrap{ overflow-x:auto; }
+table.list-table{ width:100%; border-collapse:collapse; font-size: var(--fs-sm); }
+.list-table th{
+  text-align:left; padding:10px 12px; color: var(--ink-3); font-weight:700; font-size: var(--fs-xs);
+  border-bottom:1px solid var(--line); white-space:nowrap;
+}
+.list-table td{ padding:12px; border-bottom:1px solid var(--line-soft); vertical-align:middle; white-space:nowrap; }
+.list-table tbody tr{ transition: background var(--dur) var(--ease); }
+.list-table tbody tr:hover{ background: var(--surface-2); }
+.list-table .actions-cell{ display:flex; gap:8px; flex-wrap:wrap; }
+
+/* ---------- 名單:多場次徽章 / chip + 手機 deck view — DESIGN-v3 §階段2-8/9/10/11 ---------- */
+.participation-cell{ white-space:normal; min-width:240px; }
+.badge-count{
+  display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius: var(--radius-pill);
+  background: var(--brand-soft); color: var(--brand); font-size: var(--fs-xs); font-weight:700; white-space:nowrap;
+}
+.pc-chips{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.session-chip{
+  display:flex; align-items:center; gap:6px; padding:7px 10px; border-radius: var(--radius-sm);
+  background: var(--surface-2); border:1px solid var(--line); font-size: var(--fs-xs); color: var(--ink-2);
+  white-space:normal; line-height:1.4;
+}
+.session-chip .sc-swatch{ width:10px; height:10px; border-radius:3px; border:1px solid var(--line); flex-shrink:0; }
+.session-chip .sc-swatch.costume-白{ background: var(--costume-white); }
+.session-chip .sc-swatch.costume-藍{ background: var(--costume-blue); }
+
+#peopleDeck{ display:flex; flex-direction:column; gap: var(--sp-4); }
+@media (min-width:1024px){ #peopleDeck{ display:none; } }
+#listTableCard{ display:none; }
+@media (min-width:1024px){ #listTableCard{ display:block; } }
+
+.person-card{ display:flex; flex-direction:column; }
+.person-card .pc-head{ display:flex; align-items:flex-start; justify-content:space-between; gap: var(--sp-3); }
+.person-card .pc-name{ font-size: var(--fs-md); font-weight:700; }
+.person-card .pc-sub{ font-size: var(--fs-xs); color: var(--ink-3); margin-top:2px; }
+.person-card .pc-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top: var(--sp-3); }
+.person-card .pc-fields{ margin-top: var(--sp-3); }
+.person-card .pc-field{ display:flex; justify-content:space-between; align-items:center; gap: var(--sp-3); font-size: var(--fs-sm); color: var(--ink-2); padding:8px 0; border-top:1px solid var(--line-soft); }
+.person-card .pc-field:first-child{ border-top:none; }
+.person-card .pc-field .l{ color: var(--ink-3); flex-shrink:0; }
+.person-card .pc-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top: var(--sp-4); }
+
+/* ============ Generic text input ============ */
+.text-input{
+  min-height:48px; padding: 0 14px; border-radius: var(--radius); border:1px solid var(--line);
+  background: var(--surface-2); color: var(--ink); font-size: var(--fs-base); width:100%;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.text-input:hover{ background: var(--surface-3); }
+.text-input:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.text-input:disabled{ opacity:.45; cursor:not-allowed; }
+
+/* ============ Modal ============ */
+.modal-backdrop{
+  position:fixed; inset:0; z-index: var(--z-backdrop); background: oklch(0.30 0.02 255 / .42);
+  display:none; align-items:center; justify-content:center; padding: var(--sp-4);
+}
+.modal-backdrop.open{ display:flex; animation: fadein var(--dur) var(--ease); }
+.modal{ position:relative; z-index: var(--z-modal); max-width:520px; width:100%; max-height:88vh; overflow:auto; }
+.modal h3{ font-size: var(--fs-lg); margin-bottom: var(--sp-4); }
+.modal .field{ display:flex; flex-direction:column; gap:6px; margin-bottom: var(--sp-4); }
+.modal .field label{ font-size: var(--fs-sm); color: var(--ink-2); }
+.modal .actions{ display:flex; gap: var(--sp-3); justify-content:flex-end; flex-wrap:wrap; margin-top: var(--sp-5); }
+
+/* ============ Toast ============ */
+.toast-region{ position:fixed; left:0; right:0; bottom: calc(var(--bottomnav-h) + var(--safe-b) + 12px); z-index: var(--z-toast); display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none; padding:0 16px; }
+@media (min-width:1024px){ .toast-region{ bottom:20px; } }
+.toast{
+  pointer-events:auto; max-width:420px; width:100%; background: var(--surface-3); color: var(--ink);
+  border:1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; font-size: var(--fs-sm);
+  box-shadow: var(--shadow-2); animation: toastin var(--dur-slow) var(--ease);
+  display:flex; align-items:center; gap:10px;
+}
+.toast.ok{ border-color: color-mix(in oklch, var(--ok) 50%, var(--line)); }
+.toast.err{ border-color: color-mix(in oklch, var(--danger) 50%, var(--line)); }
+@keyframes toastin{ from{ opacity:0; transform: translateY(10px);} to{ opacity:1; transform:none; } }
+
+/* small utility */
+.stack{ display:flex; flex-direction:column; gap: var(--sp-4); }
+.row-between{ display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3); }
+.mt-6{ margin-top: var(--sp-6); }
+.mt-5{ margin-top: var(--sp-5); }
+.vis-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.persona-transition{ animation: fadein var(--dur) var(--ease); }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- Mobile app bar -->
+  <header class="appbar">
+    <span class="appbar-title" id="appbarTitle">總覽</span>
+    <span class="appbar-chip" id="appbarChip">11/12–11/15 大巨蛋演繹</span>
+  </header>
+
+  <!-- Demo persona switcher (mobile) -->
+  <div class="persona-bar">
+    <span class="persona-bar-label">Demo · 以…身份檢視</span>
+    <select id="personaSelectMobile" class="persona-select" aria-label="切換檢視身份" onchange="applyPersona(this.value)"></select>
+    <span class="chip scope-chip"></span>
+  </div>
+
+  <!-- Desktop sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="icons/icon.svg" alt="">
+      <div>
+        <div class="name">慈濟大巨蛋演繹</div>
+        <div class="sub">管理系統 · Mockup</div>
+      </div>
+    </div>
+    <nav id="sidebarNav" aria-label="主要導覽"></nav>
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">林</div>
+      <div class="who">
+        <div class="n" id="sidebarWhoName">林淑惠</div>
+        <div class="r" id="sidebarWhoRole">大橋和氣 · 和氣行政</div>
+      </div>
+    </div>
+    <div class="persona-switch-desktop">
+      <label for="personaSelectDesktop" class="persona-bar-label">Demo · 以…身份檢視</label>
+      <select id="personaSelectDesktop" class="persona-select" aria-label="切換檢視身份" onchange="applyPersona(this.value)"></select>
+      <span class="chip scope-chip"></span>
+    </div>
+  </aside>
+
+  <main class="content" id="content">
+
+    <!-- ================= Overview ================= -->
+    <section class="screen" id="screen-overview" data-screen="overview">
+      <div class="install-banner hidden" id="installBanner">
+        <span>📲</span>
+        <p>將本系統加入主畫面,離線也能查看場次、座位與交通資訊。</p>
+        <button class="btn btn-sm" id="installBtn">加入主畫面</button>
+      </div>
+
+      <div class="hero-row">
+        <div>
+          <h1 class="page-title">總覽</h1>
+          <p class="page-sub">2026 慈濟一甲子菩薩大招生 · 大巨蛋演繹倒數籌備中</p>
+        </div>
+        <span class="chip scope-chip"></span>
+      </div>
+
+      <h2 class="section-title vis-hidden">四場次</h2>
+      <div class="grid grid-2" id="sessionCards"></div>
+
+      <div class="stat-row" id="statRow"></div>
+
+      <div class="grid grid-2 mt-6">
+        <div class="card">
+          <h2 class="section-title">19 和氣分佈</h2>
+          <div id="heqiDist"></div>
+        </div>
+        <div class="card">
+          <h2 class="section-title">高雄彩排交通概況</h2>
+          <div class="transport-mini" id="transportMini"></div>
+          <p class="text-3 mt-5" style="font-size:var(--fs-sm)">同一上車點目前最多 2 台,上限 5 台 — 尚有餘裕。</p>
+          <button class="btn btn-ghost mt-5" onclick="location.hash='#/transport'">前往交通調度 →</button>
+        </div>
+      </div>
+
+      <div class="card mt-6">
+        <div class="row-between">
+          <h2 class="section-title" style="margin-bottom:0">近期活動</h2>
+          <button class="btn btn-ghost btn-sm" onclick="location.hash='#/events'">全部活動</button>
+        </div>
+        <div id="recentEvents"></div>
+      </div>
+    </section>
+
+    <!-- ================= Events ================= -->
+    <section class="screen" id="screen-events" data-screen="events">
+      <div id="eventsListView">
+        <div class="row-between" style="align-items:flex-end; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h1 class="page-title">活動</h1>
+            <p class="page-sub" id="eventsPageSub">彩排、共修、驗收活動與點名</p>
+          </div>
+          <button class="btn btn-primary" id="createEventBtn" style="width:auto; display:none;"></button>
+        </div>
+        <div class="filter-row mt-6" id="eventFilters"></div>
+        <div class="grid grid-2" id="eventCards"></div>
+      </div>
+
+      <div id="eventDetailView" style="display:none">
+        <div class="back-row">
+          <button onclick="location.hash='#/events'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
+            返回活動列表
+          </button>
+        </div>
+        <div id="eventDetailHead"></div>
+        <div class="date-tabs" id="eventDateTabs"></div>
+        <div class="attendance-summary" id="attendanceSummary"></div>
+        <div class="search-input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="rosterSearch" placeholder="搜尋姓名或和氣…">
+        </div>
+        <div class="card">
+          <div id="rosterList"></div>
+        </div>
+        <div class="card mt-5">
+          <div class="row-between">
+            <h3 style="font-size:var(--fs-md)">搜尋加名(未在名冊者)</h3>
+          </div>
+          <div class="search-input mt-5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="addRosterSearch" placeholder="輸入姓名搜尋志工並加入名冊…">
+          </div>
+          <div id="addRosterResults"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Approvals (審核) ================= -->
+    <section class="screen" id="screen-approvals" data-screen="approvals">
+      <div class="row-between" style="align-items:flex-end; flex-wrap:wrap; gap:16px;">
+        <div>
+          <h1 class="page-title">審核</h1>
+          <p class="page-sub">個人帳號綁定審核 · 依範圍顯示</p>
+        </div>
+        <span class="chip scope-chip"></span>
+      </div>
+
+      <div class="card mt-6">
+        <h2 class="section-title">待審核</h2>
+        <div id="approvalsPending"></div>
+      </div>
+
+      <div class="card mt-6">
+        <h2 class="section-title">已核准</h2>
+        <div class="list-table-wrap hscroll" id="approvalsApproved"></div>
+      </div>
+    </section>
+
+    <!-- ================= Transport ================= -->
+    <section class="screen" id="screen-transport" data-screen="transport">
+      <h1 class="page-title" id="transportTitle">交通調度</h1>
+      <p class="page-sub" id="transportSub">高雄彩排 · 台南 ⇄ 高雄大巨蛋</p>
+
+      <div class="row-between mt-6" style="flex-wrap:wrap; gap:16px;">
+        <div class="toggle2" id="directionToggle">
+          <button class="active" data-dir="go">去程</button>
+          <button data-dir="return">回程</button>
+        </div>
+        <span class="chip scope-chip" id="transportScopeChip"></span>
+      </div>
+
+      <div id="transportBody" class="mt-6"></div>
+    </section>
+
+    <!-- ================= List (名單) ================= -->
+    <section class="screen" id="screen-list" data-screen="list">
+      <div class="row-between" style="align-items:flex-end; flex-wrap:wrap; gap:16px;">
+        <div>
+          <h1 class="page-title">名單</h1>
+          <p class="page-sub" id="listPageSub">志工名冊 · 依權限顯示欄位</p>
+        </div>
+        <button class="btn btn-primary" id="addPersonBtn" style="width:auto; display:none;">＋ 新增人員</button>
+      </div>
+
+      <div class="row-between mt-6" style="flex-wrap:wrap; gap:12px;">
+        <span class="chip scope-chip"></span>
+        <span class="text-3" id="listCountNote" style="font-size:var(--fs-sm)"></span>
+      </div>
+
+      <div class="search-input mt-5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="listSearch" placeholder="搜尋姓名…">
+      </div>
+
+      <div class="seat-controls" id="listFilters"></div>
+
+      <!-- 手機(<1024px):deck view;桌面(≥1024px):table — DESIGN-v3 §階段2-8 -->
+      <div id="peopleDeck" class="mt-5"></div>
+      <div class="card" id="listTableCard">
+        <div class="list-table-wrap hscroll" id="listTableWrap"></div>
+      </div>
+    </section>
+
+    <!-- ================= Seats ================= -->
+    <section class="screen" id="screen-seats" data-screen="seats">
+      <h1 class="page-title">座位格</h1>
+      <p class="page-sub">西一象限 A+B · 列1 在最右、排16 在最上(近舞台)</p>
+
+      <div class="seat-controls mt-6">
+        <div class="select-field">
+          <label for="seatSession">場次</label>
+          <select id="seatSession"></select>
+        </div>
+        <div class="select-field">
+          <label for="seatBlock">座位圖</label>
+          <select id="seatBlock">
+            <option value="AB">A+B 座位圖(整合球場圖)</option>
+            <option value="C">C 組(入座演繹)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="seatScopeNote" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:var(--sp-4);"></div>
+
+      <div id="seatGridArea">
+        <p class="text-3" id="seatCountNote" style="font-size:var(--fs-sm); margin-bottom:var(--sp-3);"></p>
+        <div class="seat-legend">
+          <span class="li"><span class="sw" style="background:var(--costume-white)"></span>白服裝</span>
+          <span class="li"><span class="sw" style="background:var(--costume-blue)"></span>藍服裝</span>
+          <span class="li"><span class="sw" style="background:var(--surface); border-style:dashed"></span>空位</span>
+          <span class="li"><span class="sw" style="box-shadow:0 0 0 3px var(--brand) inset; background:var(--surface-2)"></span>我的座位</span>
+          <span class="li">男/女:見上方標籤帶(每 3 列一組)</span>
+        </div>
+        <div class="card">
+          <div class="seat-scroll hscroll">
+            <div class="seat-grid" id="seatGrid"></div>
+          </div>
+        </div>
+        <div class="card seat-detail" id="seatDetail">
+          <p class="empty-hint">點選座位查看占用者資訊。</p>
+        </div>
+      </div>
+
+      <div class="card c-note" id="cBlockNote" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L2.5 17a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <div>
+          <h3 style="font-size:var(--fs-md); margin-bottom:6px;">C 組座位表尚未產出</h3>
+          <p class="text-2" style="font-size:var(--fs-sm)">C 組(入座演繹)座標系統與 A/B 組不同,座位表尚未產出,目前以名冊清單方式管理。以下為部分名冊:</p>
+          <ul id="cBlockList" class="mt-5" style="display:flex; flex-direction:column; gap:6px;"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Me ================= -->
+    <section class="screen" id="screen-me" data-screen="me">
+      <h1 class="page-title">我的</h1>
+      <p class="page-sub" id="mePageSub">個人場次、座位、車次與行事曆</p>
+      <div id="meBody" class="mt-6"></div>
+    </section>
+
+  </main>
+
+  <!-- Mobile bottom nav -->
+  <nav class="bottomnav" id="bottomNav" aria-label="主要導覽"></nav>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal card" id="modalBody" role="dialog" aria-modal="true"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   慈濟大巨蛋演繹管理系統 — Mockup
+   Seed data + render + router. No framework, no build, no external requests.
+===================================================================== */
+
+/* ---------- tiny helpers ---------- */
+function mulberry32(seed){
+  let s = seed >>> 0;
+  return function(){
+    s |= 0; s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hashStr(str){
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+  return h >>> 0;
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+}
+function pick(arr, rng){ return arr[Math.floor(rng() * arr.length)]; }
+function shuffle(arr, rng){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ---------- seed: 和氣 / 聯區 ---------- */
+const HEQI = ["北區","安南一","安南二","安平","市中","市南","歸仁","仁德","大橋","永康","東一","東二","曾文","善化","新化","新營","新美","佳里","學甲"];
+const LIANQU_MAP = {
+  "安平聯區": ["安南一","安南二","北區","市中","市南","安平"],
+  "仁德聯區": ["東一","東二","仁德","歸仁","大橋","永康"],
+  "佳里聯區": ["佳里","學甲","新營","新美","曾文","善化","新化"],
+};
+const LIANQU_OF = {};
+Object.entries(LIANQU_MAP).forEach(([lq, list]) => list.forEach((h) => (LIANQU_OF[h] = lq)));
+
+const HEQI_REG_COUNT = { // sums to 2592 (總報名人次)
+  "北區":168, "安南一":134, "安南二":125, "安平":184, "市中":157, "市南":112,
+  "歸仁":128, "仁德":174, "大橋":100, "永康":162, "東一":137, "東二":129,
+  "曾文":95, "善化":149, "新化":87, "新營":170, "新美":78, "佳里":188, "學甲":115,
+};
+
+/* ---------- seed: 場次 ---------- */
+const SESSIONS = [
+  { id:"1112", label:"11/12(四)", name:"全區共同場", quota:648, occupied:631 },
+  { id:"1113", label:"11/13(五)", name:"安平聯區＋大橋", quota:648, occupied:598 },
+  { id:"1114", label:"11/14(六)", name:"佳里聯區", quota:648, occupied:612 },
+  { id:"1115", label:"11/15(日)", name:"仁德聯區", quota:648, occupied:574 },
+];
+
+/* ---------- seed: 人員池 ---------- */
+const SURNAMES = ["陳","林","黃","張","李","王","吳","劉","蔡","楊","許","鄭","謝","洪","郭","曾","邱","廖","賴","徐","周","葉","蘇","莊","呂","江","何","蕭","潘","朱","簡","鍾","彭","游","詹","胡","施","沈","余","趙","盧","梁","顏","柯","翁","魏","孫","戴","范"];
+const GIVEN = ["美玉","淑芬","秀琴","月娥","麗珠","彩雲","寶珠","雪梅","金龍","志成","文彬","國樑","明宏","榮吉","進興","文雄","淑惠","清風","慧敏","素珍","阿貴","錦繡","秀蘭","桂英","玉珍","惠美","建志","俊宏","雅婷","怡君","家豪","宗翰","思穎","佳蓉","冠宇","柏翰","雅雯","詩涵","思妤","冠廷","育德","政龍","美惠","玉芬","麗華","秋月","春嬌","淑貞","貴美","勝雄"];
+const CATEGORY_POOL = ["慈誠","委員","培訓","會眾","企劃","菁英","種子"];
+const CATEGORY_WEIGHTS = [0.18,0.22,0.10,0.30,0.05,0.05,0.10];
+
+function genName(rng){ return pick(SURNAMES, rng) + pick(GIVEN, rng); }
+function weightedCategory(rng){
+  const r = rng(); let acc = 0;
+  for (let i = 0; i < CATEGORY_POOL.length; i++){
+    acc += CATEGORY_WEIGHTS[i];
+    if (r <= acc) return CATEGORY_POOL[i];
+  }
+  return CATEGORY_POOL[CATEGORY_POOL.length - 1];
+}
+
+/* ---------- PII field generators (phone / email / 身分證 / 出生年月日 → 年齡) ---------- */
+const AGE_REF_DATE = new Date(2026, 10, 13); // 演繹日 2026-11-13,年齡一律由 birthDate 換算
+function randomBirthDate(rng){
+  const year = 1950 + Math.floor(rng() * 56); // 1950–2005,偏長者志工族群
+  const month = 1 + Math.floor(rng() * 12);
+  const day = 1 + Math.floor(rng() * 28);
+  return new Date(year, month - 1, day);
+}
+function ageFromBirth(bd, ref){
+  ref = ref || AGE_REF_DATE;
+  let age = ref.getFullYear() - bd.getFullYear();
+  const m = ref.getMonth() - bd.getMonth();
+  if (m < 0 || (m === 0 && ref.getDate() < bd.getDate())) age--;
+  return age;
+}
+function fmtDate(d){
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function randomPhone(rng){
+  return "09" + (1 + Math.floor(rng() * 8)) + Math.floor(rng() * 10) + "-" +
+    String(Math.floor(rng() * 1000)).padStart(3, "0") + "-" + String(Math.floor(rng() * 1000)).padStart(3, "0");
+}
+const ID_LETTERS = "ABCDEFGHJKLMNPQRSTUVXYZ".split("");
+function randomIdNumber(rng, gender){
+  const letter = pick(ID_LETTERS, rng);
+  let digits = gender === "男" ? "1" : "2";
+  for (let i = 0; i < 8; i++) digits += Math.floor(rng() * 10);
+  return letter + digits;
+}
+function maskId(id){ return id.slice(0, 3) + "****" + id.slice(-3); }
+function randomEmail(id){ return "vol" + String(id).replace(/\D/g, "") + "@tzuchi-demo.tw"; }
+
+function buildPeoplePool(n){
+  const rng = mulberry32(20260713);
+  const pool = [];
+  for (let i = 0; i < n; i++){
+    const heQi = pick(HEQI, rng);
+    const gender = rng() < 0.42 ? "男" : "女";
+    const birthDate = randomBirthDate(rng);
+    const id = "P" + (1000 + i);
+    pool.push({
+      id,
+      name: genName(rng),
+      heQi,
+      lianQu: LIANQU_OF[heQi],
+      gender,
+      category: weightedCategory(rng),
+      birthDate,
+      age: ageFromBirth(birthDate),
+      phone: randomPhone(rng),
+      email: randomEmail(id),
+      idNumber: randomIdNumber(rng, gender),
+    });
+  }
+  return pool;
+}
+const PEOPLE = buildPeoplePool(1187);
+const ME_BIRTH = new Date(1971, 4, 12);
+const ME = {
+  id:"ME", name:"林淑惠", heQi:"大橋", lianQu:"仁德聯區", gender:"女", category:"委員",
+  birthDate: ME_BIRTH, age: ageFromBirth(ME_BIRTH),
+  phone: "0933-201-558", email: "vol.lin@tzuchi-demo.tw", idNumber: "B234567891",
+};
+PEOPLE[0] = ME;
+
+/* ---------- 大橋和氣 recognizable roster (used consistently by 名單 + 座位) ---------- */
+const BRIDGE_HEQI_NAMES = [
+  "陳金龍","林秀琴","黃志成","張美玉","李文彬","王淑芬","吳國樑","劉月娥","蔡榮吉","楊麗珠",
+  "許彩雲","鄭寶珠","謝雪梅","洪清風","郭慧敏","曾素珍","邱阿貴","廖錦繡","賴秀蘭","徐桂英",
+  "周玉珍","葉惠美","蘇建志","莊俊宏",
+];
+function buildBridgeRoster(){
+  const rng = mulberry32(hashStr("bridge-heqi-roster"));
+  return BRIDGE_HEQI_NAMES.map((name, i) => {
+    const gender = i % 2 === 0 ? "男" : "女";
+    const birthDate = randomBirthDate(rng);
+    const id = "BQ" + (100 + i);
+    return {
+      id, name, heQi:"大橋", lianQu:"仁德聯區", gender,
+      category: weightedCategory(rng),
+      birthDate, age: ageFromBirth(birthDate),
+      phone: randomPhone(rng),
+      email: randomEmail(id),
+      idNumber: randomIdNumber(rng, gender),
+    };
+  });
+}
+const BRIDGE_ROSTER = buildBridgeRoster();
+BRIDGE_ROSTER.forEach((person, i) => { PEOPLE[10 + i] = person; });
+function pickOccupant(rng){
+  const heQi = pick(HEQI, rng);
+  if (heQi === "大橋"){
+    const person = pick(BRIDGE_ROSTER, rng);
+    return { name: person.name, heQi: "大橋", lianQu: "仁德聯區", gender: person.gender, category: person.category };
+  }
+  const gender = rng() < 0.4 ? "男" : "女";
+  return { name: genName(rng), heQi, lianQu: LIANQU_OF[heQi], gender, category: weightedCategory(rng) };
+}
+
+function sampleRoster(n, seedKey, filterFn){
+  const rng = mulberry32(hashStr(seedKey));
+  let src = filterFn ? PEOPLE.filter(filterFn) : PEOPLE;
+  if (src.length < n) src = PEOPLE;
+  return shuffle(src, rng).slice(0, Math.min(n, src.length));
+}
+function ensureIncluded(roster, person){
+  if (!roster.some((p) => p.id === person.id)) roster[0] = person;
+  return roster;
+}
+
+/* ---------- shared demo clock (DESIGN-v3 共用) — ALL event temporal comparisons use this ---------- */
+const DEMO_NOW = new Date("2026-11-09T10:30:00");
+function fmtDemoNow(){
+  const pad = (n) => String(n).padStart(2, "0");
+  return DEMO_NOW.getFullYear() + "/" + pad(DEMO_NOW.getMonth() + 1) + "/" + pad(DEMO_NOW.getDate()) + " " + pad(DEMO_NOW.getHours()) + ":" + pad(DEMO_NOW.getMinutes());
+}
+
+/* ---------- seed: 活動 ---------- */
+const EVENTS = [
+  { id:"E1", type:"彩排", title:"全區精修彩排", location:"台南靜思堂大殿", days:["2026-10-28"], start:"2026-10-28T09:00:00", end:"2026-10-28T16:00:00", session:null, blocks:["全部"], heQi:null, rosterSize:186, includeMe:true },
+  { id:"E2", type:"彩排", title:"高雄大巨蛋彩排", location:"高雄巨蛋", days:["2026-11-09","2026-11-10"], start:"2026-11-09T08:00:00", end:"2026-11-10T18:00:00", session:null, blocks:["全部"], heQi:null, rosterSize:620, includeMe:true, isTransportEvent:true },
+  { id:"E3", type:"共修", title:"大橋和氣共修", location:"大橋共修處", days:["2026-10-18"], start:"2026-10-18T09:00:00", end:"2026-10-18T11:30:00", session:"1113", blocks:["A","B"], heQi:"大橋", rosterSize:42, includeMe:true },
+  { id:"E4", type:"共修", title:"培訓志工共修", location:"台南靜思堂", days:["2026-10-25"], start:"2026-10-25T09:00:00", end:"2026-10-25T12:00:00", session:null, blocks:["全部"], heQi:null, rosterSize:68, includeMe:false, filter:(p)=>p.category==="培訓" },
+  { id:"E5", type:"驗收", title:"動作驗收—安平聯區", location:"安平共修處", days:["2026-11-11"], start:"2026-11-11T09:00:00", end:"2026-11-11T12:00:00", session:"1113", blocks:["A","B"], heQi:null, scopeLianQu:"安平聯區", rosterSize:155, includeMe:false, filter:(p)=>p.lianQu==="安平聯區" },
+  { id:"E6", type:"驗收", title:"動作驗收—佳里聯區", location:"佳里聯絡處", days:["2026-11-13"], start:"2026-11-13T14:00:00", end:"2026-11-13T17:00:00", session:"1114", blocks:["全部"], heQi:null, scopeLianQu:"佳里聯區", rosterSize:148, includeMe:false, filter:(p)=>p.lianQu==="佳里聯區" },
+  { id:"E7", type:"驗收", title:"動作驗收—仁德聯區", location:"仁德聯絡處", days:["2026-11-14"], start:"2026-11-14T09:00:00", end:"2026-11-14T12:00:00", session:"1115", blocks:["全部"], heQi:null, scopeLianQu:"仁德聯區", rosterSize:132, includeMe:true, filter:(p)=>p.lianQu==="仁德聯區" },
+  { id:"E8", type:"共修", title:"大橋和氣演繹前共修", location:"大橋共修處", days:["2026-11-11"], start:"2026-11-11T19:00:00", end:"2026-11-11T21:00:00", session:"1113", blocks:["A","B"], heQi:"大橋", rosterSize:38, includeMe:true },
+];
+
+/* ---------- temporal helpers (依 DEMO_NOW 判斷 進行中/即將發生/已發生) ---------- */
+function eventStart(ev){ return new Date(ev.start || (ev.days[0] + "T09:00:00")); }
+function eventEnd(ev){ return new Date(ev.end || (ev.days[ev.days.length - 1] + "T17:00:00")); }
+function eventStatus(ev){
+  const start = eventStart(ev), end = eventEnd(ev);
+  if (DEMO_NOW >= start && DEMO_NOW <= end) return "live";
+  if (start > DEMO_NOW) return "upcoming";
+  return "past";
+}
+function eventDateRangeLabel(ev){
+  return ev.days.length <= 1 ? ev.days[0] : (ev.days[0] + " – " + ev.days[ev.days.length - 1]);
+}
+function daysBetween(startStr, endStr){
+  const start = new Date(startStr), end = new Date(endStr);
+  const days = [];
+  const d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  while (d <= endDate){ days.push(fmtDate(d)); d.setDate(d.getDate() + 1); }
+  return days.length ? days : [fmtDate(start)];
+}
+function sessionLabelShort(id){
+  if (!id) return "不限/全區";
+  const s = SESSIONS.find((x) => x.id === id);
+  return s ? s.label + " " + s.name : id;
+}
+function blocksLabel(ev){
+  if (!ev.blocks || !ev.blocks.length || ev.blocks.includes("全部")) return "全部區塊";
+  return ev.blocks.join("、") + " 區塊";
+}
+
+const EVENT_ROSTER_CACHE = {};
+function getEventRoster(ev){
+  if (EVENT_ROSTER_CACHE[ev.id]) return EVENT_ROSTER_CACHE[ev.id];
+  const filterFn = ev.heQi ? (p) => p.heQi === ev.heQi : (ev.filter || null);
+  let roster = sampleRoster(ev.rosterSize, "roster-" + ev.id, filterFn);
+  if (ev.includeMe) roster = ensureIncluded(roster, ME);
+  EVENT_ROSTER_CACHE[ev.id] = roster;
+  return roster;
+}
+
+/* checkin state (點名 · 適用進行中/已發生活動): `${eventId}_${day}_${personId}` -> '未到'|'已到'|'請假' */
+const checkinState = {};
+function seedCheckins(ev){
+  const rng = mulberry32(hashStr("checkin-" + ev.id));
+  const roster = getEventRoster(ev);
+  ev.days.forEach((day) => {
+    roster.forEach((p) => {
+      const key = ev.id + "_" + day + "_" + p.id;
+      if (checkinState[key] !== undefined) return;
+      const r = rng();
+      if (r < 0.62) checkinState[key] = "已到";
+      else if (r < 0.74) checkinState[key] = "請假";
+      else checkinState[key] = "未到";
+    });
+  });
+}
+EVENTS.forEach(seedCheckins);
+
+/* registration state (報名 · 適用即將發生活動): `${eventId}_${personId}` -> '報名'|'請假'|'未回覆' */
+const eventRegState = {};
+function seedEventReg(ev){
+  const rng = mulberry32(hashStr("reg-" + ev.id));
+  const roster = getEventRoster(ev);
+  roster.forEach((p) => {
+    const key = ev.id + "_" + p.id;
+    if (eventRegState[key] !== undefined) return;
+    const r = rng();
+    if (r < 0.66) eventRegState[key] = "報名";
+    else if (r < 0.80) eventRegState[key] = "請假";
+    else eventRegState[key] = "未回覆";
+  });
+}
+EVENTS.forEach(seedEventReg);
+function eventRegCounts(ev){
+  const roster = getEventRoster(ev);
+  const counts = { "報名":0, "請假":0, "未回覆":0 };
+  roster.forEach((p) => { counts[eventRegState[ev.id + "_" + p.id] || "未回覆"]++; });
+  return counts;
+}
+
+/* ---------- seed: 交通(高雄彩排) ---------- */
+/* 車牌(交通幹事填寫,選填)— DESIGN-v3 §階段3-15,台灣遊覽車車牌格式 */
+const BUS_PLATES = { B1:"KAA-5162", B2:"KAB-3390", B3:"KBC-7028", B4:"KCD-1247", B5:"KDE-6653", B6:"KEF-2984", B7:"KFG-8071", B8:"KGH-4519" };
+const BUSES_GO = [
+  { id:"B1", name:"台南1號車", origin:"台南靜思堂", dest:"高雄大巨蛋", driver:"王志成", driverPhone:"0933-021-115", leader:"黃志明", capacity:48, assigned:48, boarded:46, departTime:"06:00" },
+  { id:"B2", name:"台南2號車", origin:"台南靜思堂", dest:"高雄大巨蛋", driver:"李文彬", driverPhone:"0928-556-201", leader:"林淑芬", capacity:48, assigned:46, boarded:44, departTime:"06:00" },
+  { id:"B3", name:"安平區車", origin:"安平共修處", dest:"高雄大巨蛋", driver:"張國樑", driverPhone:"0955-330-882", leader:"黃秀琴", capacity:48, assigned:45, boarded:45, departTime:"06:10" },
+  { id:"B4", name:"佳里區車", origin:"佳里聯絡處", dest:"高雄大巨蛋", driver:"陳明宏", driverPhone:"0912-774-509", leader:"吳月娥", capacity:48, assigned:44, boarded:42, departTime:"05:40" },
+  { id:"B5", name:"新營區車", origin:"新營聯絡處", dest:"高雄大巨蛋", driver:"蔡榮吉", driverPhone:"0966-118-733", leader:"郭麗珠", capacity:48, assigned:43, boarded:40, departTime:"05:45" },
+  { id:"B6", name:"善化區車", origin:"善化聯絡處", dest:"高雄大巨蛋", driver:"楊金龍", driverPhone:"0921-447-668", leader:"許彩雲", capacity:48, assigned:40, boarded:38, departTime:"05:50" },
+  { id:"B7", name:"麻豆區車", origin:"麻豆聯絡處", dest:"高雄大巨蛋", driver:"賴進興", driverPhone:"0937-889-021", leader:"洪寶珠", capacity:48, assigned:38, boarded:36, departTime:"05:55" },
+  { id:"B8", name:"學甲區車", origin:"學甲聯絡處", dest:"高雄大巨蛋", driver:"周文雄", driverPhone:"0910-662-354", leader:"蘇雪梅", capacity:48, assigned:36, boarded:34, departTime:"05:35" },
+];
+const BUSES_RETURN = [
+  { id:"B1", name:"台南1號車", origin:"高雄大巨蛋", dest:"台南靜思堂", driver:"王志成", driverPhone:"0933-021-115", leader:"黃志明", capacity:48, assigned:48, boarded:0, note:"", departTime:"17:30" },
+  { id:"B2", name:"台南2號車", origin:"高雄大巨蛋", dest:"台南靜思堂", driver:"李文彬", driverPhone:"0928-556-201", leader:"林淑芬", capacity:48, assigned:46, boarded:0, note:"", departTime:"17:30" },
+  { id:"B3", name:"安平區車", origin:"高雄大巨蛋", dest:"安平共修處", driver:"張國樑", driverPhone:"0955-330-882", leader:"黃秀琴", capacity:48, assigned:45, boarded:0, note:"", departTime:"17:30" },
+  { id:"B4", name:"佳里區車", origin:"高雄大巨蛋", dest:"佳里聯絡處", driver:"陳明宏", driverPhone:"0912-774-509", leader:"吳月娥", capacity:48, assigned:41, boarded:0, note:"3 人留高雄住宿,不隨車返回", departTime:"17:30" },
+  { id:"B5", name:"新營區車", origin:"高雄大巨蛋", dest:"新營聯絡處", driver:"蔡榮吉", driverPhone:"0966-118-733", leader:"郭麗珠", capacity:48, assigned:43, boarded:0, note:"", departTime:"17:30" },
+  { id:"B6", name:"善化區車", origin:"高雄大巨蛋", dest:"善化聯絡處", driver:"楊金龍", driverPhone:"0921-447-668", leader:"許彩雲", capacity:48, assigned:40, boarded:0, note:"", departTime:"17:30" },
+  { id:"B7", name:"麻豆區車", origin:"高雄大巨蛋", dest:"麻豆聯絡處", driver:"賴進興", driverPhone:"0937-889-021", leader:"洪寶珠", capacity:48, assigned:38, boarded:0, note:"", departTime:"17:30" },
+  { id:"B8", name:"學甲區車", origin:"高雄大巨蛋", dest:"學甲聯絡處", driver:"周文雄", driverPhone:"0910-662-354", leader:"蘇雪梅", capacity:48, assigned:36, boarded:0, note:"", departTime:"17:30" },
+];
+BUSES_GO.forEach((b) => { b.plate = BUS_PLATES[b.id] || ""; });
+BUSES_RETURN.forEach((b) => { b.plate = BUS_PLATES[b.id] || ""; });
+const BOARDING_LIMIT = 5;
+function boardingPointDist(buses){
+  const m = {};
+  buses.forEach((b) => { m[b.origin] = (m[b.origin] || 0) + 1; });
+  return Object.entries(m).map(([name, count]) => ({ name, count }));
+}
+const NOT_ATTENDING = 280;
+
+/* ---------- seed: dispatch tiers (Phase 2 — 交通多階調度 §C-3) ---------- */
+const BUS_HEQI_BREAKDOWN = {
+  B1: { 大橋:24, 永康:14, 仁德:10 },
+  B2: { 東一:18, 東二:16, 歸仁:12 },
+  B3: { 安平:25, 安南一:12, 市中:8 },
+  B4: { 佳里:26, 學甲:18 },
+  B5: { 新營:24, 新美:19 },
+  B6: { 善化:22, 新化:18 },
+  B7: { 曾文:20, 善化:18 },
+  B8: { 學甲:20, 佳里:16 },
+};
+const BUS_LIANQU = { B1:"仁德聯區", B2:"仁德聯區", B3:"安平聯區", B4:"佳里聯區", B5:"佳里聯區", B6:"佳里聯區", B7:"佳里聯區", B8:"佳里聯區" };
+BUSES_GO.forEach((b) => { b.lianQu = BUS_LIANQU[b.id] || ""; b.heQiBreakdown = Object.assign({}, BUS_HEQI_BREAKDOWN[b.id] || {}); });
+
+function buildBoardingPoints(){
+  const groups = {};
+  BUSES_GO.forEach((b) => { (groups[b.origin] = groups[b.origin] || []).push(b); });
+  return Object.entries(groups).map(([name, buses]) => {
+    const assignedSeats = buses.reduce((a, b) => a + b.assigned, 0);
+    const rng = mulberry32(hashStr("bp-" + name));
+    const riders = assignedSeats + Math.floor(rng() * 6);
+    return {
+      id: "bp-" + name,
+      name,
+      riders,
+      assignedBuses: buses.length,
+      suggestedBuses: Math.ceil(riders / 48),
+      earmark: buses[0].lianQu || "",
+    };
+  });
+}
+const dispatchState = { boardingPoints: buildBoardingPoints() };
+
+/* 大橋和氣「已報名坐車」名單:多數已報名,前 18 位已排入 B1,其餘待排 */
+const busRiderAssignment = {}; // personId -> busId(已排) | null(已報名未排) | "none"(未報名坐車)
+(function seedBridgeBusSignup(){
+  const rng = mulberry32(hashStr("bridge-bus-signup"));
+  BRIDGE_ROSTER.forEach((p, i) => {
+    if (rng() < 0.83) busRiderAssignment[p.id] = i < 18 ? "B1" : null;
+    else busRiderAssignment[p.id] = "none";
+  });
+})();
+function bridgeBusRiders(){ return BRIDGE_ROSTER.filter((p) => busRiderAssignment[p.id] !== "none"); }
+
+const leaderCheckin = {}; // personId -> boolean(已上車),僅適用於已排入 B1 的大橋和氣乘客
+(function seedLeaderCheckin(){
+  const rng = mulberry32(hashStr("leader-checkin"));
+  bridgeBusRiders().forEach((p) => { if (busRiderAssignment[p.id] === "B1") leaderCheckin[p.id] = rng() < 0.7; });
+})();
+
+const busPassengerCache = {};
+function busPassengers(busId){
+  if (busPassengerCache[busId]) return busPassengerCache[busId];
+  const bus = BUSES_GO.find((b) => b.id === busId);
+  let list = [];
+  if (bus){
+    Object.entries(bus.heQiBreakdown || {}).forEach(([heQi, count]) => {
+      if (heQi === "大橋" && busId === "B1"){
+        list = list.concat(BRIDGE_ROSTER.filter((p) => busRiderAssignment[p.id] === busId));
+      } else {
+        list = list.concat(sampleRoster(count, "buspass-" + busId + "-" + heQi, (p) => p.heQi === heQi));
+      }
+    });
+  }
+  busPassengerCache[busId] = list;
+  return list;
+}
+function resolveBusId(busId){
+  if (!busId) return null;
+  if (BUSES_GO.some((b) => b.id === busId)) return busId;
+  const m = /^go-(\d+)$/.exec(busId);
+  if (m) return (BUSES_GO[+m[1] - 1] || BUSES_GO[0]).id;
+  return BUSES_GO[0].id;
+}
+
+/* ---------- seed: 座位格 (西一象限 A+B, 完整標示化 — DESIGN-v3 §階段2-12) ---------- */
+function seatCostume(rowNo){ return Math.floor((rowNo - 1) / 3) % 2 === 0 ? "白" : "藍"; }
+/* 列1–12 與 列49–54 = 男,其餘(列13–48)= 女 */
+function seatGender(rowNo){ return (rowNo <= 12 || rowNo >= 49) ? "男" : "女"; }
+/* 排16–22 共 7 排 × 54 列 = 378,截角 10 格 → 368 席
+   列51 缺排22 · 列52 缺排21,22 · 列53 缺排20,21,22 · 列54 缺排19,20,21,22 */
+function seatCellExists(row, col){ // row=列 1..54, col=排 16..22
+  if (row === 51) return col <= 21;
+  if (row === 52) return col <= 20;
+  if (row === 53) return col <= 19;
+  if (row === 54) return col <= 18;
+  return true;
+}
+
+/* combined 西一象限 A+B 座位圖(單一球場圖,非依組別分開渲染) */
+function genSeatGridCombined(sessionId){
+  const fillRate = 0.86;
+  const rng = mulberry32(hashStr("seat-" + sessionId + "-AB"));
+  const mySeat = personaSeat();
+  const p = state.persona;
+  const cells = [];
+  for (let row = 1; row <= 54; row++){
+    const costume = seatCostume(row);
+    const block = row <= 30 ? "A" : "B";
+    for (let col = 16; col <= 22; col++){
+      if (!seatCellExists(row, col)) continue;
+      const isMe = !!mySeat && mySeat.session === sessionId && mySeat.row === row && mySeat.col === col;
+      const occupied = isMe || rng() < fillRate;
+      let occ = null;
+      if (occupied){
+        occ = isMe
+          ? { name: p.person.name, heQi: p.person.heQi, lianQu: LIANQU_OF[p.person.heQi] || (p.person.lianQu + "聯區"), gender: "—", category: p.person.category }
+          : pickOccupant(rng);
+      }
+      const foreignScope = occupied && p.kind === "staff" && p.scope === "heQi" && occ.heQi !== p.heQi;
+      cells.push({
+        seatKey: sessionId + "_" + block + "_" + row + "-" + col,
+        row, col, block, costume, occupied, occ, isMe, foreignScope,
+        gridColumn: 56 - row,     // +1 offset: col1 reserved for 排-axis label column
+        gridRow: (col - 15) + 2,  // +2 offset: row1 = 列-axis header, row2 = 3列標籤帶
+      });
+    }
+  }
+  return cells;
+}
+
+const C_BLOCK_LIST = sampleRoster(14, "cblock", null);
+
+/* =====================================================================
+   多場次報名模型(名單 · DESIGN-v3 §階段2-11) — 供 Phase 3(交通)重用
+   Public API:
+     - personParticipations(personId) → [{session, block, costume, seat, is84}, …] (0–4 筆)
+     - sessionParticipation(personId, sessionId) → 單筆 | null
+     - sessionShort(sessionId) → 場次簡稱(11/12 共同 · 11/13 安平+大橋 · 11/14 佳里 · 11/15 仁德)
+===================================================================== */
+const SESSION_SHORT = { "1112":"11/12 共同", "1113":"11/13 安平+大橋", "1114":"11/14 佳里", "1115":"11/15 仁德" };
+function sessionShort(sessionId){ return SESSION_SHORT[sessionId] || sessionId; }
+
+function personOwnSession(person){
+  if (person.lianQu === "安平聯區") return "1113";
+  if (person.lianQu === "佳里聯區") return "1114";
+  if (person.lianQu === "仁德聯區") return "1115";
+  return null;
+}
+
+const PARTICIPATION_CACHE = {};
+/* 每人 0–4 筆報名;多數 1 場、部分 2–3 場、少數 4 場(與 ~1187 人 / 2592 人次概略一致) */
+function personParticipations(personId){
+  if (PARTICIPATION_CACHE[personId]) return PARTICIPATION_CACHE[personId];
+  const person = PEOPLE.find((x) => x.id === personId);
+  if (!person) return (PARTICIPATION_CACHE[personId] = []);
+
+  const rng = mulberry32(hashStr("participation-" + personId));
+  const r = rng();
+  const count = r < 0.35 ? 1 : r < 0.65 ? 2 : r < 0.85 ? 3 : 4;
+
+  const ownSession = personOwnSession(person);
+  let chosen = [];
+  if (rng() < 0.7) chosen.push("1112"); // 全區共同場,人人較常報名
+  if (ownSession && !chosen.includes(ownSession) && rng() < 0.75) chosen.push(ownSession);
+  const remaining = shuffle(SESSIONS.map((s) => s.id).filter((id) => !chosen.includes(id)), rng);
+  for (const id of remaining){
+    if (chosen.length >= count) break;
+    chosen.push(id);
+  }
+  if (!chosen.length) chosen.push(pick(SESSIONS.map((s) => s.id), rng));
+  chosen = chosen.slice(0, count);
+
+  const parts = chosen.map((sessionId) => {
+    const br = rng();
+    const block = br < 0.42 ? "A" : br < 0.82 ? "B" : "C";
+    let seat = null, costume = null;
+    if (block !== "C"){
+      const range = block === "A" ? [1, 30] : [31, 54];
+      let row = range[0], col = 16, tries = 0;
+      do {
+        row = range[0] + Math.floor(rng() * (range[1] - range[0] + 1));
+        col = 16 + Math.floor(rng() * 7);
+        tries++;
+      } while (!seatCellExists(row, col) && tries < 20);
+      costume = seatCostume(row);
+      if (rng() < 0.82) seat = row + "-" + col; // 未配位 → null(顯示「未排」)
+    }
+    const is84 = person.age >= 70 && rng() < 0.12;
+    return { session: sessionId, block, costume, seat, is84 };
+  });
+  return (PARTICIPATION_CACHE[personId] = parts);
+}
+function sessionParticipation(personId, sessionId){
+  return personParticipations(personId).find((pt) => pt.session === sessionId) || null;
+}
+
+/* =====================================================================
+   跨場次 / 整日調度(合心)— DESIGN-v3 §階段3-14
+   預設「同車去回」(一位乘客去程與回程同一台車、同上下車點)。
+   例外:高雄靜思堂彩排/驗收單日可能 2–4 場次 → 跨場次(多場次報名)
+   或整日型(企劃/菁英/工作人員)參與者,去程/回程可搭不同車(但同一上下車地點),
+   由合心統一安排。示範資料僅取「台南靜思堂」上車點(唯一同點有 2 台車 B1/B2 的組合),
+   以符合「去回不同車但同上下車點」的限制。
+   Public API: CROSS_SESSION_RIDERS[personId] → {dayType, outboundBusId, returnBusId} | undefined
+               riderDayType(personId) → '單場'|'跨場次'|'整日'
+===================================================================== */
+const CROSS_SESSION_RIDERS = {};
+(function seedCrossSessionRiders(){
+  const samePointBuses = ["B1", "B2"]; // 皆為「台南靜思堂」上車點
+  const pool = bridgeBusRiders(); // 已報名坐車(含已排/未排)的大橋和氣乘客
+  function place(p, dayType){
+    if (!p || CROSS_SESSION_RIDERS[p.id]) return;
+    const personRng = mulberry32(hashStr("cross-return-" + p.id)); // 每人獨立亂數,避免同序列相關造成全數同向
+    const outboundBusId = samePointBuses.includes(busRiderAssignment[p.id]) ? busRiderAssignment[p.id] : "B1";
+    let returnBusId = outboundBusId;
+    if (personRng() < 0.55) returnBusId = samePointBuses.find((id) => id !== outboundBusId);
+    CROSS_SESSION_RIDERS[p.id] = { dayType, outboundBusId, returnBusId };
+  }
+  const ALLDAY_CATS = ["企劃", "菁英"];
+  let allDay = pool.filter((p) => ALLDAY_CATS.includes(p.category));
+  if (allDay.length < 2) allDay = allDay.concat(pool.filter((p) => !allDay.includes(p)).slice(0, 2 - allDay.length));
+  allDay.slice(0, 4).forEach((p) => place(p, "整日"));
+  let crossSession = pool.filter((p) => personParticipations(p.id).length >= 3 && !CROSS_SESSION_RIDERS[p.id]);
+  if (crossSession.length < 2) crossSession = crossSession.concat(pool.filter((p) => personParticipations(p.id).length >= 2 && !CROSS_SESSION_RIDERS[p.id]));
+  crossSession.slice(0, 4).forEach((p) => place(p, "跨場次"));
+})();
+function riderDayType(personId){
+  return CROSS_SESSION_RIDERS[personId] ? CROSS_SESSION_RIDERS[personId].dayType : "單場";
+}
+
+/* ---------- seed: 帳號綁定審核(審核頁 · Phase 1 §1) ---------- */
+const approvalState = { pending: [], approved: [] };
+(function seedApprovals(){
+  const bridgeApplicants = BRIDGE_ROSTER.slice(2, 9);
+  const rendeApplicants = sampleRoster(6, "approval-rende", (p) => p.heQi === "仁德");
+  const pendingPool = [bridgeApplicants[0], bridgeApplicants[1], bridgeApplicants[2], rendeApplicants[0], rendeApplicants[1]];
+  const approvedPool = [bridgeApplicants[3], bridgeApplicants[4], rendeApplicants[2], rendeApplicants[3]];
+  const appliedTimes = ["2026-11-07 09:12", "2026-11-07 15:40", "2026-11-08 10:05", "2026-11-08 16:22", "2026-11-09 08:47"];
+  const approvedTimes = ["2026-11-02 11:20", "2026-11-03 14:05", "2026-11-04 09:30", "2026-11-05 17:12"];
+  const approvers = ["林淑惠(和氣行政)", "王麗華(合心行政)", "林淑惠(和氣行政)", "王麗華(合心行政)"];
+  pendingPool.forEach((person, i) => {
+    if (!person) return;
+    approvalState.pending.push({ id:"AR" + (i + 1), email:"acct" + (2001 + i) + "@gmail.com", personId: person.id, appliedAt: appliedTimes[i] || "2026-11-08 12:00" });
+  });
+  approvedPool.forEach((person, i) => {
+    if (!person) return;
+    approvalState.approved.push({
+      id:"AR" + (100 + i), email:"acct" + (1001 + i) + "@gmail.com", personId: person.id,
+      approvedBy: approvers[i] || "林淑惠(和氣行政)", approvedAt: approvedTimes[i] || "2026-11-01 10:00",
+      icsStatus: i % 2 === 0 ? "已產生" : "尚未產生",
+    });
+  });
+})();
+function approvalPerson(id){ return PEOPLE.find((x) => x.id === id); }
+function approvalVisible(req){
+  const p = state.persona;
+  const person = approvalPerson(req.personId);
+  if (!person) return false;
+  if (p.scope === "all") return true;
+  if (p.scope === "heQi") return person.heQi === p.heQi;
+  if (p.scope === "lianQu") return person.lianQu === (p.lianQu + "聯區") || person.lianQu === p.lianQu;
+  return false;
+}
+
+/* =====================================================================
+   PERSONA MODEL — 角色 / 權限分流(DESIGN-v2.md §A)
+   Public API for the next phase to build on:
+     - PERSONAS            : array of 11 persona definitions
+     - state.persona        : the persona currently being viewed
+     - can(cap)              → boolean, does current persona have capability `cap`
+     - scopeOK(row)          → boolean, is `row` (object with .heQi/.lianQu) in current persona's scope
+     - piiTier()             → 'full' | 'contact' | 'self' | 'none'
+     - applyPersona(id)      → switch current persona by id, re-renders app
+===================================================================== */
+const PERSONAS = [
+  // ===== 個人帳號(kind:'personal')=====
+  { id:'unbound',   group:'個人', label:'未綁定帳號',
+    kind:'personal', bound:false, scope:'none', pii:'none', caps:[], person:null },
+  { id:'performer', group:'個人', label:'入經藏菩薩(已綁定)',
+    kind:'personal', bound:true, staff:false, scope:'self', pii:'self',
+    caps:['self_register','self_leave','self_bus_signup'],
+    person:{ name:'陳美玲', heQi:'大橋', lianQu:'仁德', category:'委員',
+             sessions:[{s:'11/13(五) 安平聯區+大橋', block:'B', costume:'藍', seat:'B-48-21'}],
+             busDispatched:true } },
+  { id:'leader',    group:'個人', label:'入經藏菩薩 · 兼車長',
+    kind:'personal', bound:true, staff:false, busLeader:true, scope:'self', pii:'contact',
+    caps:['self_register','self_leave','self_bus_signup','bus_checkin','bus_contact'],
+    person:{ name:'黃志明', heQi:'大橋', lianQu:'仁德', category:'慈誠',
+             sessions:[{s:'11/13(五) 安平聯區+大橋', block:'A', costume:'白', seat:'A-12-18'}],
+             busId:'go-1', busDispatched:true } },
+  // ===== 幕僚(kind:'staff')scope: all|lianQu|heQi ; pii: full|contact =====
+  { id:'heqi-activity',  group:'幕僚', label:'和氣活動', kind:'staff',
+    scope:'heQi',  heQi:'大橋', lianQu:'仁德', pii:'contact',
+    caps:['manage_events_heqi','take_attendance','bus_assign_rider'] },
+  { id:'lianqu-activity',group:'幕僚', label:'聯區活動 · 交通', kind:'staff',
+    scope:'lianQu', lianQu:'仁德', pii:'contact',
+    caps:['manage_events_lianqu','take_attendance','bus_dispatch_scope','set_bus_leader'] },
+  { id:'hexin-activity', group:'幕僚', label:'合心活動 · 交通幹事', kind:'staff',
+    scope:'all', pii:'contact',
+    caps:['manage_events_all','take_attendance','bus_dispatch_all','bus_create','set_bus_leader'] },
+  { id:'heqi-hr',    group:'幕僚', label:'和氣人事', kind:'staff',
+    scope:'heQi', heQi:'大橋', lianQu:'仁德', pii:'full',
+    caps:['crud_registration','confirm_84','edit_pii'] },
+  { id:'heqi-admin', group:'幕僚', label:'和氣行政', kind:'staff',
+    scope:'heQi', heQi:'大橋', lianQu:'仁德', pii:'full',
+    caps:['crud_registration','confirm_84','edit_seat_attrs','edit_pii','manage_registration'] },
+  { id:'lianqu-admin',group:'幕僚', label:'聯區行政', kind:'staff',
+    scope:'lianQu', lianQu:'仁德', pii:'full', caps:['edit_seat_attrs'] },
+  { id:'hexin-hr',   group:'幕僚', label:'合心人事', kind:'staff',
+    scope:'all', pii:'full',
+    caps:['assign_any_seat','crud_registration','confirm_84','edit_pii','manage_registration','manage_staff'] },
+  { id:'hexin-admin',group:'幕僚', label:'合心行政', kind:'staff',
+    scope:'all', pii:'full',
+    caps:['manage_users','assign_any_seat','crud_registration','confirm_84',
+          'edit_seat_attrs','edit_pii','manage_registration','manage_staff'] },
+];
+
+const state = { persona: PERSONAS.find((p) => p.id === "heqi-admin") };
+
+function can(cap){ return !!(state.persona.caps && state.persona.caps.includes(cap)); }
+function scopeOK(row){
+  const p = state.persona;
+  if (p.scope === "all") return true;
+  if (p.scope === "lianQu") return row.lianQu === (p.lianQu + "聯區") || row.lianQu === p.lianQu;
+  if (p.scope === "heQi") return row.heQi === p.heQi;
+  return false; // self/none handled per-screen for personal personas
+}
+function piiTier(){ return state.persona.pii; }
+function hasBusCap(p){ return (p.caps || []).some((c) => c.startsWith("bus_") || c.includes("dispatch")); }
+
+function scopeHeQiList(p){
+  p = p || state.persona;
+  if (p.scope === "all") return HEQI.slice();
+  if (p.scope === "lianQu") return LIANQU_MAP[p.lianQu + "聯區"] || [];
+  if (p.scope === "heQi") return [p.heQi];
+  return [];
+}
+function scopeLabel(p){
+  p = p || state.persona;
+  if (p.kind === "personal"){
+    if (!p.bound) return "未綁定";
+    return p.person.name + " · 本人";
+  }
+  if (p.scope === "all") return "全區(合心)";
+  if (p.scope === "lianQu") return p.lianQu + "聯區";
+  if (p.scope === "heQi") return p.heQi + "和氣";
+  return "";
+}
+function piiLabel(p){
+  p = p || state.persona;
+  return { full:"人事級", contact:"聯絡級", self:"本人級", none:"無" }[p.pii] || "";
+}
+function personaOptionLabel(p){
+  return p.label + "(" + scopeLabel(p) + " · " + piiLabel(p) + ")";
+}
+
+/* ---------- persona-aware seat helper (used by 座位/我的) ---------- */
+function personaSeat(){
+  const p = state.persona;
+  if (!p.bound || !p.person || !p.person.sessions || !p.person.sessions.length) return null;
+  const s = p.person.sessions[0];
+  const sess = SESSIONS.find((x) => s.s.indexOf(x.label) === 0);
+  if (!sess) return null;
+  const parts = s.seat.split("-"); // [blockLetter, row, col]
+  return { session: sess.id, block: s.block, row: +parts[1], col: +parts[2], costume: s.costume, sessionLabel: s.s };
+}
+function resolveBusName(busId){
+  const b = BUSES_GO.find((x) => x.id === busId) || BUSES_GO[0];
+  return b.name;
+}
+
+/* ---------- nav config ---------- */
+const NAV_ITEMS = [
+  { key:"overview", label:"總覽", icon:'<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9"/>' },
+  { key:"events", label:"活動", icon:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/>' },
+  { key:"approvals", label:"審核", icon:'<path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/>' },
+  { key:"transport", label:"交通", icon:'<rect x="4" y="6" width="16" height="10" rx="2.5"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/><path d="M4 11h16"/>' },
+  { key:"list", label:"名單", icon:'<rect x="3" y="5" width="18" height="4" rx="1.5"/><rect x="3" y="11" width="18" height="4" rx="1.5"/><rect x="3" y="17" width="18" height="4" rx="1.5"/>' },
+  { key:"seats", label:"座位", icon:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>' },
+  { key:"me", label:"我的", icon:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/>' },
+];
+const TITLES = { overview:"總覽", events:"活動", approvals:"審核", transport:"交通調度", list:"名單", seats:"座位格", me:"我的" };
+const CHIPS = {
+  overview:"11/12–11/15 大巨蛋演繹",
+  events:"彩排 · 共修 · 驗收",
+  approvals:"帳號綁定審核",
+  transport:"高雄彩排",
+  list:"幕僚 · 依權限顯示",
+  seats:"西一象限 A+B · 368 席 · C 組另計",
+  me:"我的個人專區",
+};
+
+/* cap gate for 審核 page: manage_users, or (crud_registration AND persona has a defined scope) */
+function canApprovals(p){
+  p = p || state.persona;
+  const caps = p.caps || [];
+  if (caps.includes("manage_users")) return true;
+  return caps.includes("crud_registration") && !!p.scope && p.scope !== "self" && p.scope !== "none";
+}
+
+function navItemsFor(p){
+  p = p || state.persona;
+  if (p.kind === "personal"){
+    const items = ["seats", "me"];
+    if (p.busLeader) items.push("transport"); // 個人但兼車長 → 交通頁 = 車長點名(DESIGN-v3 §階段3-13)
+    return items;
+  }
+  const items = ["overview", "events"];
+  if (canApprovals(p)) items.push("approvals");
+  if (hasBusCap(p)) items.push("transport");
+  items.push("list", "seats");
+  return items;
+}
+
+function svgIcon(paths, extra){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' + (extra||"") + '>' + paths + '</svg>';
+}
+
+function buildNav(){
+  const allowed = navItemsFor(state.persona);
+  const list = NAV_ITEMS.filter((n) => allowed.includes(n.key));
+  const bottom = document.getElementById("bottomNav");
+  const side = document.getElementById("sidebarNav");
+  const html = list.map((n) =>
+    `<button class="nav-item" data-key="${n.key}" onclick="location.hash='#/${n.key}'">${svgIcon(n.icon)}<span>${n.label}</span></button>`
+  ).join("");
+  bottom.innerHTML = html;
+  side.innerHTML = html;
+}
+
+function updateNav(activeKey){
+  document.querySelectorAll(".nav-item").forEach((el) => {
+    el.classList.toggle("active", el.dataset.key === activeKey);
+  });
+  document.getElementById("appbarTitle").textContent = TITLES[activeKey] || "";
+  document.getElementById("appbarChip").textContent = CHIPS[activeKey] || "";
+}
+
+/* ---------- persona chrome: switcher selects + scope chips + user card ---------- */
+function renderPersonaChrome(){
+  const p = state.persona;
+  const groupOrder = ["個人", "幕僚"];
+  const optionsHtml = groupOrder.map((g) => {
+    const list = PERSONAS.filter((x) => x.group === g);
+    return `<optgroup label="${g}">${list.map((x) =>
+      `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(personaOptionLabel(x))}</option>`
+    ).join("")}</optgroup>`;
+  }).join("");
+  ["personaSelectMobile", "personaSelectDesktop"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = optionsHtml;
+  });
+
+  const chipText = "檢視範圍:" + scopeLabel(p) + " · " + piiLabel(p);
+  document.querySelectorAll(".scope-chip").forEach((el) => { el.textContent = chipText; });
+
+  const nameText = p.kind === "personal" ? (p.bound ? p.person.name : "未綁定使用者") : p.label;
+  const roleText = p.kind === "personal" ? p.label : (scopeLabel(p) + " · " + piiLabel(p));
+  const avatarEl = document.getElementById("sidebarAvatar");
+  if (avatarEl) avatarEl.textContent = nameText.charAt(0);
+  const whoNameEl = document.getElementById("sidebarWhoName");
+  if (whoNameEl) whoNameEl.textContent = nameText;
+  const whoRoleEl = document.getElementById("sidebarWhoRole");
+  if (whoRoleEl) whoRoleEl.textContent = roleText;
+}
+
+/* ---------- switch demo persona ---------- */
+function applyPersona(id){
+  const p = PERSONAS.find((x) => x.id === id);
+  if (!p) return;
+  state.persona = p;
+  buildNav();
+  renderPersonaChrome();
+  route();
+  const content = document.getElementById("content");
+  content.classList.remove("persona-transition");
+  void content.offsetWidth; // force reflow so the animation replays
+  content.classList.add("persona-transition");
+}
+
+/* ---------- toast ---------- */
+function showToast(msg, type){
+  const region = document.getElementById("toastRegion");
+  const el = document.createElement("div");
+  el.className = "toast" + (type ? " " + type : "");
+  el.textContent = msg;
+  region.appendChild(el);
+  setTimeout(() => { el.style.transition = "opacity .2s ease"; el.style.opacity = "0"; setTimeout(() => el.remove(), 220); }, 2400);
+}
+
+/* ================= Overview render ================= */
+function sessionVisibleForScope(s, p){
+  if (!p.scope || p.scope === "all") return true;
+  if (s.name.includes("全區")) return true;
+  if (p.scope === "heQi") return s.name.includes(p.heQi);
+  if (p.scope === "lianQu") return s.name.includes(p.lianQu);
+  return true;
+}
+
+function renderOverview(){
+  const p = state.persona;
+  const scopeHeQi = scopeHeQiList(p);
+  const visibleSessions = SESSIONS.filter((s) => sessionVisibleForScope(s, p));
+
+  const cards = document.getElementById("sessionCards");
+  cards.innerHTML = visibleSessions.map((s) => {
+    const pct = Math.round((s.occupied / s.quota) * 100);
+    return `
+    <div class="card session-card">
+      <div class="top">
+        <div>
+          <h3>${s.label} ${esc(s.name)}</h3>
+          <div class="date">大巨蛋演繹 · 648 名額</div>
+        </div>
+        <div class="ring" style="--p:${pct}"><div class="hole">${pct}%</div></div>
+      </div>
+      <div class="stats">
+        <div class="nums">
+          <div class="big">${s.occupied.toLocaleString()} <span style="font-size:var(--fs-sm); color:var(--ink-3); font-weight:600;">/ ${s.quota}</span></div>
+          <div class="lbl">已配位</div>
+        </div>
+      </div>
+      <div class="bar ${pct>90?'ok':''}"><i style="--w:${pct/100}"></i></div>
+      <div class="gap-note">尚缺 <strong style="color:var(--ink)">${s.quota - s.occupied}</strong> 位</div>
+    </div>`;
+  }).join("");
+
+  const totalReg = scopeHeQi.reduce((a, h) => a + (HEQI_REG_COUNT[h] || 0), 0);
+  const uniquePeople = p.scope === "all" ? 1187 : PEOPLE.filter((x) => scopeHeQi.includes(x.heQi)).length;
+  const totalOccupied = visibleSessions.reduce((a,s)=>a+s.occupied,0);
+  const totalQuota = visibleSessions.reduce((a,s)=>a+s.quota,0);
+  const assignedPct = totalQuota ? ((totalOccupied/totalQuota)*100).toFixed(1) : "0.0";
+
+  document.getElementById("statRow").innerHTML = `
+    <div class="stat-tile"><div class="v">${totalReg.toLocaleString()}</div><div class="l">總報名人次</div></div>
+    <div class="stat-tile"><div class="v">${uniquePeople.toLocaleString()}</div><div class="l">不重複人數</div></div>
+    <div class="stat-tile"><div class="v">${assignedPct}%</div><div class="l">已配位</div></div>
+    <div class="stat-tile"><div class="v">${scopeHeQi.length}</div><div class="l">${p.scope==="all"?"和氣":"範圍內和氣"}</div></div>
+  `;
+
+  const max = Math.max(...Object.values(HEQI_REG_COUNT));
+  document.getElementById("heqiDist").innerHTML = HEQI.map((h) => {
+    const v = HEQI_REG_COUNT[h];
+    const inScope = scopeHeQi.includes(h);
+    return `<div class="dist-row ${inScope?'in-scope':'dim'}"><span class="name">${h}</span><span class="track"><i style="width:${(v/max*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`;
+  }).join("");
+
+  const goBoarded = BUSES_GO.reduce((a,b)=>a+b.boarded,0);
+  const goAssigned = BUSES_GO.reduce((a,b)=>a+b.assigned,0);
+  document.getElementById("transportMini").innerHTML = `
+    <div class="m"><div class="v">${BUSES_GO.length} 台</div><div class="l">去程巴士</div></div>
+    <div class="m"><div class="v">${goBoarded}/${goAssigned}</div><div class="l">車上已點名</div></div>
+    <div class="m"><div class="v">${NOT_ATTENDING} 人</div><div class="l">不參加彩排</div></div>
+  `;
+
+  const recent = EVENTS.slice(0, 4);
+  document.getElementById("recentEvents").innerHTML = recent.map((ev) => {
+    const roster = getEventRoster(ev);
+    const checkedIn = roster.filter((p) => ev.days.some((d) => checkinState[ev.id+"_"+d+"_"+p.id] !== "未到")).length;
+    return `
+    <div class="event-row" onclick="location.hash='#/events/${ev.id}'">
+      <span class="chip chip-type-${ev.type}">${ev.type}</span>
+      <div class="info">
+        <h4>${esc(ev.title)}</h4>
+        <div class="meta">${esc(ev.location)} · ${ev.days[0]}${ev.days.length>1?" 起":""} · 名冊 ${roster.length} 人 · 已點名 ${checkedIn}</div>
+      </div>
+      <span class="chevron">${svgIcon('<path d="M9 6l6 6-6 6"/>')}</span>
+    </div>`;
+  }).join("");
+}
+
+/* ================= Events render ================= */
+/* ---------- role-based create + scoped list (Phase 2 — §C-4; extended Phase 1 §2-5) ---------- */
+function eventCreateLabel(p){
+  if (can("manage_events_heqi")) return "新增和氣共修";
+  if (can("manage_events_lianqu")) return "新增聯區共修";
+  if (can("manage_events_all")) return "新增活動";
+  return null;
+}
+function eventVisibleForPersonaScope(ev, p){
+  if (p.scope === "all") return true;
+  if (!ev.heQi && !ev.scopeLianQu) return true; // 全場合辦
+  if (p.scope === "lianQu"){
+    if (ev.scopeLianQu) return ev.scopeLianQu === (p.lianQu + "聯區");
+    if (ev.heQi) return LIANQU_OF[ev.heQi] === (p.lianQu + "聯區");
+    return false;
+  }
+  if (p.scope === "heQi"){
+    if (ev.heQi) return ev.heQi === p.heQi;
+    return false;
+  }
+  return true;
+}
+/* 編輯/取消:需 manage_events_* 且該活動落在此角色的可管理範圍(比「可見」更嚴格) */
+function canEditEvent(ev){
+  const p = state.persona;
+  if (can("manage_events_all")) return true;
+  if (can("manage_events_lianqu")){
+    if (ev.scopeLianQu) return ev.scopeLianQu === (p.lianQu + "聯區");
+    if (ev.heQi) return LIANQU_OF[ev.heQi] === (p.lianQu + "聯區");
+    return false;
+  }
+  if (can("manage_events_heqi")) return ev.heQi === p.heQi;
+  return false;
+}
+function eventHasCheckins(ev){
+  const roster = getEventRoster(ev);
+  return ev.days.some((d) => roster.some((p2) => {
+    const st = checkinState[ev.id + "_" + d + "_" + p2.id];
+    return st === "已到" || st === "請假";
+  }));
+}
+
+function sessionSelectOptions(selected){
+  return `<option value="" ${!selected?"selected":""}>不限 / 全區</option>` +
+    SESSIONS.map((s) => `<option value="${s.id}" ${selected===s.id?"selected":""}>${s.label} ${s.name}</option>`).join("");
+}
+function blockCheckboxesHtml(selectedBlocks){
+  const sel = (selectedBlocks && selectedBlocks.length) ? selectedBlocks : [];
+  const isAllSel = !sel.length || sel.includes("全部");
+  return `
+    <div style="display:flex; gap:var(--sp-4); flex-wrap:wrap;">
+      <label style="display:flex; align-items:center; gap:6px; min-height:48px;"><input type="checkbox" id="ceBlockAll" ${isAllSel?"checked":""}> 全部</label>
+      ${["A","B","C"].map((b) => `<label style="display:flex; align-items:center; gap:6px; min-height:48px;"><input type="checkbox" class="ceBlockOpt" value="${b}" ${sel.includes(b)?"checked":""}> ${b} 組</label>`).join("")}
+    </div>`;
+}
+function toDatetimeLocalStr(d){
+  const pad = (n) => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+/* 新增/編輯活動表單(共用) — Phase 1 §3-4:場次/演繹區塊/起訖時間 + 編輯既有活動 */
+function openEventFormModal(existingEv){
+  const p = state.persona;
+  const isHeqi = can("manage_events_heqi");
+  const isLianqu = can("manage_events_lianqu");
+  const isAll = can("manage_events_all");
+  const isEdit = !!existingEv;
+  const label = isEdit ? "編輯活動" : eventCreateLabel(p);
+  if (!label) return;
+
+  const typeField = isAll
+    ? `<div class="field"><label for="ceType">類型</label><select id="ceType"><option>共修</option><option>彩排</option><option>驗收</option></select></div>`
+    : `<div class="field"><label>類型</label><div class="chip chip-type-共修" style="width:fit-content;">共修</div></div>`;
+  const scopeField = isHeqi
+    ? `<div class="field"><label>和氣(鎖定)</label><div class="chip">${esc(p.heQi)}和氣</div></div>`
+    : isLianqu
+      ? `<div class="field"><label>範圍(鎖定)</label><div class="chip">${esc(p.lianQu)}聯區</div></div>`
+      : `<div class="field"><label for="ceScope">範圍</label><select id="ceScope"><option value="all">全區</option>${Object.keys(LIANQU_MAP).map((lq)=>`<option value="lianqu:${lq}">${lq}</option>`).join("")}${HEQI.map((h)=>`<option value="heqi:${h}">${h}和氣</option>`).join("")}</select></div>`;
+
+  const startVal = existingEv ? toDatetimeLocalStr(eventStart(existingEv)) : toDatetimeLocalStr(new Date(DEMO_NOW.getTime() + 3*86400000));
+  const endVal = existingEv ? toDatetimeLocalStr(eventEnd(existingEv)) : toDatetimeLocalStr(new Date(DEMO_NOW.getTime() + 3*86400000 + 3*3600000));
+
+  openModal(`
+    <h3>${esc(label)}</h3>
+    <form id="createEventForm">
+      ${typeField}
+      ${scopeField}
+      <div class="field"><label for="ceTitle">活動名稱</label><input id="ceTitle" class="text-input" required placeholder="例如 大橋和氣共修" value="${existingEv?esc(existingEv.title):""}"></div>
+      <div class="field"><label for="ceLocation">地點</label><input id="ceLocation" class="text-input" required placeholder="例如 大橋共修處" value="${existingEv?esc(existingEv.location):""}"></div>
+      <div class="field"><label for="ceSession">場次</label><select id="ceSession">${sessionSelectOptions(existingEv?existingEv.session:null)}</select></div>
+      <div class="field"><label>演繹區塊</label>${blockCheckboxesHtml(existingEv?existingEv.blocks:null)}</div>
+      <div class="field"><label for="ceStart">起始時間</label><input id="ceStart" class="text-input" type="datetime-local" required value="${startVal}"></div>
+      <div class="field"><label for="ceEnd">結束時間</label><input id="ceEnd" class="text-input" type="datetime-local" required value="${endVal}"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-modal-close>取消</button>
+        <button type="submit" class="btn btn-primary" style="width:auto;">${isEdit?"儲存變更":"新增"}(Demo)</button>
+      </div>
+    </form>
+  `);
+
+  if (isAll){
+    const typeSel = document.getElementById("ceType");
+    if (existingEv) typeSel.value = existingEv.type;
+    const scopeSel = document.getElementById("ceScope");
+    if (existingEv){
+      if (existingEv.heQi) scopeSel.value = "heqi:" + existingEv.heQi;
+      else if (existingEv.scopeLianQu) scopeSel.value = "lianqu:" + existingEv.scopeLianQu;
+      else scopeSel.value = "all";
+    }
+  }
+  const blockAllCb = document.getElementById("ceBlockAll");
+  const blockOptCbs = document.querySelectorAll(".ceBlockOpt");
+  blockAllCb.onchange = () => { if (blockAllCb.checked) blockOptCbs.forEach((c) => { c.checked = false; }); };
+  blockOptCbs.forEach((cb) => { cb.onchange = () => { if (cb.checked) blockAllCb.checked = false; }; });
+
+  document.getElementById("createEventForm").onsubmit = (e) => {
+    e.preventDefault();
+    const title = document.getElementById("ceTitle").value.trim() || "新活動";
+    const location = document.getElementById("ceLocation").value.trim() || "台南靜思堂";
+    const sessionVal = document.getElementById("ceSession").value || null;
+    const checkedBlocks = Array.from(blockOptCbs).filter((c) => c.checked).map((c) => c.value);
+    const blocks = checkedBlocks.length ? checkedBlocks : ["全部"];
+    const startStr = document.getElementById("ceStart").value;
+    const endStr = document.getElementById("ceEnd").value;
+    const start = startStr ? startStr + ":00" : null;
+    const end = endStr ? endStr + ":00" : start;
+    const days = start && end ? daysBetween(start, end) : [fmtDate(DEMO_NOW)];
+
+    let type = existingEv ? existingEv.type : "共修";
+    let heQi = existingEv ? existingEv.heQi : null;
+    let scopeLianQu = existingEv ? existingEv.scopeLianQu : null;
+    if (isAll){
+      type = document.getElementById("ceType").value;
+      const scopeVal = document.getElementById("ceScope").value;
+      heQi = null; scopeLianQu = null;
+      if (scopeVal.startsWith("heqi:")) heQi = scopeVal.slice(5);
+      else if (scopeVal.startsWith("lianqu:")) scopeLianQu = scopeVal.slice(7);
+    } else if (!existingEv){
+      if (isHeqi) heQi = p.heQi;
+      else if (isLianqu) scopeLianQu = p.lianQu + "聯區";
+    }
+
+    if (existingEv){
+      Object.assign(existingEv, { title, location, type, heQi, scopeLianQu, session: sessionVal, blocks, start, end, days });
+      seedCheckins(existingEv);
+      seedEventReg(existingEv);
+      closeModal();
+      showToast("已更新活動「" + title + "」(Demo)", "ok");
+      renderEventDetail(existingEv.id);
+    } else {
+      const id = "E" + (EVENTS.length + 1) + "-" + Date.now().toString(36);
+      const newEv = { id, type, title, location, days, start, end, session: sessionVal, blocks, heQi, scopeLianQu, rosterSize:24, includeMe:false };
+      EVENTS.push(newEv);
+      seedCheckins(newEv);
+      seedEventReg(newEv);
+      closeModal();
+      showToast("已新增活動「" + title + "」(Demo)", "ok");
+      renderEventsList();
+    }
+  };
+}
+
+function openCancelEventModal(ev){
+  const warnHtml = eventHasCheckins(ev)
+    ? `<p style="color:var(--warn); margin-top:10px; font-size:var(--fs-sm);">此活動已有點名紀錄(已到/請假),取消後紀錄仍會保留,但活動會標示為「已取消」。</p>`
+    : "";
+  openModal(`
+    <h3>取消活動 · ${esc(ev.title)}</h3>
+    <p class="text-2">確定要取消此活動嗎?取消後活動仍會保留在列表中並標示「已取消」,不會刪除任何名冊或點名紀錄。</p>
+    ${warnHtml}
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" data-modal-close>返回</button>
+      <button type="button" class="btn" style="border-color:var(--danger); color:var(--danger)" id="confirmCancelEventBtn">確認取消活動</button>
+    </div>
+  `);
+  document.getElementById("confirmCancelEventBtn").onclick = () => {
+    ev.cancelled = true;
+    closeModal();
+    showToast("活動「" + ev.title + "」已取消(Demo)", "ok");
+    renderEventDetail(ev.id);
+  };
+}
+
+let eventFilter = "全部";
+let eventGroupCollapsed = { past: true };
+
+function eventCardHtml(ev){
+  const roster = getEventRoster(ev);
+  const status = eventStatus(ev);
+  const checkedIn = roster.filter((p) => ev.days.some((d) => checkinState[ev.id+"_"+d+"_"+p.id] === "已到")).length;
+  const pct = roster.length ? Math.round((checkedIn/roster.length)*100) : 0;
+  const regCounts = eventRegCounts(ev);
+  const footHtml = status === "upcoming"
+    ? `<span class="bar ok"><i style="--w:${roster.length ? regCounts["報名"]/roster.length : 0}"></i></span><span class="n">${regCounts["報名"]}/${roster.length} 已報名</span>`
+    : `<span class="bar"><i style="--w:${pct/100}"></i></span><span class="n">${checkedIn}/${roster.length} 已點名</span>`;
+  const badges = [`<span class="chip chip-type-${ev.type}">${ev.type}</span>`];
+  if (status === "live") badges.push(`<span class="chip" style="color:var(--brand); border-color:color-mix(in oklch, var(--brand) 45%, var(--line)); background:var(--brand-soft)">進行中</span>`);
+  if (ev.cancelled) badges.push(`<span class="chip" style="color:var(--danger); border-color:color-mix(in oklch, var(--danger) 45%, var(--line)); background:var(--danger-soft)">已取消</span>`);
+  return `
+    <div class="card event-card ${status==='live'?'live':''} ${ev.cancelled?'cancelled':''}" onclick="location.hash='#/events/${ev.id}'">
+      <div class="head">
+        <div>
+          <h3>${esc(ev.title)}</h3>
+          <div class="meta">${esc(ev.location)} · ${eventDateRangeLabel(ev)}${ev.session ? " · " + esc(sessionLabelShort(ev.session)) : ""}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">${badges.join("")}</div>
+      </div>
+      <div class="foot">${footHtml}</div>
+    </div>`;
+}
+
+function eventGroupSectionHtml(key, label, events, opts){
+  opts = opts || {};
+  if (!events.length) return "";
+  const collapsible = !!opts.collapsible;
+  const collapsed = collapsible && !!eventGroupCollapsed[key];
+  const headInner = `<h2 class="section-title" style="margin-bottom:0">${label}<span class="text-3" style="font-weight:600; margin-left:8px;">(${events.length})</span></h2>${collapsible ? svgIcon('<path d="M6 9l6 6 6-6"/>', `class="chev${collapsed?"":" open"}"`) : ""}`;
+  const head = collapsible
+    ? `<button type="button" class="event-group-head" data-toggle-group="${key}" aria-expanded="${collapsed?"false":"true"}">${headInner}</button>`
+    : `<div class="event-group-head">${headInner}</div>`;
+  const body = (!collapsible || !collapsed) ? `<div class="grid grid-2 event-group-body">${events.map(eventCardHtml).join("")}</div>` : "";
+  return `<div class="event-group ${key}" data-group="${key}">${head}${body}</div>`;
+}
+
+function bindEventGroupToggles(){
+  document.querySelectorAll("[data-toggle-group]").forEach((btn) => {
+    btn.onclick = () => {
+      const key = btn.dataset.toggleGroup;
+      eventGroupCollapsed[key] = !eventGroupCollapsed[key];
+      renderEventsList();
+    };
+  });
+}
+
+function renderEventsList(){
+  const p = state.persona;
+  const createBtn = document.getElementById("createEventBtn");
+  const label = eventCreateLabel(p);
+  if (label){
+    createBtn.style.display = "";
+    createBtn.textContent = label;
+    createBtn.onclick = () => openEventFormModal(null);
+  } else {
+    createBtn.style.display = "none";
+  }
+  document.getElementById("eventsPageSub").textContent =
+    p.scope === "heQi" ? "彩排、共修、驗收活動與點名 · " + p.heQi + "和氣 + 全場合辦"
+    : p.scope === "lianQu" ? "彩排、共修、驗收活動與點名 · " + p.lianQu + "聯區"
+    : "彩排、共修、驗收活動與點名 · 全區";
+
+  const filters = ["全部","彩排","共修","驗收"];
+  document.getElementById("eventFilters").innerHTML = filters.map((f) =>
+    `<button class="filter-chip ${f===eventFilter?'active':''}" data-f="${f}">${f}</button>`
+  ).join("");
+  document.querySelectorAll(".filter-chip").forEach((btn) => {
+    btn.onclick = () => { eventFilter = btn.dataset.f; renderEventsList(); };
+  });
+
+  const scoped = EVENTS.filter((ev) => eventVisibleForPersonaScope(ev, p));
+  const list = scoped.filter((ev) => eventFilter === "全部" || ev.type === eventFilter);
+  const wrap = document.getElementById("eventCards");
+  wrap.className = "";
+  if (list.length === 0){
+    wrap.innerHTML = `<div class="empty-state">${svgIcon('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/>')}<h4>沒有符合的活動</h4><p>試試切換其他活動類型篩選。</p></div>`;
+    return;
+  }
+
+  const groups = { live:[], upcoming:[], past:[] };
+  list.forEach((ev) => groups[eventStatus(ev)].push(ev));
+  groups.live.sort((a,b) => eventStart(a) - eventStart(b));
+  groups.upcoming.sort((a,b) => eventStart(a) - eventStart(b));
+  groups.past.sort((a,b) => eventStart(b) - eventStart(a));
+
+  const clockHint = `<p class="demo-clock-hint">⏰ Demo 時鐘:${fmtDemoNow()} — 依此時間判斷進行中 / 即將發生 / 已發生。</p>`;
+
+  wrap.innerHTML = clockHint
+    + eventGroupSectionHtml("live", "進行中", groups.live, {})
+    + eventGroupSectionHtml("upcoming", "即將發生", groups.upcoming, {})
+    + eventGroupSectionHtml("past", "已發生", groups.past, { collapsible:true });
+
+  bindEventGroupToggles();
+}
+
+let currentEventId = null;
+let currentDay = null;
+let rosterSearchTerm = "";
+
+function renderRosterOrReg(ev){
+  if (!ev) return;
+  if (eventStatus(ev) === "upcoming") renderRegistrationList(ev); else renderRosterList(ev);
+}
+
+function renderEventDetail(id){
+  const ev = EVENTS.find((e) => e.id === id);
+  document.getElementById("eventsListView").style.display = "none";
+  document.getElementById("eventDetailView").style.display = "";
+  if (!ev){
+    document.getElementById("eventDetailHead").innerHTML = `<div class="empty-state">${svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>')}<h4>找不到此活動</h4><p>此活動可能已被移除,請返回活動列表。</p></div>`;
+    document.getElementById("eventDateTabs").innerHTML = "";
+    document.getElementById("attendanceSummary").innerHTML = "";
+    document.getElementById("rosterList").innerHTML = "";
+    return;
+  }
+  currentEventId = id;
+  if (!currentDay || !ev.days.includes(currentDay)) currentDay = ev.days[0];
+  rosterSearchTerm = "";
+  document.getElementById("rosterSearch").value = "";
+
+  const roster = getEventRoster(ev);
+  const status = eventStatus(ev);
+  const modeLabel = status === "upcoming" ? "報名中" : (status === "live" ? "點名中 · 進行中" : "點名中 · 已發生");
+  const editHtml = (canEditEvent(ev) && !ev.cancelled) ? `
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-sm" id="editEventBtn">編輯</button>
+      <button class="btn btn-sm btn-ghost" id="cancelEventBtn">取消活動</button>
+    </div>` : "";
+
+  document.getElementById("eventDetailHead").innerHTML = `
+    <div class="row-between" style="align-items:flex-start; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div style="margin-bottom:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <span class="chip chip-type-${ev.type}">${ev.type}</span>
+          <span class="chip" style="color:var(--brand); border-color:color-mix(in oklch, var(--brand) 45%, var(--line)); background:var(--brand-soft)">${modeLabel}</span>
+          ${ev.cancelled ? `<span class="chip" style="color:var(--danger); border-color:color-mix(in oklch, var(--danger) 45%, var(--line)); background:var(--danger-soft)">已取消</span>` : ""}
+          <span class="text-3" style="font-size:var(--fs-xs)">⏰ Demo 時鐘:${fmtDemoNow()}</span>
+        </div>
+        <h1 class="page-title" style="font-size:var(--fs-2xl)">${esc(ev.title)}</h1>
+        <p class="page-sub">${esc(ev.location)} · ${eventDateRangeLabel(ev)} · 名冊 ${roster.length} 人${ev.heQi ? " · " + ev.heQi + "和氣自辦" : ""} · ${esc(sessionLabelShort(ev.session))} · ${esc(blocksLabel(ev))}</p>
+      </div>
+      ${editHtml}
+    </div>
+    ${ev.cancelled ? `<div class="card mt-5" style="border-color:color-mix(in oklch, var(--danger) 45%, var(--line));"><p style="color:var(--danger); font-weight:700;">此活動已取消,以下名冊資料僅供查閱(唯讀)。</p></div>` : ""}
+  `;
+  const editBtn = document.getElementById("editEventBtn");
+  if (editBtn) editBtn.onclick = () => openEventFormModal(ev);
+  const cancelBtn = document.getElementById("cancelEventBtn");
+  if (cancelBtn) cancelBtn.onclick = () => openCancelEventModal(ev);
+
+  if (status === "upcoming"){
+    document.getElementById("eventDateTabs").innerHTML = "";
+  } else {
+    document.getElementById("eventDateTabs").innerHTML = ev.days.map((d) =>
+      `<button class="date-tab ${d===currentDay?'active':''}" data-day="${d}">${d.slice(5).replace('-','/')}</button>`
+    ).join("");
+    document.querySelectorAll(".date-tab").forEach((btn) => {
+      btn.onclick = () => { currentDay = btn.dataset.day; renderEventDetail(ev.id); };
+    });
+  }
+  renderRosterOrReg(ev);
+
+  document.getElementById("addRosterSearch").oninput = (e) => renderAddRosterResults(ev, e.target.value.trim());
+  document.getElementById("addRosterResults").innerHTML = "";
+}
+
+function attendanceScopeLabel(p){
+  if (!can("take_attendance")) return "無權限 · 僅供檢視";
+  if (p.scope === "all") return "全區";
+  if (p.scope === "lianQu") return p.lianQu + "聯區(聯區內任一和氣)";
+  if (p.scope === "heQi") return p.heQi + "和氣(僅本和氣)";
+  return "";
+}
+
+/* 即將發生活動 → 報名/請假(Phase 1 §6-7) */
+function renderRegistrationList(ev){
+  const p = state.persona;
+  const canManage = can("take_attendance") && !ev.cancelled;
+  const roster = getEventRoster(ev);
+  const term = rosterSearchTerm.toLowerCase();
+  const filtered = term ? roster.filter((p2) => p2.name.includes(rosterSearchTerm) || p2.heQi.includes(rosterSearchTerm)) : roster;
+
+  const counts = eventRegCounts(ev);
+  document.getElementById("attendanceSummary").innerHTML = `
+    <span class="pill"><span class="dot" style="background:var(--ok)"></span>已報名 ${counts["報名"]}</span>
+    <span class="pill"><span class="dot" style="background:var(--warn)"></span>請假 ${counts["請假"]}</span>
+    <span class="pill"><span class="dot" style="background:var(--ink-3)"></span>未回覆 ${counts["未回覆"]}</span>
+    <span class="chip scope-chip">可調整範圍:${attendanceScopeLabel(p)}</span>
+  `;
+
+  const listEl = document.getElementById("rosterList");
+  if (filtered.length === 0){
+    listEl.innerHTML = `<div class="empty-state">${svgIcon('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>')}<h4>查無符合的志工</h4><p>換個關鍵字試試,或至下方「搜尋加名」新增名冊。</p></div>`;
+    return;
+  }
+  listEl.innerHTML = filtered.map((p2) => {
+    const key = ev.id + "_" + p2.id;
+    const st = eventRegState[key] || "未回覆";
+    const inScope = p.scope === "all" ? true : scopeOK(p2);
+    const editable = canManage && inScope;
+    return `
+    <div class="roster-row ${editable ? '' : 'out-of-scope'}">
+      <div class="who">
+        <div>
+          <div class="name">${esc(p2.name)}${p2.id==="ME"?" (我)":""}</div>
+          <div class="sub">${p2.heQi}和氣 · ${p2.category||"—"}${inScope ? "" : " · 非可調整範圍"}${st==="未回覆" ? " · 待定" : ""}</div>
+        </div>
+      </div>
+      <div class="seg3" data-regrow="${key}">
+        <button class="state-報名 ${st==="報名"?"is-active":""}" data-rowstate="報名" ${editable?"":"disabled"}>報名</button>
+        <button class="state-請假 ${st==="請假"?"is-active":""}" data-rowstate="請假" ${editable?"":"disabled"}>請假</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  listEl.querySelectorAll("[data-regrow]").forEach((seg) => {
+    seg.querySelectorAll("button:not(:disabled)").forEach((btn) => {
+      btn.onclick = () => {
+        const key = seg.dataset.regrow;
+        const newState = btn.dataset.rowstate;
+        if (eventRegState[key] === newState) return;
+        eventRegState[key] = newState;
+        seg.querySelectorAll("button").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        btn.classList.add("pulse");
+        setTimeout(() => btn.classList.remove("pulse"), 260);
+        showToast(newState === "報名" ? "已標記報名" : "已標記請假", "ok");
+        renderRegistrationList(EVENTS.find((e) => e.id === currentEventId));
+      };
+    });
+  });
+}
+
+/* 進行中/已發生活動 → 點名(未到/已到/請假,Phase 1 §5-6) */
+function renderRosterList(ev){
+  const p = state.persona;
+  const canAttend = can("take_attendance") && !ev.cancelled;
+  const roster = getEventRoster(ev);
+  const term = rosterSearchTerm.toLowerCase();
+  const filtered = term ? roster.filter((p2) => p2.name.includes(rosterSearchTerm) || p2.heQi.includes(rosterSearchTerm)) : roster;
+
+  const counts = { "未到":0, "已到":0, "請假":0 };
+  roster.forEach((p2) => { counts[checkinState[ev.id+"_"+currentDay+"_"+p2.id]]++; });
+  document.getElementById("attendanceSummary").innerHTML = `
+    <span class="pill"><span class="dot" style="background:var(--ink-3)"></span>未到 ${counts["未到"]}</span>
+    <span class="pill"><span class="dot" style="background:var(--ok)"></span>已到 ${counts["已到"]}</span>
+    <span class="pill"><span class="dot" style="background:var(--warn)"></span>請假 ${counts["請假"]}</span>
+    <span class="chip scope-chip">可點名範圍:${attendanceScopeLabel(p)}</span>
+  `;
+
+  const listEl = document.getElementById("rosterList");
+  if (filtered.length === 0){
+    listEl.innerHTML = `<div class="empty-state">${svgIcon('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>')}<h4>查無符合的志工</h4><p>換個關鍵字試試,或至下方「搜尋加名」新增名冊。</p></div>`;
+    return;
+  }
+  listEl.innerHTML = filtered.map((p2) => {
+    const key = ev.id + "_" + currentDay + "_" + p2.id;
+    const st = checkinState[key];
+    const inScope = p.scope === "all" ? true : scopeOK(p2);
+    const editable = canAttend && inScope;
+    return `
+    <div class="roster-row ${editable ? '' : 'out-of-scope'}">
+      <div class="who">
+        <div>
+          <div class="name">${esc(p2.name)}${p2.id==="ME"?" (我)":""}</div>
+          <div class="sub">${p2.heQi}和氣 · ${p2.category||"—"}${inScope ? "" : " · 非可點名範圍"}</div>
+        </div>
+      </div>
+      <div class="seg3" data-key="${key}">
+        <button class="state-未到 ${st==="未到"?"is-active":""}" data-state="未到" ${editable?"":"disabled"}>未到</button>
+        <button class="state-已到 ${st==="已到"?"is-active":""}" data-state="已到" ${editable?"":"disabled"}>已到</button>
+        <button class="state-請假 ${st==="請假"?"is-active":""}" data-state="請假" ${editable?"":"disabled"}>請假</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  listEl.querySelectorAll(".seg3").forEach((seg) => {
+    seg.querySelectorAll("button:not(:disabled)").forEach((btn) => {
+      btn.onclick = () => {
+        const key = seg.dataset.key;
+        const newState = btn.dataset.state;
+        if (checkinState[key] === newState) return;
+        checkinState[key] = newState;
+        seg.querySelectorAll("button").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        btn.classList.add("pulse");
+        setTimeout(() => btn.classList.remove("pulse"), 260);
+        showToast((newState === "未到" ? "已標記未到" : "已點名 · " + newState), "ok");
+        renderRosterList(EVENTS.find((e) => e.id === currentEventId));
+      };
+    });
+  });
+}
+
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.id === "rosterSearch"){
+    rosterSearchTerm = e.target.value.trim();
+    const ev = EVENTS.find((x) => x.id === currentEventId);
+    renderRosterOrReg(ev);
+  }
+});
+
+function renderAddRosterResults(ev, term){
+  const wrap = document.getElementById("addRosterResults");
+  if (!term){ wrap.innerHTML = ""; return; }
+  const roster = getEventRoster(ev);
+  const rosterIds = new Set(roster.map((p) => p.id));
+  const results = PEOPLE.filter((p) => !rosterIds.has(p.id) && p.name.includes(term)).slice(0, 6);
+  if (results.length === 0){
+    wrap.innerHTML = `<p class="text-3 mt-5" style="font-size:var(--fs-sm)">查無符合「${esc(term)}」且尚未在名冊中的志工。</p>`;
+    return;
+  }
+  wrap.innerHTML = results.map((p) => `
+    <div class="add-roster-row">
+      <div><strong>${esc(p.name)}</strong> <span class="text-3" style="font-size:var(--fs-sm)">${p.heQi}和氣</span></div>
+      <button class="btn btn-sm" data-add="${p.id}">加入名冊</button>
+    </div>`).join("");
+  wrap.querySelectorAll("[data-add]").forEach((btn) => {
+    btn.onclick = () => {
+      const p = PEOPLE.find((x) => x.id === btn.dataset.add);
+      roster.push(p);
+      ev.days.forEach((d) => { checkinState[ev.id+"_"+d+"_"+p.id] = "未到"; });
+      eventRegState[ev.id+"_"+p.id] = "未回覆";
+      showToast(p.name + " 已加入名冊", "ok");
+      renderEventDetail(ev.id);
+    };
+  });
+}
+
+/* ================= Approvals render(審核 · Phase 1 §1) ================= */
+function renderApprovals(){
+  const p = state.persona;
+  document.querySelectorAll("#screen-approvals .scope-chip").forEach((el) => { el.textContent = "審核範圍:" + scopeLabel(p); });
+
+  const pending = approvalState.pending.filter(approvalVisible);
+  const approved = approvalState.approved.filter(approvalVisible);
+
+  const pendingEl = document.getElementById("approvalsPending");
+  if (!pending.length){
+    pendingEl.innerHTML = `<div class="empty-state">${svgIcon('<path d="M20 6 9 17l-5-5"/>')}<h4>目前無待審核申請</h4><p>所有帳號綁定申請都已處理完畢。</p></div>`;
+  } else {
+    pendingEl.innerHTML = pending.map((req) => {
+      const person = approvalPerson(req.personId);
+      return `
+      <div class="roster-row">
+        <div class="who">
+          <div>
+            <div class="name">${esc(req.email)}</div>
+            <div class="sub">綁定對象:${esc(person.name)} · ${esc(person.heQi)}和氣 · 申請時間 ${esc(req.appliedAt)}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-sm" data-approve="${req.id}">核准</button>
+          <button class="btn btn-sm btn-ghost" data-reject="${req.id}">婉拒</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  const approvedEl = document.getElementById("approvalsApproved");
+  if (!approved.length){
+    approvedEl.innerHTML = `<p class="text-2" style="padding:var(--sp-4) 0;">尚無已核准的綁定申請。</p>`;
+  } else {
+    approvedEl.innerHTML = `<table class="list-table"><thead><tr><th>Email</th><th>綁定對象</th><th>核准人</th><th>核准時間</th><th>ICS 狀態</th></tr></thead><tbody>${
+      approved.map((req) => {
+        const person = approvalPerson(req.personId);
+        const icsOk = req.icsStatus === "已產生";
+        return `<tr>
+          <td>${esc(req.email)}</td>
+          <td>${esc(person.name)} <span class="text-3">(${esc(person.heQi)}和氣)</span></td>
+          <td>${esc(req.approvedBy)}</td>
+          <td>${esc(req.approvedAt)}</td>
+          <td><span class="chip" style="${icsOk?"color:var(--ok); border-color:color-mix(in oklch, var(--ok) 45%, var(--line)); background:var(--ok-soft);":"color:var(--ink-3);"}">${esc(req.icsStatus)}</span></td>
+        </tr>`;
+      }).join("")
+    }</tbody></table>`;
+  }
+
+  bindApprovalEvents();
+}
+
+function bindApprovalEvents(){
+  document.querySelectorAll("#approvalsPending [data-approve]").forEach((btn) => {
+    btn.onclick = () => {
+      const idx = approvalState.pending.findIndex((r) => r.id === btn.dataset.approve);
+      if (idx < 0) return;
+      const req = approvalState.pending.splice(idx, 1)[0];
+      req.approvedBy = state.persona.label + "(" + scopeLabel(state.persona) + ")";
+      req.approvedAt = fmtDemoNow();
+      req.icsStatus = "已產生";
+      approvalState.approved.unshift(req);
+      showToast("已核准 · 已產生 ICS token(Demo)", "ok");
+      renderApprovals();
+    };
+  });
+  document.querySelectorAll("#approvalsPending [data-reject]").forEach((btn) => {
+    btn.onclick = () => {
+      const idx = approvalState.pending.findIndex((r) => r.id === btn.dataset.reject);
+      if (idx < 0) return;
+      approvalState.pending.splice(idx, 1);
+      showToast("已婉拒申請", "ok");
+      renderApprovals();
+    };
+  });
+}
+
+/* ================= Transport render (Phase 2 — 多階調度 §C-3) ================= */
+let transportDirection = "go";
+
+function busCardHtml(b, opts){
+  opts = opts || {};
+  const fillPct = Math.round((b.assigned / b.capacity) * 100);
+  const barClass = fillPct >= 100 ? "warn" : "ok";
+  return `
+    <div class="card bus-card">
+      <div class="head">
+        <div>
+          <h3>${esc(b.name)}</h3>
+          <div class="route">${esc(b.origin)} → ${esc(b.dest)}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <span class="chip">${b.assigned}/${b.capacity} 席</span>
+          ${opts.editable ? `<button class="btn btn-sm btn-ghost" data-editbus="${b.id}" aria-label="編輯${esc(b.name)}車次">編輯</button>` : ""}
+        </div>
+      </div>
+      <div class="cap-wrap">
+        <span class="bar ${barClass}"><i style="--w:${Math.min(fillPct,100)/100}"></i></span>
+        <span class="n">${fillPct}%</span>
+      </div>
+      <div class="row"><span class="l">車上點名</span><span>${b.boarded}/${b.assigned}${transportDirection==="go"?"":"(尚未發車)"}</span></div>
+      <div class="row"><span class="l">發車時間</span><span class="mono">${esc(b.departTime||"—")}</span></div>
+      <div class="row"><span class="l">車長</span><span>${esc(b.leader)}</span></div>
+      <div class="row"><span class="l">車牌</span><span class="mono">${esc(b.plate || "—")}</span></div>
+      ${b.lianQu ? `<div class="row"><span class="l">指派</span><span>${esc(b.lianQu)}</span></div>` : ""}
+      ${b.note ? `<div class="row"><span class="l">備註</span><span style="color:var(--warn)">${esc(b.note)}</span></div>` : ""}
+      <div class="driver">
+        <span class="text-3">司機 ${esc(b.driver)}</span>
+        <span class="phone-group"><span class="phone">${esc(b.driverPhone)}</span>${b.driverPhone && b.driverPhone !== "—" ? `<a class="btn btn-sm" href="tel:${b.driverPhone.replace(/-/g,'')}">撥打</a>` : ""}</span>
+      </div>
+    </div>`;
+}
+
+function transportRoleHeader(){
+  const p = state.persona;
+  const isLeaderView = p.kind === "personal" && p.busLeader;
+  let viewLabel = "交通調度";
+  if (isLeaderView) viewLabel = "車長點名";
+  else if (can("bus_dispatch_all")) viewLabel = "上車點調度";
+  else if (can("bus_dispatch_scope")) viewLabel = "車輛分配";
+  else if (can("bus_assign_rider")) viewLabel = "乘客編排";
+  document.getElementById("transportTitle").textContent = viewLabel;
+  document.getElementById("transportSub").textContent = isLeaderView
+    ? (p.label + " · 高雄彩排 · 僅顯示本車")
+    : (p.label + " · 高雄彩排 · 台南 ⇄ 高雄大巨蛋");
+  const chip = document.getElementById("transportScopeChip");
+  chip.textContent = isLeaderView ? "檢視範圍:本人車次" : "檢視範圍:" + scopeLabel(p);
+  const toggle = document.getElementById("directionToggle");
+  if (toggle){
+    toggle.style.display = isLeaderView ? "none" : "";
+    chip.style.marginLeft = isLeaderView ? "auto" : "";
+  }
+}
+
+function returnDirectionHtml(){
+  const buses = BUSES_RETURN;
+  const totalAssigned = buses.reduce((a,b)=>a+b.assigned,0);
+  const totalCapacity = buses.reduce((a,b)=>a+b.capacity,0);
+  return `
+    <p class="text-2" style="margin-bottom:var(--sp-4)">回程檢視 · 上車點調度僅適用於去程,回程沿用去程車輛與人員分配。</p>
+    <div class="transport-summary">
+      <div class="stat-tile"><div class="v">${buses.length} 台</div><div class="l">回程</div></div>
+      <div class="stat-tile"><div class="v">${totalAssigned}/${totalCapacity}</div><div class="l">座位分配</div></div>
+    </div>
+    <div class="grid grid-2 mt-5">${buses.map(busCardHtml).join("")}</div>`;
+}
+
+/* ---------- 跨場次 / 整日調度(合心)— DESIGN-v3 §階段3-14 ---------- */
+function crossSessionRiderRowHtml(personId, info){
+  const person = bridgeBusRiders().find((p) => p.id === personId) || PEOPLE.find((p) => p.id === personId);
+  if (!person) return "";
+  const outBus = BUSES_GO.find((b) => b.id === info.outboundBusId) || BUSES_GO[0];
+  const boardingPoint = outBus.origin;
+  const diff = info.outboundBusId !== info.returnBusId;
+  const goOptions = BUSES_GO.filter((b) => b.origin === boardingPoint);
+  const retOptions = BUSES_RETURN.filter((b) => b.dest === boardingPoint);
+  return `
+  <div class="roster-row">
+    <div class="who">
+      <div>
+        <div class="name">${esc(person.name)}</div>
+        <div class="sub">${esc(person.heQi)}和氣 · ${esc(person.category||"—")} · ${esc(boardingPoint)}上下車</div>
+      </div>
+    </div>
+    <span class="chip" style="color:var(--brand)">${info.dayType}</span>
+    <span class="text-3" style="font-size:var(--fs-xs)">去</span>
+    <select class="earmark-select" data-cross-out="${personId}" aria-label="${esc(person.name)} 去程車">
+      ${goOptions.map((b) => `<option value="${b.id}" ${b.id===info.outboundBusId?"selected":""}>${esc(b.name)}</option>`).join("")}
+    </select>
+    <span class="text-3" style="font-size:var(--fs-xs)">回</span>
+    <select class="earmark-select" data-cross-ret="${personId}" aria-label="${esc(person.name)} 回程車">
+      ${retOptions.map((b) => `<option value="${b.id}" ${b.id===info.returnBusId?"selected":""}>${esc(b.name)}</option>`).join("")}
+    </select>
+    ${diff
+      ? `<span class="chip" style="color:var(--warn); border-color:color-mix(in oklch, var(--warn) 45%, var(--line)); background:var(--warn-soft);">去≠回</span>`
+      : `<span class="chip" style="color:var(--ink-3)">同車去回</span>`}
+  </div>`;
+}
+function crossSessionDispatchHtml(){
+  const ids = Object.keys(CROSS_SESSION_RIDERS);
+  if (!ids.length) return "";
+  const rows = ids.map((id) => crossSessionRiderRowHtml(id, CROSS_SESSION_RIDERS[id])).join("");
+  return `
+  <div class="card mt-6">
+    <div class="row-between" style="flex-wrap:wrap; gap:12px;">
+      <h2 class="section-title" style="margin-bottom:0">跨場次 / 整日調度</h2>
+      <span class="chip" style="color:var(--ink-3)">${ids.length} 人 · 合心安排</span>
+    </div>
+    <p class="text-2 mt-3">高雄靜思堂彩排/驗收單日可能 2–4 場次;跨場次與整日型(企劃/菁英/工作人員)參與者可去程、回程搭不同車(維持同一上下車地點),由合心統一安排。一般單場乘客預設同車去回。</p>
+    <div class="mt-5">${rows}</div>
+  </div>`;
+}
+
+function dispatchAllHtml(){
+  const buses = BUSES_GO;
+  const totalAssigned = buses.reduce((a,b)=>a+b.assigned,0);
+  const totalCapacity = buses.reduce((a,b)=>a+b.capacity,0);
+  const dist = boardingPointDist(buses);
+  const maxAtPoint = Math.max(...dist.map((d) => d.count));
+  const rows = dispatchState.boardingPoints.map((bp) => `
+    <div class="dispatch-row">
+      <div class="dr-head">
+        <div class="dr-name">${esc(bp.name)}</div>
+        ${bp.earmark ? `<span class="chip">${esc(bp.earmark)}</span>` : `<span class="chip" style="color:var(--ink-3)">未指派</span>`}
+      </div>
+      <div class="dr-stats">
+        <div><div class="lbl">目前報名坐車</div><div class="dr-num">${bp.riders}</div></div>
+        <div><div class="lbl">建議車數</div><div class="dr-num">${bp.suggestedBuses}</div></div>
+        <div><div class="lbl">已安排車數</div><div class="dr-num" style="${bp.assignedBuses<bp.suggestedBuses?'color:var(--warn)':'color:var(--ok)'}">${bp.assignedBuses}</div></div>
+      </div>
+      <div class="dr-controls">
+        <div class="stepper">
+          <button data-step="-1" data-bp="${bp.id}" ${bp.assignedBuses<=0?"disabled":""} aria-label="${esc(bp.name)}減少安排車數">−</button>
+          <span class="val">${bp.assignedBuses}</span>
+          <button data-step="1" data-bp="${bp.id}" aria-label="${esc(bp.name)}增加安排車數">＋</button>
+        </div>
+        <select class="earmark-select" data-bp="${bp.id}" aria-label="${esc(bp.name)}指派聯區或和氣">
+          <option value="">未指派</option>
+          <optgroup label="聯區">${Object.keys(LIANQU_MAP).map((lq)=>`<option value="${lq}" ${bp.earmark===lq?"selected":""}>${lq}</option>`).join("")}</optgroup>
+          <optgroup label="和氣">${HEQI.map((h)=>`<option value="${h}" ${bp.earmark===h?"selected":""}>${h}和氣</option>`).join("")}</optgroup>
+        </select>
+      </div>
+    </div>`).join("");
+
+  return `
+    <div class="transport-summary">
+      <div class="stat-tile"><div class="v">${buses.length} 台</div><div class="l">去程(最大 9)</div></div>
+      <div class="stat-tile"><div class="v">${totalAssigned}/${totalCapacity}</div><div class="l">座位分配</div></div>
+      <div class="stat-tile"><div class="v">${maxAtPoint}/${BOARDING_LIMIT}</div><div class="l">同上車點上限</div></div>
+      <div class="stat-tile"><div class="v">${NOT_ATTENDING} 人</div><div class="l">不參加彩排</div></div>
+    </div>
+    <div class="card mt-5">
+      <div class="row-between" style="flex-wrap:wrap; gap:12px;">
+        <h2 class="section-title" style="margin-bottom:0">上車點調度</h2>
+        <button class="btn btn-sm" id="addBusBtn">＋ 新增車次</button>
+      </div>
+      <div class="mt-5">${rows}</div>
+    </div>
+    ${crossSessionDispatchHtml()}
+    <h2 class="section-title mt-6">車輛總覽</h2>
+    <div class="grid grid-2">${buses.map((b) => busCardHtml(b, {editable:true})).join("")}</div>`;
+}
+
+function dispatchScopeHtml(){
+  const p = state.persona;
+  const lianQuName = p.lianQu + "聯區";
+  const buses = BUSES_GO.filter((b) => b.lianQu === lianQuName);
+  const scopeHeQi = scopeHeQiList(p);
+  const totalAssigned = buses.reduce((a,b)=>a+b.assigned,0);
+  const totalCapacity = buses.reduce((a,b)=>a+b.capacity,0);
+  const cards = buses.map((b) => {
+    const passengers = busPassengers(b.id);
+    const breakdownRows = scopeHeQi.map((h) => `
+      <div class="breakdown-row">
+        <span>${esc(h)}和氣</span>
+        <input type="number" class="num-input" data-bus="${b.id}" data-heqi="${esc(h)}" min="0" max="${b.capacity}" value="${b.heQiBreakdown[h]||0}" aria-label="${esc(b.name)} ${esc(h)}和氣席次">
+      </div>`).join("");
+    const leaderOptions = passengers.map((psg) => `<option value="${esc(psg.name)}" ${b.leader===psg.name?"selected":""}>${esc(psg.name)}(${esc(psg.heQi)})</option>`).join("");
+    return `
+    <div class="card bus-card">
+      <div class="head">
+        <div><h3>${esc(b.name)}</h3><div class="route">${esc(b.origin)} → ${esc(b.dest)}</div></div>
+        <span class="chip">${b.assigned}/${b.capacity} 席</span>
+      </div>
+      <h4 style="font-size:var(--fs-sm); color:var(--ink-3); font-weight:700;">和氣 × 席次分配</h4>
+      ${breakdownRows}
+      <div class="select-field mt-3" style="width:100%; max-width:none;">
+        <label for="leader-${b.id}">車長(從乘客名單選)</label>
+        <select id="leader-${b.id}" data-setleader="${b.id}" style="width:100%; max-width:none; min-width:0;">
+          <option value="">— 尚未指派 —</option>
+          ${leaderOptions}
+        </select>
+      </div>
+      <div class="row"><span class="l">車牌</span><span class="mono">${esc(b.plate || "—")}</span></div>
+      <div class="driver">
+        <span class="text-3">司機 ${esc(b.driver)}</span>
+        <span class="phone-group"><span class="phone">${esc(b.driverPhone)}</span></span>
+      </div>
+    </div>`;
+  }).join("");
+
+  return `
+    <div class="transport-summary">
+      <div class="stat-tile"><div class="v">${buses.length} 台</div><div class="l">分配至本聯區</div></div>
+      <div class="stat-tile"><div class="v">${totalAssigned}/${totalCapacity}</div><div class="l">座位分配</div></div>
+      <div class="stat-tile"><div class="v">${scopeHeQi.length}</div><div class="l">聯區內和氣</div></div>
+    </div>
+    <p class="text-2 mt-5">編輯各車「和氣 × 席次」分配、把車與數量指派給和氣活動,並可設定車長(從該車乘客名單中選擇)。</p>
+    <div class="grid grid-2 mt-5">${cards || `<p class="text-2">目前尚無分配至本聯區的車次。</p>`}</div>`;
+}
+
+function dispatchHeqiHtml(){
+  const p = state.persona;
+  const busId = "B1"; // 本和氣配額車次(種子資料)
+  const bus = BUSES_GO.find((b) => b.id === busId);
+  const allotted = (bus.heQiBreakdown && bus.heQiBreakdown[p.heQi]) || 0;
+  const riders = bridgeBusRiders(); // 本和氣「已報名坐車」名單(scope 已限定大橋)
+  const assignedCount = riders.filter((r) => busRiderAssignment[r.id] === busId).length;
+
+  const riderRows = riders.map((r) => {
+    const assigned = busRiderAssignment[r.id] === busId;
+    const dayType = riderDayType(r.id);
+    const dayTypeChip = dayType === "單場"
+      ? `<span class="chip" style="color:var(--ink-3)">同車去回</span>`
+      : `<span class="chip" style="color:var(--warn); border-color:color-mix(in oklch, var(--warn) 45%, var(--line)); background:var(--warn-soft);">${dayType} · 合心安排</span>`;
+    return `
+    <div class="roster-row">
+      <div class="who"><div><div class="name">${esc(r.name)}</div><div class="sub">${esc(r.heQi)}和氣 · ${esc(r.category||"—")}</div></div></div>
+      ${dayTypeChip}
+      ${assigned
+        ? `<span class="chip" style="color:var(--brand)">已排:${esc(bus.name)}</span><button class="btn btn-sm btn-ghost" data-unassign="${r.id}">移除</button>`
+        : `<span class="chip" style="color:var(--ink-3)">未排</span><button class="btn btn-sm" data-assign="${r.id}" data-bus="${busId}">排入 ${esc(bus.name)}</button>`}
+    </div>`;
+  }).join("");
+
+  return `
+    <div class="transport-summary">
+      <div class="stat-tile"><div class="v">${assignedCount}/${allotted}</div><div class="l">已排/容量(${esc(bus.name)})</div></div>
+      <div class="stat-tile"><div class="v">${riders.length}</div><div class="l">已報名坐車</div></div>
+    </div>
+    <div class="card mt-5 bus-card">
+      <div class="head"><div><h3>${esc(bus.name)}</h3><div class="route">${esc(bus.origin)} → ${esc(bus.dest)}</div></div><span class="chip">本和氣配額 ${allotted} 席</span></div>
+      <div class="cap-wrap"><span class="bar ${assignedCount>=allotted?'warn':'ok'}"><i style="--w:${allotted?Math.min(assignedCount/allotted,1):0}"></i></span><span class="n">${assignedCount}/${allotted}</span></div>
+      <div class="row"><span class="l">車長</span><span>${esc(bus.leader)}</span></div>
+      <div class="row"><span class="l">發車時間</span><span class="mono">${esc(bus.departTime||"—")}</span></div>
+      <div class="row"><span class="l">車牌</span><span class="mono">${esc(bus.plate || "—")}</span></div>
+    </div>
+    <h2 class="section-title mt-6">已報名坐車名單 · ${esc(p.heQi)}和氣</h2>
+    <div class="card">${riderRows || `<p class="text-2">目前無已報名坐車志工。</p>`}</div>`;
+}
+
+/* 新增/編輯車次表單(交通幹事)— DESIGN-v3 §階段3-15:司機姓名/司機電話/車牌(選填) */
+function openBusModal(busId){
+  const editing = !!busId;
+  const bus = editing ? BUSES_GO.find((b) => b.id === busId) : null;
+  const pts = dispatchState.boardingPoints.map((bp) => bp.name);
+  openModal(`
+    <h3>${editing ? "編輯車次" : "新增車次"}</h3>
+    <form id="addBusForm">
+      <div class="field"><label for="abName">車次名稱</label><input id="abName" class="text-input" placeholder="例如 台南3號車" value="${editing ? esc(bus.name) : ""}" required></div>
+      <div class="field"><label for="abPoint">上車點</label><input id="abPoint" class="text-input" list="abPointList" placeholder="輸入或選擇上車點" value="${editing ? esc(bus.origin) : ""}" required>
+        <datalist id="abPointList">${pts.map((pt)=>`<option value="${esc(pt)}">`).join("")}</datalist>
+      </div>
+      <div class="field"><label for="abCapacity">容量</label><input id="abCapacity" class="text-input" type="number" value="${editing ? bus.capacity : 48}" min="10" max="60"></div>
+      <div class="field"><label for="abDriver">司機姓名</label><input id="abDriver" class="text-input" placeholder="例如 王志成" value="${editing && bus.driver !== "—" ? esc(bus.driver) : ""}"></div>
+      <div class="field"><label for="abDriverPhone">司機電話</label><input id="abDriverPhone" class="text-input" placeholder="例如 0933-021-115" value="${editing && bus.driverPhone !== "—" ? esc(bus.driverPhone) : ""}"></div>
+      <div class="field"><label for="abPlate">車牌(選填)</label><input id="abPlate" class="text-input" placeholder="例如 KAB-1234" value="${editing ? esc(bus.plate || "") : ""}"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-modal-close>取消</button>
+        <button type="submit" class="btn btn-primary" style="width:auto;">${editing ? "儲存" : "新增(Demo)"}</button>
+      </div>
+    </form>
+  `);
+  document.getElementById("addBusForm").onsubmit = (e) => {
+    e.preventDefault();
+    const name = document.getElementById("abName").value.trim() || "新增車次";
+    const origin = document.getElementById("abPoint").value.trim() || "台南靜思堂";
+    const capacity = +document.getElementById("abCapacity").value || 48;
+    const driver = document.getElementById("abDriver").value.trim() || "—";
+    const driverPhone = document.getElementById("abDriverPhone").value.trim() || "—";
+    const plate = document.getElementById("abPlate").value.trim();
+    if (editing){
+      Object.assign(bus, { name, origin, capacity, driver, driverPhone, plate });
+      const returnBus = BUSES_RETURN.find((b) => b.id === bus.id);
+      if (returnBus) Object.assign(returnBus, { name, dest: origin, capacity, driver, driverPhone, plate });
+      dispatchState.boardingPoints = buildBoardingPoints();
+      closeModal();
+      showToast("已更新車次「" + name + "」(Demo)", "ok");
+    } else {
+      const id = "B" + (BUSES_GO.length + 1);
+      const newBus = { id, name, origin, dest:"高雄大巨蛋", driver, driverPhone, plate, leader:"—", capacity, assigned:0, boarded:0, lianQu:"", heQiBreakdown:{}, departTime:"06:00" };
+      BUSES_GO.push(newBus);
+      dispatchState.boardingPoints = buildBoardingPoints();
+      closeModal();
+      showToast("已新增車次「" + name + "」(Demo)", "ok");
+    }
+    renderTransport();
+  };
+}
+
+function bindTransportEvents(){
+  document.querySelectorAll("[data-step]").forEach((btn) => {
+    btn.onclick = () => {
+      const bp = dispatchState.boardingPoints.find((x) => x.id === btn.dataset.bp);
+      if (!bp) return;
+      bp.assignedBuses = Math.max(0, bp.assignedBuses + (+btn.dataset.step));
+      renderTransport();
+    };
+  });
+  document.querySelectorAll(".earmark-select").forEach((sel) => {
+    sel.onchange = () => {
+      const bp = dispatchState.boardingPoints.find((x) => x.id === sel.dataset.bp);
+      if (!bp) return;
+      bp.earmark = sel.value;
+      showToast(bp.earmark ? "已指派給 " + bp.earmark : "已取消指派", "ok");
+      renderTransport();
+    };
+  });
+  const addBusBtn = document.getElementById("addBusBtn");
+  if (addBusBtn) addBusBtn.onclick = () => openBusModal(null);
+  document.querySelectorAll("[data-editbus]").forEach((btn) => {
+    btn.onclick = () => openBusModal(btn.dataset.editbus);
+  });
+  document.querySelectorAll("[data-cross-out]").forEach((sel) => {
+    sel.onchange = () => {
+      const info = CROSS_SESSION_RIDERS[sel.dataset.crossOut];
+      if (!info) return;
+      info.outboundBusId = sel.value;
+      showToast("已更新去程車次安排", "ok");
+      renderTransport();
+    };
+  });
+  document.querySelectorAll("[data-cross-ret]").forEach((sel) => {
+    sel.onchange = () => {
+      const info = CROSS_SESSION_RIDERS[sel.dataset.crossRet];
+      if (!info) return;
+      info.returnBusId = sel.value;
+      showToast("已更新回程車次安排", "ok");
+      renderTransport();
+    };
+  });
+
+  document.querySelectorAll(".num-input[data-bus]").forEach((inp) => {
+    inp.onchange = () => {
+      const bus = BUSES_GO.find((b) => b.id === inp.dataset.bus);
+      if (!bus) return;
+      bus.heQiBreakdown[inp.dataset.heqi] = Math.max(0, +inp.value || 0);
+      showToast("已更新 " + inp.dataset.heqi + "和氣席次分配", "ok");
+    };
+  });
+  document.querySelectorAll("[data-setleader]").forEach((sel) => {
+    sel.onchange = () => {
+      const bus = BUSES_GO.find((b) => b.id === sel.dataset.setleader);
+      if (!bus) return;
+      bus.leader = sel.value || "—";
+      showToast("已設定車長:" + bus.leader, "ok");
+      renderTransport();
+    };
+  });
+  document.querySelectorAll("[data-assign]").forEach((btn) => {
+    btn.onclick = () => {
+      busRiderAssignment[btn.dataset.assign] = btn.dataset.bus;
+      showToast("已排入車次", "ok");
+      renderTransport();
+    };
+  });
+  document.querySelectorAll("[data-unassign]").forEach((btn) => {
+    btn.onclick = () => {
+      busRiderAssignment[btn.dataset.unassign] = null;
+      showToast("已移除車次安排", "ok");
+      renderTransport();
+    };
+  });
+}
+
+/* ---------- leader(車長)交通頁 = 車長點名視圖(只有本車)— DESIGN-v3 §階段3-13 ---------- */
+function leaderTransportBodyHtml(person){
+  const bus = BUSES_GO.find((b) => b.id === resolveBusId(person.busId)) || BUSES_GO[0];
+  const passengers = bridgeBusRiders().filter((r) => busRiderAssignment[r.id] === bus.id);
+  const boardedCount = passengers.filter((r) => leaderCheckin[r.id]).length;
+  return `
+  <div class="transport-summary">
+    <div class="stat-tile"><div class="v">${esc(bus.name)}</div><div class="l">本車車次</div></div>
+    <div class="stat-tile"><div class="v">${boardedCount}/${passengers.length}</div><div class="l">上車點名</div></div>
+    <div class="stat-tile"><div class="v">${esc(bus.departTime||"—")}</div><div class="l">發車時間</div></div>
+    <div class="stat-tile"><div class="v">${esc(bus.plate||"—")}</div><div class="l">車牌</div></div>
+  </div>
+  <div class="card mt-5 bus-card">
+    <div class="head">
+      <div><h3>${esc(bus.name)}</h3><div class="route">${esc(bus.origin)} → ${esc(bus.dest)}</div></div>
+      <span class="chip">${esc(bus.origin)}上車</span>
+    </div>
+    <div class="row"><span class="l">車牌</span><span class="mono">${esc(bus.plate || "—")}</span></div>
+    <div class="driver">
+      <span class="text-3">司機聯絡 · ${esc(bus.driver)}</span>
+      <span class="phone-group"><span class="phone">${esc(bus.driverPhone)}</span><a class="btn btn-sm" href="tel:${bus.driverPhone.replace(/-/g,'')}">撥打司機</a></span>
+    </div>
+    <div class="bar ok mt-3"><i style="--w:${passengers.length ? boardedCount/passengers.length : 0}"></i></div>
+  </div>
+  <h2 class="section-title mt-6">乘客名單 · 上車點名(${passengers.length} 人)</h2>
+  <div class="card">
+    <div id="leaderPassengerList">${leaderPassengerRowsHtml(passengers)}</div>
+  </div>`;
+}
+
+function renderTransport(){
+  document.querySelectorAll("#directionToggle button").forEach((b) => b.classList.toggle("active", b.dataset.dir === transportDirection));
+  transportRoleHeader();
+  const body = document.getElementById("transportBody");
+  const p = state.persona;
+  if (p.kind === "personal" && p.busLeader){
+    body.innerHTML = leaderTransportBodyHtml(p.person);
+    return;
+  }
+  if (transportDirection === "return"){
+    body.innerHTML = returnDirectionHtml();
+    return;
+  }
+  if (can("bus_dispatch_all")) body.innerHTML = dispatchAllHtml();
+  else if (can("bus_dispatch_scope")) body.innerHTML = dispatchScopeHtml();
+  else if (can("bus_assign_rider")) body.innerHTML = dispatchHeqiHtml();
+  else body.innerHTML = `<div class="empty-state">${svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>')}<h4>此身份無交通調度權限</h4><p>請切換至具有交通調度能力的身份檢視此頁面。</p></div>`;
+  bindTransportEvents();
+}
+
+document.addEventListener("click", (e) => {
+  const dirBtn = e.target.closest("#directionToggle button");
+  if (dirBtn){ transportDirection = dirBtn.dataset.dir; renderTransport(); }
+});
+
+/* ================= Seats render ================= */
+let seatSessionId = SESSIONS[1].id;
+let seatBlock = "AB";
+let selectedSeatKey = null;
+
+/* 每 3 列一組的標籤帶(區塊/服裝/性別)— 18 組涵蓋列1–54;分組邊界與區塊/服裝/性別邊界皆對齊 */
+function seatBandGroups(){
+  const groups = [];
+  for (let g = 1; g <= 18; g++){
+    const repRow = 3 * g; // 組內任一列即可代表整組(區塊/服裝/性別皆以3為週期對齊)
+    groups.push({
+      g,
+      colStart: 56 - 3 * g, // grid-column start(3 欄跨距),+1 offset 已內含
+      block: repRow <= 30 ? "A" : "B",
+      costume: seatCostume(repRow),
+      gender: seatGender(repRow),
+    });
+  }
+  return groups;
+}
+
+function renderSeats(){
+  const sessSelect = document.getElementById("seatSession");
+  if (!sessSelect.dataset.built){
+    sessSelect.innerHTML = SESSIONS.map((s) => `<option value="${s.id}">${s.label} ${s.name}</option>`).join("");
+    sessSelect.dataset.built = "1";
+    sessSelect.onchange = () => { seatSessionId = sessSelect.value; selectedSeatKey = null; renderSeats(); };
+  }
+  sessSelect.value = seatSessionId;
+  const blockSelect = document.getElementById("seatBlock");
+  blockSelect.value = seatBlock;
+  blockSelect.onchange = () => { seatBlock = blockSelect.value; selectedSeatKey = null; renderSeats(); };
+
+  const gridArea = document.getElementById("seatGridArea");
+  const cNote = document.getElementById("cBlockNote");
+
+  if (seatBlock === "C"){
+    gridArea.style.display = "none";
+    cNote.style.display = "flex";
+    document.getElementById("cBlockList").innerHTML = C_BLOCK_LIST.map((p) =>
+      `<li class="row-between" style="border-top:1px solid var(--line-soft); padding-top:6px;"><span>${esc(p.name)}</span><span class="text-3" style="font-size:var(--fs-sm)">${p.heQi}和氣</span></li>`
+    ).join("");
+    renderSeatScopeNote();
+    return;
+  }
+  gridArea.style.display = "";
+  cNote.style.display = "none";
+
+  const cells = genSeatGridCombined(seatSessionId);
+  document.getElementById("seatCountNote").textContent = `本象限 A+B 共 ${cells.length} 席(排16–22 × 列1–54,截角湊成 368)`;
+
+  const desktop = window.matchMedia("(min-width:1024px)").matches;
+  const cellW = desktop ? 42 : 30;
+  const cellH = desktop ? 50 : 30;
+  const axisColW = desktop ? 36 : 26;
+  const axisRowH = desktop ? 22 : 18;
+  const bandRowH = desktop ? 34 : 28;
+
+  const gridEl = document.getElementById("seatGrid");
+  gridEl.style.gridTemplateColumns = `${axisColW}px repeat(54, ${cellW}px)`;
+  gridEl.style.gridTemplateRows = `${axisRowH}px ${bandRowH}px repeat(7, ${cellH}px)`;
+
+  let html = `<div class="seat-corner" style="grid-column:1; grid-row:1 / 3;" aria-hidden="true"></div>`;
+  // 上方軸標:列號 1..54,對齊每欄
+  for (let row = 1; row <= 54; row++){
+    html += `<div class="seat-axis-col" style="grid-column:${56 - row}; grid-row:1;">${row}</div>`;
+  }
+  // 每 3 列一組的標籤帶:{A/B} · {白/藍} · {男/女}
+  html += seatBandGroups().map((b) =>
+    `<div class="seat-band block-${b.block}" style="grid-column:${b.colStart} / span 3; grid-row:2;" title="第 ${3*b.g-2}–${3*b.g} 列 · ${b.block} 區 · ${b.costume}服 · ${b.gender}眾"><b>${b.block}</b><span>${b.costume}·${b.gender}</span></div>`
+  ).join("");
+  // 左方軸標:排號 16..22,對齊每列
+  for (let col = 16; col <= 22; col++){
+    html += `<div class="seat-axis-row" style="grid-column:1; grid-row:${col - 13};">${col}</div>`;
+  }
+  // 座位本體
+  html += cells.map((c) => {
+    const cls = ["seat-cell"];
+    if (c.occupied) cls.push("occupied", "costume-" + c.costume); else cls.push("empty");
+    if (c.isMe) cls.push("me");
+    if (c.foreignScope) cls.push("foreign-scope");
+    if (c.seatKey === selectedSeatKey) cls.push("selected");
+    const inner = `<span class="seatnum">${c.row}-${c.col}</span>` +
+      (c.occupied ? `<span class="nm">${esc(c.occ.name)}</span><span class="hq">${esc(c.occ.heQi)}</span>` : "");
+    const ariaExtra = c.occupied ? `,${c.occ.name},${c.occ.heQi}和氣,${c.block} 區` : ",空位";
+    return `<button class="${cls.join(' ')}" style="grid-column:${c.gridColumn};grid-row:${c.gridRow}" data-key="${c.seatKey}" title="座位 ${c.row}-${c.col}" aria-label="座位 ${c.row}-${c.col}${ariaExtra}">${inner}</button>`;
+  }).join("");
+
+  gridEl.innerHTML = html;
+
+  gridEl.querySelectorAll(".seat-cell").forEach((el) => {
+    el.onclick = () => {
+      selectedSeatKey = el.dataset.key;
+      renderSeats();
+      renderSeatDetail(cells.find((c) => c.seatKey === selectedSeatKey));
+    };
+  });
+
+  if (selectedSeatKey){
+    const sel = cells.find((c) => c.seatKey === selectedSeatKey);
+    if (sel) renderSeatDetail(sel); else document.getElementById("seatDetail").innerHTML = `<p class="empty-hint">點選座位查看占用者資訊。</p>`;
+  } else {
+    document.getElementById("seatDetail").innerHTML = `<p class="empty-hint">點選座位查看占用者資訊。</p>`;
+  }
+
+  renderSeatScopeNote();
+}
+
+function renderSeatScopeNote(){
+  const el = document.getElementById("seatScopeNote");
+  if (!el) return;
+  const p = state.persona;
+  const mySeat = personaSeat();
+  let html = "";
+  if (p.kind === "personal" && p.bound && mySeat){
+    html += `<span class="chip scope-chip">我的座位:${esc(mySeat.block)}-${mySeat.row}-${mySeat.col} · ${esc(mySeat.costume || "")}服裝</span>`;
+  }
+  if (p.kind === "personal" && !p.bound){
+    html += `<span class="chip">通用檢視 · 未顯示個人座位</span>`;
+  }
+  if (p.kind === "staff" && p.scope === "heQi"){
+    html += `<span class="chip scope-chip">僅 ${esc(p.heQi)}和氣座位可操作,其餘唯讀</span>`;
+  }
+  el.innerHTML = html;
+}
+
+let seatResizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(seatResizeTimer);
+  seatResizeTimer = setTimeout(() => { if (parseHash().screen === "seats") renderSeats(); }, 150);
+});
+
+function renderSeatDetail(cell){
+  const det = document.getElementById("seatDetail");
+  if (!cell.occupied){
+    det.innerHTML = `<p class="empty-hint">座位 <span class="mono">${cell.seatKey}</span> 目前空位,尚未配位。</p>`;
+    return;
+  }
+  det.innerHTML = `
+    <div class="occ">
+      <div>
+        <div class="name">${esc(cell.occ.name)}${cell.isMe?" (我)":""}</div>
+        <div class="text-3" style="font-size:var(--fs-sm)">座位 <span class="mono">${cell.seatKey}</span></div>
+      </div>
+      <span class="chip chip-heqi">${cell.occ.heQi}和氣</span>
+      <span class="chip">${cell.block} 區塊</span>
+      <span class="chip">${cell.occ.gender}</span>
+      <span class="chip">${cell.costume}服裝</span>
+      ${cell.occ.category ? `<span class="chip">${cell.occ.category}</span>` : ""}
+      ${cell.foreignScope ? `<span class="chip" style="color:var(--ink-3)">唯讀 · 非本和氣</span>` : ""}
+    </div>
+  `;
+}
+
+/* ================= Me render (persona-aware; personal personas only) ================= */
+function icsBoxHtml(){
+  return `
+    <div class="card ics-box" id="icsBox">
+      <h2 class="section-title">行事曆訂閱(ICS)</h2>
+      <p class="hint">訂閱後,彩排 / 共修 / 驗收與演繹當日行程會自動出現在你的行事曆 App。連結內含個人專屬憑證,請勿轉傳或公開分享。</p>
+      <button class="btn btn-primary" id="icsBtn">產生我的行事曆連結</button>
+      <div class="url-row">
+        <code id="icsUrl">https://dome.tzuchi-tainan.cc/api/me/calendar?token=••••••••••••</code>
+        <button class="icon-btn" id="icsCopyBtn" aria-label="複製連結">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderUnboundMe(){
+  return `
+  <div class="card">
+    <h2 class="section-title">尚未綁定帳號</h2>
+    <p class="text-2">綁定後即可查看您的個人場次、座位配置與車次資訊。請填寫以下資料進行綁定(Demo):</p>
+    <form id="bindForm" class="stack mt-5">
+      <div class="select-field">
+        <label for="bindName">姓名</label>
+        <input id="bindName" class="text-input" type="text" required placeholder="請輸入姓名">
+      </div>
+      <div class="select-field">
+        <label for="bindId">身分證字號</label>
+        <input id="bindId" class="text-input" type="text" required placeholder="A123456789">
+      </div>
+      <button type="submit" class="btn btn-primary">綁定帳號(Demo)</button>
+    </form>
+  </div>
+  <div class="grid grid-2 mt-6">
+    <div class="card">
+      <h2 class="section-title">座位表</h2>
+      <p class="text-2">尚未綁定帳號,無法顯示個人座位。您可查看整體座位配置(通用檢視)。</p>
+      <button class="btn btn-ghost mt-5" onclick="location.hash='#/seats'">前往座位表 →</button>
+    </div>
+    ${icsBoxHtml()}
+  </div>`;
+}
+
+/* ---------- performer/leader personal state (Phase 2 — §C-6) ---------- */
+const meRegState = {}; // `${personaId}_${eventId}` -> '報名' | '請假'
+function meRegKey(p, evId){ return p.id + "_" + evId; }
+function personEventVisible(ev, person){
+  if (!ev.heQi && !ev.scopeLianQu) return true;
+  if (ev.heQi) return ev.heQi === person.heQi;
+  if (ev.scopeLianQu) return ev.scopeLianQu === LIANQU_OF[person.heQi];
+  return false;
+}
+
+function renderMiniSeatGrid(seatInfo){
+  const rng = mulberry32(hashStr("mini-" + seatInfo.row + "-" + seatInfo.col));
+  const size = 5;
+  const mid = Math.floor(size / 2);
+  let cells = "";
+  for (let r = 0; r < size; r++){
+    for (let c = 0; c < size; c++){
+      const isMe = r === mid && c === mid;
+      const occ = isMe || rng() < 0.85;
+      const costume = isMe ? seatInfo.costume : (rng() < 0.5 ? "白" : "藍");
+      const cls = ["mini-cell"];
+      if (occ) cls.push("costume-" + costume);
+      if (isMe) cls.push("me");
+      cells += `<div class="${cls.join(' ')}" ${isMe ? 'title="我的座位"' : ''}></div>`;
+    }
+  }
+  return `<div class="mini-grid" style="grid-template-columns:repeat(${size},28px)">${cells}</div>`;
+}
+
+function meCardHtml(p, person){
+  return `
+  <div class="card me-card">
+    <div class="avatar">${esc(person.name.charAt(0))}</div>
+    <div>
+      <h2>${esc(person.name)}</h2>
+      <div class="tags">
+        <span class="chip">${esc(person.heQi)}和氣</span>
+        <span class="chip">${esc(person.lianQu)}聯區</span>
+        <span class="chip">${esc(person.category)}</span>
+        ${p.busLeader ? '<span class="chip" style="color:var(--brand)">車長</span>' : ""}
+      </div>
+    </div>
+  </div>`;
+}
+
+function meTimelineHtml(p, person){
+  const items = [];
+  EVENTS.forEach((ev) => {
+    if (!personEventVisible(ev, person)) return;
+    ev.days.forEach((d) => items.push({ date:d, title:ev.title, type:ev.type, location:ev.location, evId:ev.id }));
+  });
+  (person.sessions || []).forEach((s) => items.push({ date:"2026-11-13", title:"大巨蛋演繹 · " + s.s.split(") ").pop(), type:"正式演繹", location:"高雄大巨蛋", evId:null }));
+  items.sort((a,b) => a.date.localeCompare(b.date));
+
+  const rows = items.map((it) => {
+    let actionHtml;
+    if (it.evId){
+      const key = meRegKey(p, it.evId);
+      const st = meRegState[key] || "報名";
+      actionHtml = `
+        <div class="seg3" data-regkey="${key}" style="flex-shrink:0;">
+          <button class="state-報名 ${st==='報名'?'is-active':''}" data-regstate="報名">報名</button>
+          <button class="state-請假 ${st==='請假'?'is-active':''}" data-regstate="請假">請假</button>
+        </div>`;
+    } else {
+      actionHtml = `<span class="chip" style="color:var(--ok); border-color:color-mix(in oklch, var(--ok) 45%, var(--line)); background:var(--ok-soft)">已確認演繹</span>`;
+    }
+    return `
+    <div class="timeline-item">
+      <div class="row-between" style="flex-wrap:wrap; gap:10px;">
+        <div>
+          <h4>${esc(it.title)}</h4>
+          <div class="meta">${it.date} · ${esc(it.location)} · ${it.type}</div>
+        </div>
+        ${actionHtml}
+      </div>
+    </div>`;
+  }).join("");
+  return `<h2 class="section-title">我的行程</h2><div class="timeline">${rows || '<p class="text-2">尚無行程資料。</p>'}</div>`;
+}
+
+function meBusSignupFormHtml(person){
+  const points = Array.from(new Set(BUSES_GO.map((b) => b.origin)));
+  return `
+  <div class="card">
+    <h2 class="section-title">遊覽車登記</h2>
+    <form id="busSignupForm" class="stack">
+      <div class="row-between">
+        <span class="text-2">需要坐車?</span>
+        <button type="button" class="switch on" id="busNeedSwitch" aria-pressed="true" aria-label="切換是否需要坐車"><i></i></button>
+      </div>
+      <div class="select-field" style="width:100%; max-width:none;">
+        <label for="busPointInput">上車點</label>
+        <input id="busPointInput" class="text-input" list="busPointList" placeholder="輸入或選擇上車點" value="${esc(person.heQi)}共修處">
+        <datalist id="busPointList">${points.map((pt) => `<option value="${esc(pt)}">`).join("")}</datalist>
+      </div>
+      <div class="select-field" style="width:100%; max-width:none;">
+        <label for="busReturnDest">回程目的地</label>
+        <select id="busReturnDest">
+          <option value="回台南">回台南</option>
+          <option value="留高雄">留高雄(不隨車返回)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">送出遊覽車登記(Demo)</button>
+    </form>
+  </div>`;
+}
+
+function meSeatCardHtml(person){
+  const s = (person.sessions || [])[0];
+  if (!s) return `<div class="card"><h2 class="section-title">我的座位</h2><p class="text-2">尚無場次資料。</p></div>`;
+  const parts = s.seat.split("-");
+  const seatInfo = { row:+parts[1], col:+parts[2], costume:s.costume };
+  return `
+  <div class="card">
+    <h2 class="section-title">我的座位</h2>
+    <div class="mini-grid-wrap">
+      ${renderMiniSeatGrid(seatInfo)}
+      <div>
+        <div style="font-weight:700; font-size:var(--fs-md)">${esc(s.s)}</div>
+        <div class="text-2" style="margin-top:4px;">${esc(s.block)} 組 · ${esc(s.costume)}服裝</div>
+        <div class="mono mt-5" style="font-weight:800; font-size:var(--fs-lg)">${esc(s.seat)}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function meBusCardHtml(person){
+  if (!person.busDispatched){
+    return `<div class="card"><h2 class="section-title">我的車次</h2><p class="text-2">尚未派車,請靜候交通調度公告。</p></div>`;
+  }
+  const bus = BUSES_GO.find((b) => b.id === resolveBusId(person.busId)) || BUSES_GO[0];
+  return `
+  <div class="card">
+    <h2 class="section-title">我的車次</h2>
+    <div class="stack">
+      <div class="row-between"><span class="text-3">車次</span><span style="font-weight:700">${esc(bus.name)}</span></div>
+      <div class="row-between"><span class="text-3">上車地點</span><span>${esc(bus.origin)}</span></div>
+      <div class="row-between"><span class="text-3">發車時間</span><span class="mono">${esc(bus.departTime||"06:00")}</span></div>
+      <div class="row-between"><span class="text-3">車長</span><span>${esc(bus.leader)}</span></div>
+    </div>
+  </div>`;
+}
+
+function leaderPassengerRowsHtml(passengers){
+  if (!passengers.length) return `<p class="text-2">尚無乘客資料。</p>`;
+  return passengers.map((r) => {
+    const boarded = !!leaderCheckin[r.id];
+    return `
+    <div class="roster-row">
+      <div class="who">
+        <div>
+          <div class="name">${esc(r.name)}</div>
+          <div class="sub">${esc(r.heQi)}和氣 · ${esc(r.category||"—")}</div>
+        </div>
+      </div>
+      <a class="btn btn-sm btn-ghost" href="tel:${r.phone.replace(/-/g,'')}">撥打</a>
+      <button class="btn btn-sm" data-checkin="${r.id}" style="${boarded?'background:var(--ok-soft); color:var(--ok); border-color:color-mix(in oklch, var(--ok) 45%, var(--line));':''}">${boarded?'✓ 已上車':'標記上車'}</button>
+    </div>`;
+  }).join("");
+}
+
+function meNotesCardHtml(person){
+  return `
+  <div class="card">
+    <h2 class="section-title">跑位備註</h2>
+    <p class="text-2">${(person.sessions && person.sessions[0]) ? esc(person.sessions[0].s) + " · " + esc(person.sessions[0].block) + " 組" : "—"}</p>
+    <p class="text-3 mt-5" style="font-size:var(--fs-sm)">入場後由西側走道進入,依編號就座;動作驗收時對照跑位表,詳見現場動線圖。</p>
+  </div>`;
+}
+
+function renderBoundMe(p){
+  const person = p.person;
+  /* 車長工具已移至「交通」頁(車長點名視圖)— DESIGN-v3 §階段3-13;我的僅保留行程/座位/車次基本資訊 */
+  let html = meCardHtml(p, person);
+  html += `<div class="card mt-6">${meTimelineHtml(p, person)}</div>`;
+  html += `<div class="grid grid-2 mt-6">${meBusSignupFormHtml(person)}${meSeatCardHtml(person)}</div>`;
+  html += `<div class="mt-6">${meBusCardHtml(person)}</div>`;
+  html += `<div class="grid grid-2 mt-6">${icsBoxHtml()}${meNotesCardHtml(person)}</div>`;
+  return html;
+}
+
+function renderMe(){
+  const p = state.persona;
+  const sub = document.getElementById("mePageSub");
+  if (sub) sub.textContent = p.bound ? "個人行程、座位、車次與行事曆" : "綁定帳號後即可查看您的個人場次與座位";
+  const body = document.getElementById("meBody");
+  body.innerHTML = p.bound ? renderBoundMe(p) : renderUnboundMe();
+  bindMeEvents();
+}
+
+function bindMeEvents(){
+  const icsBtn = document.getElementById("icsBtn");
+  const icsBox = document.getElementById("icsBox");
+  const copyBtn = document.getElementById("icsCopyBtn");
+  if (icsBtn) icsBtn.addEventListener("click", () => {
+    icsBox.classList.add("revealed");
+    showToast("已產生個人行事曆連結,請勿轉傳", "ok");
+  });
+  if (copyBtn) copyBtn.addEventListener("click", () => {
+    const text = document.getElementById("icsUrl").textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(() => showToast("已複製連結", "ok")).catch(() => showToast("複製失敗,請手動選取", "err"));
+    } else {
+      showToast("已複製連結", "ok");
+    }
+  });
+  const bindForm = document.getElementById("bindForm");
+  if (bindForm) bindForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    showToast("這是 Demo,綁定功能尚未串接 — 請改用上方「Demo」切換器體驗已綁定身份。", "ok");
+  });
+  const busSignupForm = document.getElementById("busSignupForm");
+  if (busSignupForm) busSignupForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    showToast("遊覽車登記已送出(Demo)", "ok");
+  });
+}
+
+/* ---------- global delegated handlers: 報名/請假 toggle, 車上點名 toggle, 需要坐車 switch ---------- */
+document.addEventListener("click", (e) => {
+  const regBtn = e.target.closest("[data-regstate]");
+  if (regBtn){
+    const seg = regBtn.closest("[data-regkey]");
+    const key = seg.dataset.regkey;
+    const val = regBtn.dataset.regstate;
+    if (meRegState[key] !== val){
+      meRegState[key] = val;
+      showToast(val === "報名" ? "已報名" : "已請假", "ok");
+      renderMe();
+    }
+    return;
+  }
+  const checkinBtn = e.target.closest("[data-checkin]");
+  if (checkinBtn){
+    const id = checkinBtn.dataset.checkin;
+    leaderCheckin[id] = !leaderCheckin[id];
+    showToast(leaderCheckin[id] ? "已標記上車" : "已取消上車標記", "ok");
+    /* 車長點名可能發生在「交通」頁(移至此處後)或(理論上)其他情境,依目前作用中畫面重繪 — §階段3-13 */
+    const activeScreen = document.querySelector(".screen.active");
+    if (activeScreen && activeScreen.dataset.screen === "transport") renderTransport(); else renderMe();
+    return;
+  }
+  const needSwitch = e.target.closest("#busNeedSwitch");
+  if (needSwitch){
+    const on = needSwitch.classList.toggle("on");
+    needSwitch.setAttribute("aria-pressed", String(on));
+  }
+});
+
+/* ================= List (名單) render ================= */
+let listSearch = "";
+let listHeQiFilter = "全部";
+let listSessionFilter = "全部";
+let listCategoryFilter = "全部";
+const revealedIds = new Set();
+
+function scopedPeople(){
+  const p = state.persona;
+  if (p.scope === "all") return PEOPLE;
+  return PEOPLE.filter((x) => scopeOK(x));
+}
+
+/* ---------- 多場次報名呈現(全部場次:徽章+chips;單一場次:區塊/服裝/位置) — §階段2-10/11 ---------- */
+function participationBadgeHtml(personId){
+  const n = personParticipations(personId).length;
+  return `<span class="badge-count">報 ${n} 場</span>`;
+}
+function participationChipHtml(pt, tier){
+  const posLabel = pt.seat || "未排";
+  const costumeLabel = pt.block === "C" ? "—" : (pt.costume ? pt.costume + "服" : "—");
+  const swatch = pt.block !== "C" ? `<span class="sc-swatch costume-${pt.costume}"></span>` : "";
+  const is84Mark = (tier === "full" && pt.is84) ? ` · <span style="color:var(--warn); font-weight:700;">84</span>` : "";
+  return `<span class="session-chip">${swatch}<span>${esc(sessionShort(pt.session))} · ${pt.block} 組 · ${costumeLabel} · ${posLabel}${is84Mark}</span></span>`;
+}
+function participationChipsListHtml(personId){
+  const parts = personParticipations(personId);
+  if (!parts.length) return `<p class="text-3" style="font-size:var(--fs-xs); margin-top:8px;">未報名任何場次</p>`;
+  const tier = piiTier();
+  return `<div class="pc-chips">${parts.map((pt) => participationChipHtml(pt, tier)).join("")}</div>`;
+}
+function participationFields(personId, sessionId){
+  const pt = sessionParticipation(personId, sessionId);
+  if (!pt) return { block:"—", costume:"—", seat:"—" };
+  return {
+    block: pt.block + " 組",
+    costume: pt.block === "C" ? "—" : (pt.costume ? pt.costume + "服" : "—"),
+    seat: pt.seat || "未排",
+  };
+}
+
+function buildListTable(rows){
+  const tier = piiTier();
+  if (rows.length === 0){
+    return `<div class="empty-state">${svgIcon('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>')}<h4>查無符合的志工</h4><p>試試調整搜尋或篩選條件。</p></div>`;
+  }
+  const canManage = can("manage_registration");
+  const canEditPii = can("edit_pii");
+  const showActions = canManage || canEditPii;
+  const specificSession = listSessionFilter !== "全部" ? listSessionFilter : null;
+
+  const headCells = ["姓名"];
+  if (tier === "full") headCells.push("性別");
+  headCells.push("和氣");
+  if (tier === "full") headCells.push("聯區");
+  headCells.push("類別");
+  if (specificSession) headCells.push("區塊", "服裝", "位置");
+  else headCells.push("場次報名");
+  if (tier === "full") headCells.push("電話", "Email", "身分證", "出生年月日", "年齡");
+  else headCells.push("電話", "年齡");
+  if (showActions) headCells.push("操作");
+
+  const bodyRows = rows.map((person) => {
+    const cells = [`<strong>${esc(person.name)}${person.id === "ME" ? " (我)" : ""}</strong>`];
+    if (tier === "full") cells.push(esc(person.gender));
+    cells.push(`<span class="chip chip-heqi">${esc(person.heQi)}</span>`);
+    if (tier === "full") cells.push(esc(person.lianQu));
+    cells.push(esc(person.category || "—"));
+    if (specificSession){
+      const f = participationFields(person.id, specificSession);
+      cells.push(esc(f.block), esc(f.costume), `<span class="mono">${esc(f.seat)}</span>`);
+    } else {
+      cells.push(`<div class="participation-cell">${participationBadgeHtml(person.id)}${participationChipsListHtml(person.id)}</div>`);
+    }
+    if (tier === "full"){
+      const revealed = revealedIds.has(person.id);
+      cells.push(`<span class="mono">${esc(person.phone)}</span>`);
+      cells.push(`<span class="mono" style="font-size:var(--fs-xs)">${esc(person.email)}</span>`);
+      cells.push(`<span class="mono">${esc(revealed ? person.idNumber : maskId(person.idNumber))}</span> <button class="btn btn-sm" data-reveal="${person.id}" style="margin-left:6px;">${revealed ? "隱藏" : "顯示"}</button>`);
+      cells.push(fmtDate(person.birthDate));
+      cells.push(person.age);
+    } else {
+      cells.push(`<span class="mono">${esc(person.phone)}</span>`);
+      cells.push(person.age);
+    }
+    if (showActions){
+      let actions = "";
+      if (canManage) actions += `<button class="btn btn-sm" data-manage="${person.id}">報名管理</button>`;
+      if (canEditPii) actions += `<button class="btn btn-sm btn-ghost" data-editpii="${person.id}">編輯人事資料</button>`;
+      cells.push(`<span class="actions-cell">${actions}</span>`);
+    }
+    return `<tr>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
+  }).join("");
+
+  return `<table class="list-table"><thead><tr>${headCells.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${bodyRows}</tbody></table>`;
+}
+
+/* 手機(<1024px)deck view:一人一卡,關鍵欄位分行排版 — §階段2-8 */
+function buildPersonCard(person){
+  const tier = piiTier();
+  const specificSession = listSessionFilter !== "全部" ? listSessionFilter : null;
+  const canManage = can("manage_registration");
+  const canEditPii = can("edit_pii");
+  const revealed = revealedIds.has(person.id);
+
+  let sessionFieldsHtml = "";
+  if (specificSession){
+    const f = participationFields(person.id, specificSession);
+    sessionFieldsHtml = `
+      <div class="pc-field"><span class="l">區塊</span><span>${esc(f.block)}</span></div>
+      <div class="pc-field"><span class="l">服裝</span><span>${esc(f.costume)}</span></div>
+      <div class="pc-field"><span class="l">位置</span><span class="mono">${esc(f.seat)}</span></div>`;
+  }
+
+  const contactFieldsHtml = tier === "full" ? `
+      <div class="pc-field"><span class="l">電話</span><span class="mono">${esc(person.phone)}</span></div>
+      <div class="pc-field"><span class="l">Email</span><span class="mono" style="font-size:var(--fs-xs)">${esc(person.email)}</span></div>
+      <div class="pc-field"><span class="l">身分證</span><span class="mono">${esc(revealed ? person.idNumber : maskId(person.idNumber))} <button class="btn btn-sm" data-reveal="${person.id}">${revealed ? "隱藏" : "顯示"}</button></span></div>
+      <div class="pc-field"><span class="l">出生年月日</span><span>${fmtDate(person.birthDate)}</span></div>
+      <div class="pc-field"><span class="l">年齡</span><span>${person.age}</span></div>` : `
+      <div class="pc-field"><span class="l">電話</span><span class="mono">${esc(person.phone)}</span></div>
+      <div class="pc-field"><span class="l">年齡</span><span>${person.age}</span></div>`;
+
+  const actions = [];
+  if (canManage) actions.push(`<button class="btn btn-sm" data-manage="${person.id}">報名管理</button>`);
+  if (canEditPii) actions.push(`<button class="btn btn-sm btn-ghost" data-editpii="${person.id}">編輯人事資料</button>`);
+
+  return `
+  <div class="card person-card">
+    <div class="pc-head">
+      <div>
+        <div class="pc-name">${esc(person.name)}${person.id === "ME" ? " (我)" : ""}</div>
+        <div class="pc-sub">${tier === "full" ? esc(person.gender) + " · " : ""}${esc(person.lianQu)} · ${esc(person.category || "—")}</div>
+      </div>
+      ${specificSession ? "" : participationBadgeHtml(person.id)}
+    </div>
+    <div class="pc-tags"><span class="chip chip-heqi">${esc(person.heQi)}和氣</span></div>
+    <div class="pc-fields">${sessionFieldsHtml}${contactFieldsHtml}</div>
+    ${specificSession ? "" : participationChipsListHtml(person.id)}
+    ${actions.length ? `<div class="pc-actions">${actions.join("")}</div>` : ""}
+  </div>`;
+}
+function buildPeopleDeck(rows){
+  if (rows.length === 0){
+    return `<div class="card empty-state">${svgIcon('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>')}<h4>查無符合的志工</h4><p>試試調整搜尋或篩選條件。</p></div>`;
+  }
+  return rows.map(buildPersonCard).join("");
+}
+
+function bindListRowEvents(rows){
+  document.querySelectorAll("#listTableWrap [data-reveal], #peopleDeck [data-reveal]").forEach((btn) => {
+    btn.onclick = () => {
+      const id = btn.dataset.reveal;
+      if (revealedIds.has(id)) revealedIds.delete(id); else revealedIds.add(id);
+      renderList();
+    };
+  });
+  document.querySelectorAll("#listTableWrap [data-manage], #peopleDeck [data-manage]").forEach((btn) => {
+    btn.onclick = () => openManageModal(rows.find((r) => r.id === btn.dataset.manage));
+  });
+  document.querySelectorAll("#listTableWrap [data-editpii], #peopleDeck [data-editpii]").forEach((btn) => {
+    btn.onclick = () => openEditPiiModal(rows.find((r) => r.id === btn.dataset.editpii));
+  });
+}
+
+/* ＋新增人員(cap manage_staff:合心人事/合心行政) — §階段2-9 */
+function openAddPersonModal(){
+  openModal(`
+    <h3>＋ 新增人員(Demo)</h3>
+    <form id="addPersonForm">
+      <div class="field"><label for="apName">姓名</label><input id="apName" class="text-input" required placeholder="請輸入姓名"></div>
+      <div class="field"><label for="apGender">性別</label><select id="apGender"><option>女</option><option>男</option></select></div>
+      <div class="field"><label for="apHeqi">和氣</label><select id="apHeqi">${HEQI.map((h) => `<option>${h}</option>`).join("")}</select></div>
+      <div class="field"><label for="apLianqu">聯區</label><input id="apLianqu" class="text-input" disabled></div>
+      <div class="field"><label for="apCategory">類別</label><select id="apCategory"><option>工作人員</option>${CATEGORY_POOL.map((c) => `<option>${c}</option>`).join("")}</select></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-modal-close>取消</button>
+        <button type="submit" class="btn btn-primary" style="width:auto;">新增(Demo)</button>
+      </div>
+    </form>
+  `);
+  const heqiSel = document.getElementById("apHeqi");
+  const lianquInput = document.getElementById("apLianqu");
+  const syncLianqu = () => { lianquInput.value = LIANQU_OF[heqiSel.value] || ""; };
+  heqiSel.onchange = syncLianqu;
+  syncLianqu();
+  document.getElementById("addPersonForm").onsubmit = (e) => {
+    e.preventDefault();
+    const name = document.getElementById("apName").value.trim() || "新志工";
+    showToast("已新增人員「" + name + "」(Demo)", "ok");
+    closeModal();
+  };
+}
+
+function renderList(){
+  const p = state.persona;
+  document.getElementById("listPageSub").textContent =
+    piiTier() === "full" ? "志工名冊 · 完整資料(人事/行政)" : "志工名冊 · 聯絡資料";
+
+  const addBtn = document.getElementById("addPersonBtn");
+  if (addBtn){
+    addBtn.style.display = can("manage_staff") ? "" : "none";
+    addBtn.onclick = openAddPersonModal;
+  }
+
+  const rows = scopedPeople();
+  const heQiOptions = Array.from(new Set(rows.map((x) => x.heQi))).sort();
+
+  const filtered = rows.filter((x) => {
+    if (listSearch && !x.name.includes(listSearch)) return false;
+    if (listHeQiFilter !== "全部" && x.heQi !== listHeQiFilter) return false;
+    if (listSessionFilter !== "全部" && !personParticipations(x.id).some((pt) => pt.session === listSessionFilter)) return false;
+    if (listCategoryFilter !== "全部" && x.category !== listCategoryFilter) return false;
+    return true;
+  });
+
+  document.getElementById("listFilters").innerHTML = `
+    <div class="select-field">
+      <label for="listHeQiSel">和氣</label>
+      <select id="listHeQiSel">
+        <option value="全部">全部和氣</option>
+        ${heQiOptions.map((h) => `<option value="${h}" ${h === listHeQiFilter ? "selected" : ""}>${h}</option>`).join("")}
+      </select>
+    </div>
+    <div class="select-field">
+      <label for="listSessionSel">場次</label>
+      <select id="listSessionSel">
+        <option value="全部">全部場次</option>
+        ${SESSIONS.map((s) => `<option value="${s.id}" ${s.id === listSessionFilter ? "selected" : ""}>${s.label} ${s.name}</option>`).join("")}
+      </select>
+    </div>
+    <div class="select-field">
+      <label for="listCategorySel">類別</label>
+      <select id="listCategorySel">
+        <option value="全部">全部類別</option>
+        ${CATEGORY_POOL.map((c) => `<option value="${c}" ${c === listCategoryFilter ? "selected" : ""}>${c}</option>`).join("")}
+      </select>
+    </div>
+  `;
+  document.getElementById("listHeQiSel").onchange = (e) => { listHeQiFilter = e.target.value; renderList(); };
+  document.getElementById("listSessionSel").onchange = (e) => { listSessionFilter = e.target.value; renderList(); };
+  document.getElementById("listCategorySel").onchange = (e) => { listCategoryFilter = e.target.value; renderList(); };
+
+  document.getElementById("listCountNote").textContent =
+    `共 ${filtered.length} 筆(範圍內總數 ${rows.length} 筆)` + (filtered.length > 60 ? ",顯示前 60 筆" : "");
+
+  const shown = filtered.slice(0, 60);
+  document.getElementById("peopleDeck").innerHTML = buildPeopleDeck(shown);
+  document.getElementById("listTableWrap").innerHTML = buildListTable(shown);
+  bindListRowEvents(shown);
+}
+
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.id === "listSearch"){
+    listSearch = e.target.value.trim();
+    if (parseHash().screen === "list") renderList();
+  }
+});
+
+/* ---------- modal (報名管理 / 編輯人事資料) ---------- */
+function modalEscHandler(e){ if (e.key === "Escape") closeModal(); }
+function openModal(html){
+  document.getElementById("modalBody").innerHTML = html;
+  document.getElementById("modalBackdrop").classList.add("open");
+  document.addEventListener("keydown", modalEscHandler);
+}
+function closeModal(){
+  document.getElementById("modalBackdrop").classList.remove("open");
+  document.removeEventListener("keydown", modalEscHandler);
+}
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.id === "modalBackdrop") closeModal();
+  if (e.target.closest && e.target.closest("[data-modal-close]")) closeModal();
+});
+
+function openManageModal(person){
+  if (!person) return;
+  openModal(`
+    <h3>報名管理 · ${esc(person.name)}</h3>
+    <form id="manageForm">
+      <div class="field">
+        <label for="mgSession">場次</label>
+        <select id="mgSession">${SESSIONS.map((s) => `<option>${s.label} ${s.name}</option>`).join("")}</select>
+      </div>
+      <div class="field">
+        <label for="mgSeat">座位編號</label>
+        <input id="mgSeat" class="text-input" type="text" placeholder="例如 B-48-21">
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-modal-close>取消</button>
+        <button type="button" class="btn" style="border-color:var(--danger); color:var(--danger)" id="mgRemoveBtn">刪除報名</button>
+        <button type="submit" class="btn btn-primary" style="width:auto;">儲存</button>
+      </div>
+    </form>
+  `);
+  document.getElementById("manageForm").onsubmit = (e) => {
+    e.preventDefault();
+    showToast("已更新報名資料(Demo)", "ok");
+    closeModal();
+  };
+  document.getElementById("mgRemoveBtn").onclick = () => {
+    showToast("已刪除報名(Demo)", "ok");
+    closeModal();
+  };
+}
+
+function openEditPiiModal(person){
+  if (!person) return;
+  openModal(`
+    <h3>編輯人事資料 · ${esc(person.name)}</h3>
+    <form id="piiForm">
+      <div class="field"><label for="piiName">姓名</label><input id="piiName" class="text-input" value="${esc(person.name)}"></div>
+      <div class="field"><label for="piiPhone">電話</label><input id="piiPhone" class="text-input" value="${esc(person.phone)}"></div>
+      <div class="field"><label for="piiEmail">Email</label><input id="piiEmail" class="text-input" value="${esc(person.email)}"></div>
+      <div class="field"><label for="piiIdNo">身分證字號</label><input id="piiIdNo" class="text-input" value="${esc(person.idNumber)}"></div>
+      <div class="field"><label for="piiBirth">出生年月日</label><input id="piiBirth" class="text-input" type="date" value="${fmtDate(person.birthDate)}"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-modal-close>取消</button>
+        <button type="submit" class="btn btn-primary" style="width:auto;">儲存</button>
+      </div>
+    </form>
+  `);
+  document.getElementById("piiForm").onsubmit = (e) => {
+    e.preventDefault();
+    showToast("已更新人事資料(Demo)", "ok");
+    closeModal();
+  };
+}
+
+/* ---------- router ---------- */
+function parseHash(){
+  const h = (location.hash || "#/overview").replace(/^#\//, "");
+  const parts = h.split("/");
+  return { screen: parts[0] || "overview", id: parts[1] };
+}
+
+function route(){
+  const { screen, id } = parseHash();
+  const allowed = navItemsFor(state.persona);
+  let key = allowed.includes(screen) ? screen : (state.persona.kind === "personal" ? "me" : "overview");
+  if (key !== screen){
+    history.replaceState(null, "", "#/" + key);
+  }
+  document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("active", s.dataset.screen === key));
+  updateNav(key);
+  window.scrollTo({ top:0 });
+
+  if (key === "overview") renderOverview();
+  else if (key === "events"){
+    if (id){
+      renderEventDetail(id);
+    } else {
+      document.getElementById("eventsListView").style.display = "";
+      document.getElementById("eventDetailView").style.display = "none";
+      renderEventsList();
+    }
+  }
+  else if (key === "approvals") renderApprovals();
+  else if (key === "transport") renderTransport();
+  else if (key === "list") renderList();
+  else if (key === "seats") renderSeats();
+  else if (key === "me") renderMe();
+}
+
+window.addEventListener("hashchange", route);
+window.addEventListener("DOMContentLoaded", () => {
+  buildNav();
+  renderPersonaChrome();
+  route();
+});
+
+/* ---------- PWA: service worker + install prompt ---------- */
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById("installBanner").classList.remove("hidden");
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("installBtn");
+  if (btn) btn.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    document.getElementById("installBanner").classList.add("hidden");
+  });
+});
+</script>
+</body>
+</html>
